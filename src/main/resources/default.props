@@ -1,0 +1,3 @@
+DatabaseURL = jdbc:mysql://localhost:3306/BeDone
+DatabaseUsername = root
+DatabasePassword = test1234

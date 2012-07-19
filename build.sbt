@@ -8,11 +8,14 @@ version := "0.1"            // 我們的專案版本
 
 scalaVersion := "2.9.2"     // 我們要使用的 Scala 版本
 
+resolvers += "Scala-Tools Maven2 Snapshots Repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
+
 libraryDependencies ++= Seq(
     "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
     "javax.servlet" % "servlet-api" % "2.5" % "provided",
-    "net.liftweb" % "lift-webkit_2.9.1" % "2.4" % "compile",
-    "net.liftweb" % "lift-squeryl-record_2.9.1" % "2.4" % "compile"
+    "mysql" % "mysql-connector-java" % "5.1.6",
+    "net.liftweb" % "lift-webkit_2.9.2" % "2.5-SNAPSHOT" % "compile->default",
+    "net.liftweb" % "lift-squeryl-record_2.9.2" % "2.5-SNAPSHOT"
 )
 
 

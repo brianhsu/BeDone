@@ -1,4 +1,4 @@
-<div class="modal hide" id="signupModal">
+<div class="modal hide" id="signupModal" data-lift="Signup">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3>Sign Up BeDone</h3>
@@ -6,11 +6,11 @@
   <div class="modal-body">
     <form class="form-horizontal">
       <fieldset>
-        <div class="control-group">
+        <div class="control-group" id="usernameGroup">
           <label class="control-label" for="username">Username:</label>
           <div class="controls">
             <input type="text" id="username">
-            <span class="help-inline"></span>
+            <span class="help-inline" id="usernameMsg"></span>
           </div>
         </div>
         <div class="control-group">
@@ -39,7 +39,7 @@
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-    <a href="#" class="btn btn-primary">Sign Up</a>
+    <a href="#" class="btn btn-primary" id="signup">Sign Up</a>
   </div>
   <script type="text/javascript" language="JavaScript">
   <!--
