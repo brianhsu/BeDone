@@ -11,7 +11,8 @@ scalaVersion := "2.9.2"     // 我們要使用的 Scala 版本
 libraryDependencies ++= Seq(
     "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
     "javax.servlet" % "servlet-api" % "2.5" % "provided",
-    "net.liftweb" % "lift-webkit_2.9.1" % "2.4" % "compile"
+    "net.liftweb" % "lift-webkit_2.9.1" % "2.4" % "compile",
+    "net.liftweb" % "lift-squeryl-record_2.9.1" % "2.4" % "compile"
 )
 
 
