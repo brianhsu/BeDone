@@ -5,6 +5,7 @@ package bootstrap.liftweb
 import net.liftweb.http.LiftRules
 import net.liftweb.http.Html5Properties
 import net.liftweb.http.Req
+import net.liftweb.record.field.PasswordField
 
 class Boot {
     def boot {
@@ -16,6 +17,8 @@ class Boot {
         LiftRules.htmlProperties.default.set { r: Req => 
             new Html5Properties(r.userAgent)
         }
+
+        PasswordField.minPasswordLength = 7
 
         DBSettings.initDB()
     }

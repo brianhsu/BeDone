@@ -9,11 +9,13 @@ import net.liftweb.util.FieldError
 import net.liftweb.record.field._
 import net.liftweb.record.Field
 import net.liftweb.record.BaseField
+import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
 
 import net.liftweb.util.FieldIdentifier
 
 import net.liftweb.http.SHtml
+import net.liftweb.http.SHtml.ElemAttr
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
@@ -23,63 +25,99 @@ import net.liftweb.http.js.JE.JsRaw
 import scala.xml.NodeSeq
 import scala.xml.Text
 
-class SignupDialog {
+class SignupDialog extends AjaxForm[User]
+{
+    private var confirmPassword: String = _
 
-    val record = Publisher.createRecord
+    override protected val record = User.createRecord
+    override protected val fields = List(record.username, record.email, record.password)
 
-    object Form extends AjaxForm[Publisher] {
-        val record = SignupDialog.this.record
+    def saveAndClose(): JsCmd = {
+        record.saveTheRecord() 
+        JsRaw(""" $('#signupModal').modal('hide') """)
     }
 
-    def closeDialog: JsCmd = JsRaw(""" $('#signupModal').modal('toogle') """)
     def signup(): JsCmd = {
 
         record.validate match {
-            case Nil    => closeDialog
-            case errors => 
-                println(errors) 
-                Form.showAllError(errors)
+            case Nil if isPasswordConfirmed => saveAndClose()
+            case errors => passwordConfirmJS & this.showAllError(errors)
         }
     }
 
+    def isPasswordConfirmed = record.password.match_?(this.confirmPassword)
+
+    def passwordConfirmJS: JsCmd = {
+        val fieldID = "confirmPassword"
+
+         isPasswordConfirmed match {
+            case true  => removeFieldError(fieldID)
+            case false => showFieldError(fieldID, Text("密碼不一致"))
+        }
+    }
+
+    def confirmPasswordBinding() =
+    {
+        val fieldID = "confirmPassword"
+        val messageID = fieldID + "_msg"
+
+        def ajaxTest(value: String) = {
+            this.confirmPassword = value
+            passwordConfirmJS
+        }
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> "Confirm Password" &
+            ".help-inline [id]" #> messageID &
+            "input" #> SHtml.textAjaxTest("", doNothing _, ajaxTest _, "type" -> "password")
+        )
+    }
+
+    override def cssBinding: List[net.liftweb.util.CssSel] = 
+        super.cssBinding :+ confirmPasswordBinding
+
     def render = 
-        ".modal-body *" #> Form.toForm &
+        ".modal-body *" #> this.toForm &
         ".btn-primary" #> SHtml.a(signup _, Text("註冊"))
-                
 }
 
 abstract class AjaxForm[T <: Record[T]]
 {
-    val record: T
+    protected val record: T
+    protected def fields = record.allFields.filter(_.name != "idField")
 
-    private lazy val xs = record.allFields.filter(_.name != "idField")
     private lazy val template = Templates("templates-hidden" :: "test" :: Nil)
 
-    def showFieldError(fieldError: FieldError): JsCmd =
-    {
-        val fieldID = fieldError.field.uniqueFieldId.get
+    def showFieldError(fieldID: String, message: NodeSeq): JsCmd = {
         val messageID = fieldID + "_msg"
 
-        JqSetHtml(messageID, <span>{fieldError.msg}</span>) &
+        JqSetHtml(messageID, message) &
         JsRaw(""" $('#%s').addClass('error') """.format(fieldID))
     }
 
-    def removeFieldError(field: BaseField) =
-    {
-        val fieldID = field.uniqueFieldId.get
+    def removeFieldError(fieldID: String, helpMessage: NodeSeq = NodeSeq.Empty): JsCmd = {
         val messageID = fieldID + "_msg"
 
-        JqSetHtml(messageID, field.helpAsHtml.openOr(Text(""))) &
+        JqSetHtml(messageID, helpMessage) &
         JsRaw(""" $('#%s').removeClass('error') """.format(fieldID))
     }
 
-    def ajaxTextField(field: BaseField, defaultValue: String)
+    def showFieldError(fieldError: FieldError): JsCmd = {
+        showFieldError(fieldError.field.uniqueFieldId.get, fieldError.msg)
+    }
+
+    def removeFieldError(field: BaseField): JsCmd = {
+        removeFieldError(field.uniqueFieldId.get, field.helpAsHtml.openOr(Text("")))
+    }
+
+    def doNothing(value: String) {}
+
+    def ajaxTextField(field: BaseField, defaultValue: String, attrs: ElemAttr*)
                      (setValue: (String) => Any) =
     {
         val fieldID = field.uniqueFieldId.get
         val messageID = fieldID + "_msg"
-
-        def doNothing(value: String) {}
 
         def ajaxTest(value: String) = {
             setValue(value)
@@ -91,7 +129,7 @@ abstract class AjaxForm[T <: Record[T]]
             ".control-label *" #> field.displayName &
             ".help-inline [id]" #> messageID &
             ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
-            "input" #> SHtml.textAjaxTest(defaultValue, doNothing _, ajaxTest _)
+            "input" #> SHtml.textAjaxTest(defaultValue, doNothing _, ajaxTest _, attrs:_*)
         )
     }
 
@@ -116,10 +154,18 @@ abstract class AjaxForm[T <: Record[T]]
         }
     }
 
+    def passwordFieldToForm(field: PasswordField[_]) =
+    {
+        ajaxTextField(field, "", "type" -> "password") { value =>
+            field(value)
+        } 
+    }
+
     def toForm(field: net.liftweb.record.Field[_, _]) = field match {
         case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)
         case f: OptionalStringField[_] => optionalStringFieldToForm(f)
+        case f: PasswordField[_] => passwordFieldToForm(f)
         case y => ".control-label *" #> ("Not String Type " + y.name)
     }
 
@@ -134,8 +180,10 @@ abstract class AjaxForm[T <: Record[T]]
         error.map(showFieldError)
     }
 
+    def cssBinding = fields.map(toForm)
+
     def toForm: NodeSeq = {
-        val cssBinder = "fieldset *" #> record.allFields.filter(_.name != "idField").map(toForm)
+        val cssBinder = "fieldset *" #> cssBinding
         template.map(cssBinder).openOr(<span>Form Generate Error</span>)
     }
 
