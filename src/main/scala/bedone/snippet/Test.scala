@@ -73,19 +73,25 @@ abstract class AjaxForm[T <: Record[T]]
         JsRaw(""" $('#%s').removeClass('error') """.format(fieldID))
     }
 
-    def ajaxTextField(field: BaseField, defaultValue: String, ajaxTest: (String) => JsCmd) =
+    def ajaxTextField(field: BaseField, defaultValue: String)
+                     (setValue: (String) => Any) =
     {
         val fieldID = field.uniqueFieldId.get
         val messageID = fieldID + "_msg"
 
         def doNothing(value: String) {}
 
+        def ajaxTest(value: String) = {
+            setValue(value)
+            validationJS(field, field.validate)
+        }
+
         ".control-group [id]" #> fieldID &
         ".control-group *" #> (
             ".control-label *" #> field.displayName &
             ".help-inline [id]" #> messageID &
             ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
-            "input" #> SHtml.textAjaxTest(defaultValue, doNothing _, ajaxTest)
+            "input" #> SHtml.textAjaxTest(defaultValue, doNothing _, ajaxTest _)
         )
     }
 
@@ -96,26 +102,22 @@ abstract class AjaxForm[T <: Record[T]]
 
     def optionalStringFieldToForm(field: OptionalStringField[_]) =
     {
-        def ajaxTest(value: String) = {
-            field.set(if(value.trim.length > 0) Some(value) else None)
-            validationJS(field, field.validate)
-        }
+        val defaultValue = field.defaultValueBox.openOr("").toString
 
-        ajaxTextField(field, field.defaultValueBox.openOr("").toString, ajaxTest _)
+        ajaxTextField(field, defaultValue) { value =>
+            field.set(if(value.trim.length > 0) Some(value) else None)
+        }
     }
 
-    def stringFieldToForm(field: StringField[_], checkEmpty: Boolean = true) =
+    def stringFieldToForm(field: StringField[_]) =
     {
-        def ajaxTest(value: String) = {
+        ajaxTextField(field, field.defaultValue) { value =>
             field(value)
-            validationJS(field, field.validate)
         }
-
-        ajaxTextField(field, field.defaultValue, ajaxTest _)
     }
 
     def toForm(field: net.liftweb.record.Field[_, _]) = field match {
-        case f: EmailField[_]  => stringFieldToForm(f, false)
+        case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)
         case f: OptionalStringField[_] => optionalStringFieldToForm(f)
         case y => ".control-label *" #> ("Not String Type " + y.name)
