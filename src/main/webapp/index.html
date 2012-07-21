@@ -26,9 +26,23 @@
           <p><a class="btn" href="#">View details &raquo;</a></p>
         </div>
       </div>
-      <div data-lift="lift:embed?what=signup"></div>
+      <div class="modal hide" id="signupModal" data-lift="SignupDialog">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <h3>註冊</h3>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <a href="#" class="btn close-link" data-dismiss="modal">取消</a>
+          <a href="#" class="btn btn-primary">註冊</a>
+        </div>
+        <script type="text/javascript">
+        <!--
+            $('#signupModal').modal();
+        -->
+        </script>
+      </div>
     </div>
-
   </body>
 </html>
 
