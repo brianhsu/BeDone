@@ -15,6 +15,7 @@ import scala.xml.Text
 
 class SignupDialog extends AjaxForm[User]
 {
+    private implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
     private var confirmPassword: String = _
 
     override protected val record = User.createRecord
@@ -22,14 +23,17 @@ class SignupDialog extends AjaxForm[User]
 
     def saveAndClose(): JsCmd = {
         record.saveTheRecord() 
-        JsRaw(""" $('#signupModal').modal('hide') """)
+        
+        """$('#signupModal').modal('hide')""" & resetButton
     }
+
+    def resetButton: JsCmd = """$('#signupButton').button('reset')"""
 
     def signup(): JsCmd = {
 
         record.validate match {
             case Nil if isPasswordConfirmed => saveAndClose()
-            case errors => passwordConfirmJS & this.showAllError(errors)
+            case errors => passwordConfirmJS & this.showAllError(errors) & resetButton
         }
     }
 
@@ -73,6 +77,6 @@ class SignupDialog extends AjaxForm[User]
         ".modal-body *" #> this.toForm &
         ".close" #> SHtml.ajaxButton("×", reInitForm _) &
         ".close-link" #> SHtml.a(reInitForm _, Text("取消"), "href" -> "javascript:void(0)") &
-        ".btn-primary" #> SHtml.a(signup _, Text("註冊"), "href" -> "javascript:void(0)")
+        "#signupButton" #> SHtml.ajaxButton(Text("註冊"), signup _)
 }
 
