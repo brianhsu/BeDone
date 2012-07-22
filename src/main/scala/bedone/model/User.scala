@@ -1,33 +1,26 @@
 package org.bedone.model
 
 import net.liftweb.common.{Box, Full, Empty, Failure}
-import net.liftweb.record.MetaRecord
-import net.liftweb.record.Record
+
 import net.liftweb.util.FieldError
 
-import net.liftweb.record.BaseField
+import net.liftweb.record.MetaRecord
+import net.liftweb.record.Record
 import net.liftweb.record.field.LongField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.PasswordField
-import net.liftweb.record.field.OptionalEmailField
 import net.liftweb.record.field.EmailField
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
-import net.liftweb.common.Full
 
 import org.squeryl.annotations.Column
-import org.squeryl.Schema
 import scala.xml.Text
 
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
-
-object BeDoneSchema extends Schema {
-    val users = table[User]("users")
-}
 
 object User extends User with MetaRecord[User]
 {
@@ -46,22 +39,6 @@ object User extends User with MetaRecord[User]
             case List(user) => Full(user)
             case Nil => Empty
             case _   => Failure("more than one user has email:" + username)
-        }
-    }
-}
-
-trait MyValidation
-{
-    def isAlphaNumeric(field: BaseField)(value: String): List[FieldError] = {
-
-        val isOK = value.forall { c =>
-            (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-            (c >= '0' && c <= '9') || (c == '_')
-        }
-
-        isOK match {
-            case true  => Nil
-            case false => List(FieldError(field, "只能使用英文字母、數字和底線"))
         }
     }
 }
@@ -126,5 +103,3 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         postAction
     }
 }
-
-
