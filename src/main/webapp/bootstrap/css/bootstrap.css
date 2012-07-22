@@ -2397,7 +2397,6 @@ table .span24 {
   z-index: 1000;
   display: none;
   float: left;
-  min-width: 160px;
   padding: 4px 0;
   margin: 1px 0 0;
   list-style: none;

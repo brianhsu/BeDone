@@ -72,7 +72,7 @@ class SignupDialog extends AjaxForm[User]
     def render = 
         ".modal-body *" #> this.toForm &
         ".close" #> SHtml.ajaxButton("×", reInitForm _) &
-        ".close-link" #> SHtml.a(reInitForm _, Text("取消")) &
-        ".btn-primary" #> SHtml.a(signup _, Text("註冊"))
+        ".close-link" #> SHtml.a(reInitForm _, Text("取消"), "href" -> "javascript:void(0)") &
+        ".btn-primary" #> SHtml.a(signup _, Text("註冊"), "href" -> "javascript:void(0)")
 }
 

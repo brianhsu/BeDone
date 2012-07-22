@@ -20,6 +20,11 @@ import org.squeryl.annotations.Column
 import org.squeryl.Schema
 import scala.xml.Text
 
+import net.liftweb.http.SessionVar
+import net.liftweb.http.S
+
+object CurrentUser extends SessionVar[Box[User]](Empty)
+
 object BeDoneSchema extends Schema {
     val users = table[User]("users")
 }
@@ -108,6 +113,17 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         } catch {
             case e => new Failure("Error in insert to user table", Full(e), Empty)
         }
+    }
+
+    def logout(postAction: => Any = ()) {
+        CurrentUser.set(Empty)
+        postAction
+        S.session.foreach(_.destroySession)
+    }
+
+    def login(postAction: => Any = ()) {
+        CurrentUser.set(Full(this))
+        postAction
     }
 }
 
