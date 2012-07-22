@@ -2,4 +2,4 @@ project/project/
 project/target/
 target/
 *.swp
-src/main/resources/USBGentoo.props
+src/main/resources/default.props
