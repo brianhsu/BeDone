@@ -25,7 +25,7 @@ abstract class AjaxForm[T <: Record[T]]
     protected val record: T
     protected def fields = record.allFields.filter(_.name != "idField")
 
-    private lazy val template = Templates("templates-hidden" :: "test" :: Nil)
+    private lazy val template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
 
     def showFieldError(fieldID: String, message: NodeSeq): JsCmd = {
         val messageID = fieldID + "_msg"
