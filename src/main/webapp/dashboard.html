@@ -4,11 +4,16 @@
     <meta charset="utf-8">
     <title>BeDone</title>
   </head>
-
   <body class="lift:content_id=main">
-
-    <div id="main" class="main lift:surround?with=default;at=content">
-        Hello World
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        SideBar
+      </div>
+      <div class="hero-unit">
+        <h1>Be Done!</h1>
+        <p class="heroText">BeDone is a GTD style TODO list.</p>
+        <p><a class="btn btn-primary btn-large" data-toggle="modal" href="#signupModal">Sign Up &raquo;</a></p>
+      </div>
     </div>
   </body>
 </html>

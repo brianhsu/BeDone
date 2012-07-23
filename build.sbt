@@ -20,4 +20,5 @@ libraryDependencies ++= Seq(
     "net.liftweb" % "lift-squeryl-record_2.9.2" % "2.5-SNAPSHOT"
 )
 
+port in container.Configuration := 8081
 
