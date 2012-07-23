@@ -16,9 +16,13 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds.JqSetHtml
+import net.liftweb.util.Helpers.tryo
 
 import scala.xml.NodeSeq
 import scala.xml.Text
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 abstract class AjaxForm[T <: Record[T]]
 {
@@ -118,11 +122,42 @@ abstract class AjaxForm[T <: Record[T]]
         )
     }
 
+    def optionalDateTimeFieldToForm(field: OptionalDateTimeField[_]) = {
+        val fieldID = field.uniqueFieldId.get
+        val messageID = fieldID + "_msg"
+
+        def ajaxTest(value: String) = {
+
+            if (value.trim.length > 0) {
+                val deadline = tryo { 
+                    val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+                    val calendar = Calendar.getInstance
+                    dateFormatter.setLenient(false)
+                    calendar.setTime(dateFormatter.parse(value))
+                    calendar
+                }
+                field.setBox(deadline)
+            }
+           
+            validationJS(field, field.validate)
+        }
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> field.displayName &
+            ".help-inline [id]" #> messageID &
+            ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
+            "input" #> SHtml.textAjaxTest("", doNothing _, ajaxTest _)
+        )
+    }
+
+
     def toForm(field: net.liftweb.record.Field[_, _]) = field match {
         case f: TextareaField[_] => textareaFieldToForm(f)
         case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)
         case f: OptionalStringField[_] => optionalStringFieldToForm(f)
+        case f: OptionalDateTimeField[_] => optionalDateTimeFieldToForm(f)
         case f: PasswordField[_] => passwordFieldToForm(f)
         case y => ".control-label *" #> ("Not String Type " + y.name)
     }

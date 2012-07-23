@@ -1,6 +1,8 @@
 package org.bedone.model
 
 import net.liftweb.common.Box
+import net.liftweb.common.Full
+
 import net.liftweb.util.Helpers.tryo
 
 import net.liftweb.util.FieldError
@@ -32,8 +34,9 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
 
     @Column(name="id")
     val idField = new LongField(this, 1)
-
     val userID = new LongField(this, 1)
+    val createTime = new DateTimeField(this)
+
     val title = new StringField(this, "") {
         override def displayName = "標題"
         override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
@@ -41,7 +44,9 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
     val description = new TextareaField(this, 1000) {
         override def displayName = "描述"
     }
-    val createTime = new DateTimeField(this)
-    val deadline = new OptionalDateTimeField(this)
+    val deadline = new OptionalDateTimeField(this) {
+        override def displayName = "期限"
+        override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
+    }
 }
 
