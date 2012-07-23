@@ -41,6 +41,8 @@ object User extends User with MetaRecord[User]
             case _   => Failure("more than one user has email:" + username)
         }
     }
+
+    def isLoggedIn = CurrentUser.get.isDefined
 }
 
 class User extends Record[User] with KeyedRecord[Long] with MyValidation

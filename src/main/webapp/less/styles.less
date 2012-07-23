@@ -1,0 +1,54 @@
+body {
+  /* 60px to make the container go all the way to the bottom of the topbar */
+  padding-top: 60px; 
+}
+
+.heroText {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.alert ul {
+    list-style: none;
+    margin-top:0.4em;
+}
+
+.ajax-loader {
+    margin-top: 0.3%;
+    display: none;
+}
+
+.ajax-loader-modal {
+    float: left;
+    display: none;
+}
+
+.rounded-corners (@radius: 5px) {
+  border-radius: @radius;
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+}
+
+@sidebarBackground: #FAFAD2;
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  box-shadow:         @style @c;
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+}
+
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+.sidebar {
+    background: @sidebarBackground;
+    padding: 5px;
+    .rounded-corners(10px);
+    .box-shadow(0 0 5px, 30%);
+}
+
+.sidebarIcon {
+    margin-top:3px;
+    padding-right: 5px;
+}
