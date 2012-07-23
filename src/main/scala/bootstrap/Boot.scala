@@ -2,12 +2,18 @@
 
 package bootstrap.liftweb
 
+import org.bedone.model.User
+
 import net.liftweb.common.Full
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.Html5Properties
 import net.liftweb.http.Req
+
 import net.liftweb.record.field.PasswordField
+import net.liftweb.sitemap.SiteMap
+import net.liftweb.sitemap.Menu
+import net.liftweb.sitemap.Loc._
 
 class Boot 
 {
@@ -33,6 +39,13 @@ class Boot
         LiftRules.htmlProperties.default.set { r: Req => 
             new Html5Properties(r.userAgent)
         }
+
+        def siteMap = SiteMap(
+            Menu.i("Index") / "index",
+            (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入")
+        )
+
+        LiftRules.setSiteMap(siteMap)
 
         initAjaxLoader()
         PasswordField.minPasswordLength = 7
