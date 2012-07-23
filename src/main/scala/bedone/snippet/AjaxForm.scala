@@ -99,7 +99,27 @@ abstract class AjaxForm[T <: Record[T]]
         } 
     }
 
+    def textareaFieldToForm(field: TextareaField[_]) = {
+        val fieldID = field.uniqueFieldId.get
+        val messageID = fieldID + "_msg"
+        val defaultValue = field.defaultValue
+
+        def ajaxTest(value: String) = {
+            field.set(value)
+            validationJS(field, field.validate)
+        }
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> field.displayName &
+            ".help-inline [id]" #> messageID &
+            ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
+            "input" #> SHtml.ajaxTextarea(defaultValue, ajaxTest _)
+        )
+    }
+
     def toForm(field: net.liftweb.record.Field[_, _]) = field match {
+        case f: TextareaField[_] => textareaFieldToForm(f)
         case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)
         case f: OptionalStringField[_] => optionalStringFieldToForm(f)

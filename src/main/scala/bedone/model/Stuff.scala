@@ -3,10 +3,13 @@ package org.bedone.model
 import net.liftweb.common.Box
 import net.liftweb.util.Helpers.tryo
 
+import net.liftweb.util.FieldError
+
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
 import net.liftweb.record.field.LongField
 import net.liftweb.record.field.StringField
+import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
 import net.liftweb.record.field.OptionalDateTimeField
 
@@ -31,8 +34,13 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
     val idField = new LongField(this, 1)
 
     val userID = new LongField(this, 1)
-    val title = new StringField(this, "")
-    val description = new StringField(this, "")
+    val title = new StringField(this, "") {
+        override def displayName = "標題"
+        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
+    }
+    val description = new TextareaField(this, 1000) {
+        override def displayName = "描述"
+    }
     val createTime = new DateTimeField(this)
     val deadline = new OptionalDateTimeField(this)
 }
