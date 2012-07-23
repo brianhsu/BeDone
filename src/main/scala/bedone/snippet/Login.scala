@@ -32,7 +32,7 @@ class Login
         } yield user
 
         user.isDefined match {
-            case true => user.open_!.login(S.redirectTo("/dashboard", () => S.notice("Logged in")))
+            case true => user.open_!.login(S.redirectTo("/dashboard"))
             case false => S.error("帳號密碼錯誤")
         }
     }
@@ -51,7 +51,7 @@ class Login
     }
 
     def logout() = {
-        CurrentUser.foreach { _.logout(S.redirectTo("/", () => S.notice("已登出"))) }
+        CurrentUser.foreach { _.logout(S.redirectTo("/")) }
     }
 
     def redirectToHome = {
