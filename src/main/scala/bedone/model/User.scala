@@ -10,6 +10,7 @@ import net.liftweb.record.field.LongField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.PasswordField
 import net.liftweb.record.field.EmailField
+import net.liftweb.record.field.DateTimeField
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -21,6 +22,7 @@ import net.liftweb.http.SessionVar
 import net.liftweb.http.S
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
+
 
 object User extends User with MetaRecord[User]
 {
@@ -104,4 +106,5 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         CurrentUser.set(Full(this))
         postAction
     }
+
 }
