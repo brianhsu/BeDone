@@ -4,7 +4,7 @@ import net.liftweb.util.Props
 import net.liftweb.squerylrecord.SquerylRecord
 
 import org.squeryl.Session
-import org.squeryl.adapters.MySQLAdapter
+import org.squeryl.adapters.MySQLInnoDBAdapter
 
 import java.sql.DriverManager
 
@@ -18,7 +18,7 @@ object DBSettings
 
     def initDB()
     {
-        val adapter = new MySQLAdapter
+        val adapter = new MySQLInnoDBAdapter
 
         SquerylRecord.initWithSquerylSession(Session.create(
             DriverManager.getConnection(dbURL, dbUsername, dbPassword), adapter
