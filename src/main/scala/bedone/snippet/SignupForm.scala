@@ -15,7 +15,6 @@ import scala.xml.Text
 
 class SignupDialog extends AjaxForm[User]
 {
-    private implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
     private var confirmPassword: String = _
 
     override protected val record = User.createRecord
@@ -23,7 +22,6 @@ class SignupDialog extends AjaxForm[User]
 
     def saveAndClose(): JsCmd = {
         record.saveTheRecord() 
-        
         """$('#signupModal').modal('hide')""" & resetButton
     }
 
@@ -66,12 +64,8 @@ class SignupDialog extends AjaxForm[User]
         )
     }
 
-    override def cssBinding: List[net.liftweb.util.CssSel] = 
-        super.cssBinding :+ confirmPasswordBinding
-
-    def reInitForm(): JsCmd = 
-        fields.map(removeFieldError) &
-        removeFieldError("confirmPassword")
+    override def cssBinding = super.cssBinding :+ confirmPasswordBinding
+    override def reInitForm(): JsCmd = super.reInitForm & removeFieldError("confirmPassword")
 
     def render = 
         ".modal-body *" #> this.toForm &

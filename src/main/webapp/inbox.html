@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea" class="sidebar">
+        <ul class="nav nav-list">
+          <li><a href="/dashboard"><i class="icon-home sidebarIcon"></i>Dashboard</a></li>
+          <li class="active"><a href="/inbox"><i class="icon-white icon-inbox sidebarIcon"></i>Inbox</a></li>
+          <li><a href="#"><i class="icon-tasks sidebarIcon"></i>Next Action</a></li>
+          <li><a href="#"><i class="icon-folder-open sidebarIcon"></i>Project</a></li>
+          <li class="divider"></li>
+          <li><a href="#"><i class="icon-thumbs-up sidebarIcon"></i>Someday / Maybe</a></li>
+          <li><a href="#"><i class="icon-book sidebarIcon"></i>Reference</a></li>
+        </ul>
+      </div>
+      <div>
+        <div data-lift="Inbox">
+          <div style="margin-bottom: 1em; text-align: right">
+            <a class="btn btn-primary btn-large" data-toggle="modal" href="#addStuffModal">新增雜事</a>
+            <button class="btn btn-large" id="processButton">處理雜事</button>
+          </div>
+
+          <div class="hero-unit noStuff">
+            太好了，沒有事情要處理！
+          </div>
+          <table class="table table-striped">
+            <tr><th>標題</th><th>描述</th><th>時間</th><th>期限</th></tr>
+            <tr class="stuffs">
+                <td class="title">My Title 1</td>
+                <td class="desc">FFFFFFFFFFFFFF</td>
+                <td class="createTime">2012-03-02 11:11</td>
+                <td class="deadline">2012-03-22 11:11</td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal hide" id="addStuffModal" data-lift="AddStuffDialog">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>新增雜事</h3>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <img src="/images/ajax-loader-modal.gif" id="ajax-loader-signup" class="ajax-loader-modal" alt="" />
+            <a href="#" class="btn close-link" data-dismiss="modal">取消</a>
+            <button class="btn btn-primary" data-loading-text="儲存中..." id="addStuffButton">新增</button>
+          </div>
+          <script type="text/javascript">
+            $('#addStuffButton').click(function() {
+                $(this).button('loading');
+            });
+          </script>
+
+        </div>
+       
+      </div>
+    </div>
+  </body>
+</html>
+

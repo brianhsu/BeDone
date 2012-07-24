@@ -16,16 +16,29 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds.JqSetHtml
+import net.liftweb.util.Helpers.tryo
 
 import scala.xml.NodeSeq
 import scala.xml.Text
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 abstract class AjaxForm[T <: Record[T]]
 {
     protected val record: T
+
+    protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
     protected def fields = record.allFields.filter(_.name != "idField")
+    protected def formID: Option[String] = None
 
     private lazy val template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
+
+    def resetForm: JsCmd = formID.map { id => 
+        jsCmdFromStr("""$('#%s').each(function() { this.reset(); })""".format(id))
+    }.getOrElse(Noop)
+
+    def reInitForm: JsCmd = fields.map(removeFieldError)
 
     def showFieldError(fieldID: String, message: NodeSeq): JsCmd = {
         val messageID = fieldID + "_msg"
@@ -99,10 +112,78 @@ abstract class AjaxForm[T <: Record[T]]
         } 
     }
 
+    def textareaFieldToForm(field: TextareaField[_]) = {
+        val fieldID = field.uniqueFieldId.get
+        val messageID = fieldID + "_msg"
+        val defaultValue = field.defaultValue
+
+        def ajaxTest(value: String) = {
+            field.set(value)
+            validationJS(field, field.validate)
+        }
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> field.displayName &
+            ".help-inline [id]" #> messageID &
+            ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
+            "input" #> SHtml.ajaxTextarea(defaultValue, ajaxTest _)
+        )
+    }
+
+    def optionalDateTimeFieldToForm(field: OptionalDateTimeField[_]) = {
+        val fieldID = field.uniqueFieldId.get
+        val messageID = fieldID + "_msg"
+
+        def ajaxTest(value: String) = {
+
+            println("date ajax text:" + value);
+
+            if (value.trim.length > 0) {
+                val deadline = tryo { 
+                    val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+                    val calendar = Calendar.getInstance
+                    dateFormatter.setLenient(false)
+                    calendar.setTime(dateFormatter.parse(value))
+                    calendar
+                }
+
+                field.setBox(deadline)
+            }
+           
+            validationJS(field, field.validate)
+        }
+
+        val datePickerID = "datetime_" + fieldID
+        val enableDatePickerJS = """
+             $(function() {
+                 $( "#%s" ).datepicker({
+                    dateFormat: "yy-mm-dd",
+                    onClose: function(dateText) {$("#%s").blur();}
+                 });
+             });
+
+        """.format(datePickerID, datePickerID)
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> field.displayName &
+            ".help-inline [id]" #> messageID &
+            ".help-inline *" #> field.helpAsHtml.openOr(Text("")) &
+            "input" #> (
+                SHtml.textAjaxTest("", doNothing _, ajaxTest _, "id" -> datePickerID) ++
+                <script>{enableDatePickerJS}</script>
+            )
+        )
+    }
+
+
     def toForm(field: net.liftweb.record.Field[_, _]) = field match {
+        case f: TextareaField[_] => textareaFieldToForm(f)
         case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)
         case f: OptionalStringField[_] => optionalStringFieldToForm(f)
+        case f: OptionalDateTimeField[_] => optionalDateTimeFieldToForm(f)
         case f: PasswordField[_] => passwordFieldToForm(f)
         case y => ".control-label *" #> ("Not String Type " + y.name)
     }
@@ -121,7 +202,12 @@ abstract class AjaxForm[T <: Record[T]]
     def cssBinding = fields.map(toForm)
 
     def toForm: NodeSeq = {
-        val cssBinder = "fieldset *" #> cssBinding
+        val formBinder = "fieldset *" #> cssBinding
+        val cssBinder = formID match {
+            case Some(id) => formBinder & "form [id]" #> id
+            case None => formBinder
+        }
+
         template.map(cssBinder).openOr(<span>Form Generate Error</span>)
     }
 

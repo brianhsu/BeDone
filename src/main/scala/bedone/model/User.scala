@@ -10,6 +10,7 @@ import net.liftweb.record.field.LongField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.PasswordField
 import net.liftweb.record.field.EmailField
+import net.liftweb.record.field.DateTimeField
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -19,8 +20,10 @@ import scala.xml.Text
 
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
+import net.liftweb.util.Helpers.tryo
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
+
 
 object User extends User with MetaRecord[User]
 {
@@ -85,14 +88,7 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         override def helpAsHtml = Full(Text("至少需要七個字元"))
     }
 
-    override def saveTheRecord(): Box[User] = inTransaction {
-        try {
-            BeDoneSchema.users.insert(this)
-            Full(this)
-        } catch {
-            case e => new Failure("Error in insert to user table", Full(e), Empty)
-        }
-    }
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.users.insert(this)) }
 
     def logout(postAction: => Any = ()) {
         CurrentUser.set(Empty)
@@ -104,4 +100,5 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         CurrentUser.set(Full(this))
         postAction
     }
+
 }
