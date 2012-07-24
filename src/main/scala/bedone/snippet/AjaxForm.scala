@@ -202,7 +202,6 @@ abstract class AjaxForm[T <: Record[T]]
     def cssBinding = fields.map(toForm)
 
     def toForm: NodeSeq = {
-
         val formBinder = "fieldset *" #> cssBinding
         val cssBinder = formID match {
             case Some(id) => formBinder & "form [id]" #> id

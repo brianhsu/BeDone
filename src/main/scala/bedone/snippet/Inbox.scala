@@ -18,13 +18,21 @@ class Inbox
         stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
     }
 
-    def render = {
+    def noStuff = ".table" #> "" & "#processButton [disabled]" #> "disabled"
 
+    def stuffTable = 
+        ".noStuff" #> "" &
         ".stuffs" #> stuffs.map ( stuff =>
             ".title *" #> stuff.title &
-            ".desc *"  #> stuff.description &
+            ".desc *"  #> stuff.descriptionHTML &
             ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
             ".deadline *" #> formatDeadline(stuff)
         )
+
+    def render = {
+        stuffs.isEmpty match {
+            case true  => noStuff
+            case false => stuffTable
+        }
     }
 }

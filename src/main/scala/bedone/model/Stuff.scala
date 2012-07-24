@@ -20,6 +20,8 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
 import net.liftweb.util.Helpers.tryo
+import java.io.StringReader
+import java.io.StringWriter
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
@@ -52,6 +54,17 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
     val deadline = new OptionalDateTimeField(this) {
         override def displayName = "期限"
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
+    }
+
+    def descriptionHTML = {
+        import org.tautua.markdownpapers.Markdown
+        val reader = new StringReader(description.is)
+        val writer = new StringWriter
+        val markdown = new Markdown
+        markdown.transform(reader, writer)
+
+        val rawHTML = "<div>" + writer.toString + "</div>"
+        scala.xml.XML.loadString(rawHTML)
     }
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
