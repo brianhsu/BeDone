@@ -20,6 +20,7 @@ import scala.xml.Text
 
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
+import net.liftweb.util.Helpers.tryo
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
 
@@ -87,14 +88,7 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         override def helpAsHtml = Full(Text("至少需要七個字元"))
     }
 
-    override def saveTheRecord(): Box[User] = inTransaction {
-        try {
-            BeDoneSchema.users.insert(this)
-            Full(this)
-        } catch {
-            case e => new Failure("Error in insert to user table", Full(e), Empty)
-        }
-    }
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.users.insert(this)) }
 
     def logout(postAction: => Any = ()) {
         CurrentUser.set(Empty)

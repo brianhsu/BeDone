@@ -19,6 +19,7 @@ import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
+import net.liftweb.util.Helpers.tryo
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
@@ -48,5 +49,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
         override def displayName = "期限"
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
     }
+
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
 }
 
