@@ -25,7 +25,11 @@ object Stuff extends Stuff with MetaRecord[Stuff]
 {
     def findByUser(user: User): Box[List[Stuff]] = inTransaction {
         tryo {
-            BeDoneSchema.stuffs.where(_.userID === user.idField).toList
+            from(BeDoneSchema.stuffs)(table =>
+                where(table.userID === user.idField) 
+                select(table)
+                orderBy(table.createTime asc)
+            ).toList
         }
     }
 }
