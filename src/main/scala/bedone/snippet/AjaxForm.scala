@@ -16,11 +16,12 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds.JqSetHtml
-import net.liftweb.util.Helpers.tryo
 
 import scala.xml.NodeSeq
 import scala.xml.Text
+
 import java.text.SimpleDateFormat
+
 import java.util.Calendar
 import java.util.Date
 
@@ -29,7 +30,7 @@ abstract class AjaxForm[T <: Record[T]]
     protected val record: T
 
     protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
-    protected def fields = record.allFields.filter(_.name != "idField")
+    protected def fields: List[BaseField] = record.allFields.filter(_.name != "idField")
     protected def formID: Option[String] = None
 
     private lazy val template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
@@ -178,7 +179,7 @@ abstract class AjaxForm[T <: Record[T]]
     }
 
 
-    def toForm(field: net.liftweb.record.Field[_, _]) = field match {
+    def toForm(field: BaseField) = field match {
         case f: TextareaField[_] => textareaFieldToForm(f)
         case f: EmailField[_]  => stringFieldToForm(f)
         case f: StringField[_] => stringFieldToForm(f)

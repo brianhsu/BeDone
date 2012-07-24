@@ -27,12 +27,21 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
     override protected val modalID = "addStuffModal"
     override protected val buttonID = "addStuffButton"
     override protected val formID = Some("addStuffForm")
+
     override protected val record = Stuff.createRecord
     override protected val fields = List(record.title, record.description, record.deadline)
 
+    private var topics: List[String] = Nil
+
     def saveAndClose(): JsCmd = {
-        record.saveTheRecord() 
+
+        record.saveTheRecord().foreach { savedRecord => 
+            val stuffTopic = StuffTopic.createRecord.stuffID(record.idField.is)
+            topics.foreach(topic => stuffTopic.topic(topic).saveTheRecord)
+        }
+
         S.redirectTo("/inbox")
+
         Noop
     }
 
@@ -44,6 +53,41 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
             case errors => errors.map(showFieldError) & resetButton
         }
     }
+
+    def topicForm = {
+
+        val fieldID = "stuffTopic"
+        val messageID = fieldID + "_msg"
+        val tagID = fieldID + "_tag"
+
+        def tagItJS = """
+            $('#%s').tagsInput({
+                autocomplete_url:'http://localhost:8081/autocomplete/topic',
+                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
+                defaultText: '新增主題',
+                width: 210,
+                height: 20,
+                onChange: function() { $('#%s').blur() }
+            });
+        """.format(tagID, tagID)
+
+        def ajaxTest(value: String) = {
+            this.topics = value.split(",").map(_.trim).toList
+            Noop
+        }
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> "主題" &
+            ".help-inline [id]" #> messageID &
+            "input" #> (
+                SHtml.textAjaxTest("", doNothing _, ajaxTest _, "id" -> tagID) ++
+                <script type="text/javascript">{tagItJS}</script>
+            )
+        )
+    }
+
+    override def cssBinding = super.cssBinding :+ topicForm
 
     def render = {
         ".modal-body *" #> this.toForm &
