@@ -14,6 +14,7 @@ import net.liftweb.record.field.StringField
 import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
 import net.liftweb.record.field.OptionalDateTimeField
+import net.liftweb.record.field.BooleanField
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -22,6 +23,37 @@ import org.squeryl.annotations.Column
 import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
+
+object StuffTopic extends StuffTopic with MetaRecord[StuffTopic]
+{
+    def findByUser(user: User) = inTransaction (tryo {
+        from(BeDoneSchema.stuffs, BeDoneSchema.stuffTopics) { (stuff, topic) =>
+            where(stuff.userID === user.idField and stuff.idField === topic.stuffID)
+            select(topic)
+        }.toList
+    })
+}
+
+class StuffTopic extends Record[StuffTopic] {
+    def meta = StuffTopic
+
+    val stuffID = new LongField(this)
+    val topic = new StringField(this, "") {
+        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
+    }
+
+    override def saveTheRecord = inTransaction ( tryo {
+        import BeDoneSchema.stuffTopics
+
+        val oldTopics = stuffTopics.where(t => t.stuffID === stuffID and t.topic === topic)
+
+        oldTopics.toList match {
+            case Nil => stuffTopics.insert(this)
+            case xs  => this
+        }
+    })
+
+}
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
@@ -41,8 +73,9 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
 
     @Column(name="id")
     val idField = new LongField(this, 1)
-    val userID = new LongField(this, 1)
+    val userID = new LongField(this)
     val createTime = new DateTimeField(this)
+    val isTrash = new BooleanField(this, false)
 
     val title = new StringField(this, "") {
         override def displayName = "標題"
@@ -55,6 +88,10 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
         override def displayName = "期限"
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
     }
+
+    def topics = inTransaction(tryo {
+        BeDoneSchema.stuffTopics.where(_.stuffID === this.idField).map(_.topic.is).toList
+    })
 
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown

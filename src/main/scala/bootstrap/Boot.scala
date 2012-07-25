@@ -14,6 +14,7 @@ import net.liftweb.record.field.PasswordField
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.sitemap.Menu
 import net.liftweb.sitemap.Loc._
+import org.bedone.view.AutoComplete
 
 class Boot 
 {
@@ -51,7 +52,10 @@ class Boot
         initAjaxLoader()
         PasswordField.minPasswordLength = 7
 
+        LiftRules.dispatch.append(AutoComplete.autoComplete)
+
         DBSettings.initDB()
     }
+
 }
 

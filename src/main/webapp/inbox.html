@@ -18,24 +18,20 @@
         </ul>
       </div>
       <div>
-        <div data-lift="Inbox">
+        <div data-lift="Inbox?eager_eval=true">
+          <div class="btn-group" style="float:left">
+            <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
+            <button class="btn btn-info" id="showAll" disabled="disabled">顯示全部</button>
+          </div>
           <div style="margin-bottom: 1em; text-align: right">
             <a class="btn btn-primary btn-large" data-toggle="modal" href="#addStuffModal">新增雜事</a>
             <button class="btn btn-large" id="processButton">處理雜事</button>
           </div>
 
-          <div class="hero-unit noStuff">
+          <div class="hero-unit" id="noStuff">
             太好了，沒有事情要處理！
           </div>
-          <table class="table table-striped">
-            <tr><th>標題</th><th>描述</th><th>時間</th><th>期限</th></tr>
-            <tr class="stuffs">
-                <td class="title">My Title 1</td>
-                <td class="desc">FFFFFFFFFFFFFF</td>
-                <td class="createTime">2012-03-02 11:11</td>
-                <td class="deadline">2012-03-22 11:11</td>
-            </tr>
-          </table>
+          <div id="stuffTable"></div>
         </div>
         <div class="modal hide" id="addStuffModal" data-lift="AddStuffDialog">
           <div class="modal-header">
