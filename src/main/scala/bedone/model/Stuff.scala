@@ -89,6 +89,10 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
     }
 
+    def topics = inTransaction(tryo {
+        BeDoneSchema.stuffTopics.where(_.stuffID === this.idField).map(_.topic.is).toList
+    })
+
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
         val reader = new StringReader(description.is)
