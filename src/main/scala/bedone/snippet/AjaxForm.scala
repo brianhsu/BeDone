@@ -35,11 +35,13 @@ abstract class AjaxForm[T <: Record[T]]
 
     private lazy val template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
 
-    def resetForm: JsCmd = formID.map { id => 
-        jsCmdFromStr("""$('#%s').each(function() { this.reset(); })""".format(id))
+    def resetForm: JsCmd = formID.map{ id => 
+        JsRaw("""$('#%s').get(0).reset();""".format(id)).cmd
     }.getOrElse(Noop)
 
-    def reInitForm: JsCmd = fields.map(removeFieldError)
+    def reInitForm: JsCmd = {
+        fields.map(removeFieldError) & resetForm
+    }
 
     def showFieldError(fieldID: String, message: NodeSeq): JsCmd = {
         val messageID = fieldID + "_msg"

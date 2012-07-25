@@ -22,7 +22,7 @@ trait ModalDialog {
     def resetButton: JsCmd = JsRaw("""$('#%s').button('reset')""".format(buttonID))
 }
 
-class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
+class AddStuffDialog(postAction: => JsCmd) extends AjaxForm[Stuff] with ModalDialog
 {
     override protected val modalID = "addStuffModal"
     override protected val buttonID = "addStuffButton"
@@ -40,9 +40,7 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
             topics.foreach(topic => stuffTopic.topic(topic).saveTheRecord)
         }
 
-        S.redirectTo("/inbox")
-
-        Noop
+        hideModal & reInitForm & resetButton
     }
 
     def addStuff(): JsCmd =
@@ -72,7 +70,7 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
         """.format(tagID, tagID)
 
         def ajaxTest(value: String) = {
-            this.topics = value.split(",").map(_.trim).toList
+            this.topics = value.split(",").map(_.trim).filter(_.trim.length > 0).toList
             Noop
         }
 

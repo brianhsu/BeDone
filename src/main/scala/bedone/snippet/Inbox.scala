@@ -21,17 +21,17 @@ import java.text.SimpleDateFormat
 
 class Inbox
 {
-    lazy val stuffs = CurrentUser.get.flatMap(Stuff.findByUser).openOr(Nil)
-    lazy val completeStuffTable = createStuffTable(stuffs)
+
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+    def stuffs = CurrentUser.get.flatMap(Stuff.findByUser).openOr(Nil)
+    def completeStuffTable = createStuffTable(stuffs)
 
     def formatDeadline(stuff: Stuff) = 
     {
         stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
     }
-
-    def noStuff = ".table" #> "" & "#processButton [disabled]" #> "disabled"
 
     def filterStuff(topic: String)(): JsCmd =
     {
@@ -74,11 +74,19 @@ class Inbox
         "#stuffTable *" #> completeStuffTable
     }
 
-    def render = 
-    {
-        stuffs.isEmpty match {
-            case true  => noStuff
-            case false => stuffTable
+    def render = stuffTable
+
+    def addStuffDialog = {
+
+        object InboxAddStuffDialog extends AddStuffDialog {
+            override def saveAndClose() = {
+                val originJS = super.saveAndClose()
+                val newTable = createStuffTable(stuffs)
+
+                originJS & reInitForm & showAllStuff
+            }
         }
+
+        InboxAddStuffDialog.render
     }
 }
