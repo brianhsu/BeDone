@@ -80,6 +80,7 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
         ".control-group *" #> (
             ".control-label *" #> "主題" &
             ".help-inline [id]" #> messageID &
+            ".help-inline *" #> "使用逗號分隔，按下 Enter 確認" &
             "input" #> (
                 SHtml.textAjaxTest("", doNothing _, ajaxTest _, "id" -> tagID) ++
                 <script type="text/javascript">{tagItJS}</script>
@@ -88,6 +89,7 @@ class AddStuffDialog extends AjaxForm[Stuff] with ModalDialog
     }
 
     override def cssBinding = super.cssBinding :+ topicForm
+    override def reInitForm = super.reInitForm & """$('#stuffTopic_tag').importTags("")"""
 
     def render = {
         ".modal-body *" #> this.toForm &
