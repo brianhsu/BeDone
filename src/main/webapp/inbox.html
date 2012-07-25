@@ -6,16 +6,27 @@
   </head>
   <body class="lift:content_id=main">
     <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
-      <div data-lift="lift:withParam?name=sideBarArea" class="sidebar">
-        <ul class="nav nav-list">
-          <li><a href="/dashboard"><i class="icon-home sidebarIcon"></i>Dashboard</a></li>
-          <li class="active"><a href="/inbox"><i class="icon-white icon-inbox sidebarIcon"></i>Inbox</a></li>
-          <li><a href="#"><i class="icon-tasks sidebarIcon"></i>Next Action</a></li>
-          <li><a href="#"><i class="icon-folder-open sidebarIcon"></i>Project</a></li>
-          <li class="divider"></li>
-          <li><a href="#"><i class="icon-thumbs-up sidebarIcon"></i>Someday / Maybe</a></li>
-          <li><a href="#"><i class="icon-book sidebarIcon"></i>Reference</a></li>
-        </ul>
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div class="sidebar" style="position: fixed">
+          <ul class="nav nav-list">
+            <li class="nav-header">Work</li>
+            <li><a href="/dashboard"><i class="icon-home sidebarIcon"></i>Dashboard</a></li>
+            <li class="active"><a href="/inbox"><i class="icon-white icon-inbox sidebarIcon"></i>Inbox</a></li>
+            <li><a href="#"><i class="icon-tasks sidebarIcon"></i>Next Action</a></li>
+            <li><a href="#"><i class="icon-comment sidebarIcon"></i>Delegated</a></li>
+            <li><a href="#"><i class="icon-calendar sidebarIcon"></i>Schedule</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Review</li>
+            <li><a href="#"><i class="icon-folder-open sidebarIcon"></i>Project</a></li>
+            <li><a href="#"><i class="icon-thumbs-up sidebarIcon"></i>Someday / Maybe</a></li>
+            <li class="divider"></li>
+            <li class="nav-header">Reference</li>
+            <li><a href="#"><i class="icon-book sidebarIcon"></i>Reference</a></li>
+            <li><a href="#"><i class="icon-user sidebarIcon"></i>Contacts</a></li>
+            <li><a href="#"><i class="icon-trash sidebarIcon"></i>Recycle Bin</a></li>
+          </ul>
+        </div>
+
       </div>
       <div>
         <div data-lift="Inbox">
