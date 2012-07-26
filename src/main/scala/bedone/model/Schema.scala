@@ -8,7 +8,7 @@ object BeDoneSchema extends Schema {
     // Entity 
     val users = table[User]("users")
     val stuffs = table[Stuff]("stuffs")
-    val reference = table[Reference]("references")
+    val reference = table[Reference]("refs")
 
     val projects = table[Project]("projects")
     val topics = table[Topic]("topics")
