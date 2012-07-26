@@ -34,7 +34,6 @@ object Reference extends Reference with MetaRecord[Reference]
     def findByUser(userID: Int): Box[List[Reference]] = inTransaction(tryo{
         BeDoneSchema.references.where(_.userID === userID).toList
     })
-   
 }
 
 class Reference extends Record[Reference] with KeyedRecord[Int] 
@@ -59,6 +58,7 @@ class Reference extends Record[Reference] with KeyedRecord[Int]
         override def displayName = "描述"
     }
 
-    lazy val projects = inTransaction { BeDoneSchema.referenceProjects.left(this).toList }
+    def projects = inTransaction { BeDoneSchema.referenceProjects.left(this).toList }
+    def topics = inTransaction { BeDoneSchema.referenceTopics.left(this).toList }
 }
 
