@@ -11,6 +11,7 @@ object BeDoneSchema extends Schema
     val users = table[User]("Users")
     val stuffs = table[Stuff]("Stuffs")
     val references = table[Reference]("Refs")
+    val maybes = table[Maybe]("Maybes")
 
     val projects = table[Project]("Projects")
     val topics = table[Topic]("Topics")
