@@ -24,38 +24,6 @@ import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
 
-object StuffTopic extends StuffTopic with MetaRecord[StuffTopic]
-{
-    def findByUser(user: User) = inTransaction (tryo {
-        from(BeDoneSchema.stuffs, BeDoneSchema.stuffTopics) { (stuff, topic) =>
-            where(stuff.userID === user.idField and stuff.idField === topic.stuffID)
-            select(topic)
-        }.toList
-    })
-}
-
-class StuffTopic extends Record[StuffTopic] 
-{
-    def meta = StuffTopic
-
-    val stuffID = new LongField(this)
-    val topic = new StringField(this, "") {
-        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
-    }
-
-    override def saveTheRecord = inTransaction ( tryo {
-        import BeDoneSchema.stuffTopics
-
-        val oldTopics = stuffTopics.where(t => t.stuffID === stuffID and t.topic === topic)
-
-        oldTopics.toList match {
-            case Nil => stuffTopics.insert(this)
-            case xs  => this
-        }
-    })
-
-}
-
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
     def findByID(id: Long): Box[Stuff] = inTransaction {
@@ -136,66 +104,3 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long]
         projectTitles.map(getProject).foreach(_.addStuff(this))
     }
 }
-
-object Project extends Project with MetaRecord[Project]
-{
-    import net.liftweb.common.Box._
-
-    def findByID(id: Long): Box[Project] = inTransaction (
-        BeDoneSchema.projects.where(_.idField === id).headOption
-    )
-
-    def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
-    def findByUser(userID: Long): Box[List[Project]] = inTransaction(tryo{
-        BeDoneSchema.projects.where(_.userID === userID).toList
-    })
-
-    def findByTitle(userID: Long, title: String): Box[Project] = inTransaction(
-        BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
-    )
-}
-
-class Project extends Record[Project] with KeyedRecord[Long]
-{
-    def meta = Project
-
-    @Column(name="id")
-    val idField = new LongField(this, 1)
-    val userID = new LongField(this)
-    val title = new StringField(this, "")
-    val description = new TextareaField(this, 1000)
-
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
-    def addStuff(stuff: Stuff) = inTransaction {
-        val record = StuffProject.createRecord.projectID(idField.is).stuffID(stuff.idField.is)
-        record.saveTheRecord()
-    }
-}
-
-
-object StuffProject extends StuffProject with MetaRecord[StuffProject]
-class StuffProject extends Record[StuffProject] 
-{
-    def meta = StuffProject
-
-    val stuffID = new LongField(this)
-    val projectID = new LongField(this)
-
-    def project = Project.findByID(projectID.is).open_!
-    def stuff = Stuff.findByID(stuffID.is).open_!
-
-    override def saveTheRecord = inTransaction ( tryo {
-        import BeDoneSchema.stuffProjects
-
-        val oldProjects = stuffProjects.where { t => 
-            t.stuffID === stuffID and t.projectID === projectID
-        }
-
-        oldProjects.toList match {
-            case Nil => stuffProjects.insert(this)
-            case xs  => this
-        }
-    })
-
-}
-
