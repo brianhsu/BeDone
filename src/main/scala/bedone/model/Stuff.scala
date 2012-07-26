@@ -63,11 +63,8 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
     }
 
-    def topics = StuffTopic.findByStuff(this)
-
-    def projects = inTransaction(tryo {
-        BeDoneSchema.stuffProjects.where(_.stuffID === this.idField).map(_.project).toList
-    })
+    def topics = inTransaction(BeDoneSchema.stuffTopics.left(this).toList)
+    def projects = inTransaction(BeDoneSchema.stuffProjects.left(this).toList)
 
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
@@ -109,7 +106,11 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         def getProject(title: String) = 
             Project.findByTitle(userID.is, title).openOr(createProject(title))
 
-        projectTitles.map(getProject).foreach(_.addStuff(this))
+        projectTitles.map(getProject).foreach(addProject)
+    }
+
+    def addProject(project: Project) = inTransaction { 
+        BeDoneSchema.stuffProjects.left(this).associate(project)
     }
 }
 

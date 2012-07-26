@@ -54,12 +54,9 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.topics.insert(this)) }
 
-    def stuffs = inTransaction(tryo {
-        BeDoneSchema.stuffTopics.where(_.topicID === idField).map(_.stuff).toList
-    })
+    def stuffs = inTransaction(BeDoneSchema.stuffTopics.right(this).toList)
 
     def addStuff(stuff: Stuff) = inTransaction {
-        val record = StuffTopic.createRecord.topicID(idField.is).stuffID(stuff.idField.is)
-        record.saveTheRecord()
+        BeDoneSchema.stuffTopics.right(this).associate(stuff)
     }
 }

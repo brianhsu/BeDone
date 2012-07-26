@@ -35,7 +35,7 @@ class Inbox
 
     def filterStuff(topic: Topic)(): JsCmd =
     {
-        val newTable = createStuffTable(topic.stuffs.openOr(Nil))
+        val newTable = createStuffTable(topic.stuffs)
 
         JqSetHtml("stuffTable", newTable) &
         JqSetHtml("current", Text(topic.title.is)) &
@@ -56,7 +56,7 @@ class Inbox
             ".stuffs" #> stuffs.map ( stuff =>
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
-                ".topic" #> stuff.topics.openOr(Nil).map{ topic =>
+                ".topic" #> stuff.topics.map{ topic =>
                     "a" #> SHtml.a(filterStuff(topic)_, Text(topic.title.is))
                 } &
                 ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &

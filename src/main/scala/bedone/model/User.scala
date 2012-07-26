@@ -100,17 +100,4 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         CurrentUser.set(Full(this))
         postAction
     }
-
-}
-
-import org.squeryl.dsl._
-import org.squeryl.KeyedEntity
-
-object ManyToMany
-{
-    type Key = CompositeKey2[Int,Int]
-
-    class ReferenceProject(val referenceID: Int, val projectID: Int) extends KeyedEntity[Key] {
-        def id = compositeKey(referenceID, projectID)
-    }
 }
