@@ -25,6 +25,17 @@ import java.io.StringReader
 import java.io.StringWriter
 
 object Reference extends Reference with MetaRecord[Reference]
+{
+    def findByID(id: Int): Box[Reference] = inTransaction (
+        BeDoneSchema.references.where(_.idField === id).headOption
+    )
+
+    def findByUser(user: User): Box[List[Reference]] = findByUser(user.idField.is)
+    def findByUser(userID: Int): Box[List[Reference]] = inTransaction(tryo{
+        BeDoneSchema.references.where(_.userID === userID).toList
+    })
+   
+}
 
 class Reference extends Record[Reference] with KeyedRecord[Int] 
 {
