@@ -9,7 +9,7 @@ import net.liftweb.util.FieldError
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
-import net.liftweb.record.field.LongField
+import net.liftweb.record.field.IntField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
@@ -26,7 +26,7 @@ import java.io.StringWriter
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
-    def findByID(id: Long): Box[Stuff] = inTransaction {
+    def findByID(id: Int): Box[Stuff] = inTransaction {
         tryo { BeDoneSchema.stuffs.where(_.idField === id).single }
     }
 
@@ -41,13 +41,13 @@ object Stuff extends Stuff with MetaRecord[Stuff]
     }
 }
 
-class Stuff extends Record[Stuff] with KeyedRecord[Long] 
+class Stuff extends Record[Stuff] with KeyedRecord[Int] 
 {
     def meta = Stuff
 
     @Column(name="id")
-    val idField = new LongField(this, 1)
-    val userID = new LongField(this)
+    val idField = new IntField(this, 1)
+    val userID = new IntField(this)
     val createTime = new DateTimeField(this)
     val isTrash = new BooleanField(this, false)
 
@@ -63,9 +63,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long]
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
     }
 
-    def topics = inTransaction(tryo {
-        BeDoneSchema.stuffTopics.where(_.stuffID === this.idField).map(_.topic.is).toList
-    })
+    def topics = StuffTopic.findByStuff(this)
 
     def projects = inTransaction(tryo {
         BeDoneSchema.stuffProjects.where(_.stuffID === this.idField).map(_.project).toList
@@ -84,9 +82,19 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long]
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
 
-    def addTopics(topics: List[String]) {
-        val stuffTopic = StuffTopic.createRecord.stuffID(this.idField.is)
-        topics.foreach(topic => stuffTopic.topic(topic).saveTheRecord)
+    def addTopics(topicTitles: List[String]) {
+
+        def createTopic(title: String) = {
+            val topic = Topic.createRecord
+            topic.userID(this.userID.is).title(title)
+            topic.saveTheRecord()
+            topic
+        }
+
+        def getTopic(title: String) = 
+            Topic.findByTitle(userID.is, title).openOr(createTopic(title))
+
+        topicTitles.map(getTopic).foreach(_.addStuff(this))
     }
 
     def addProjects(projectTitles: List[String]) {
@@ -104,3 +112,5 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long]
         projectTitles.map(getProject).foreach(_.addStuff(this))
     }
 }
+
+

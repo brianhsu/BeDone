@@ -12,12 +12,9 @@ object AutoComplete {
 
         for (term <- S.param("term"); user <- CurrentUser.is) yield {
 
-            val topics = StuffTopic.findByUser(user).map{ xs => 
-                xs.map(_.topic.is).filter(_.contains(term)).distinct
-            }
-
-            val jsonTopics = topics.openOr(Nil).map { topic => 
-                """{"id": "%s", "label": "%s"}""" format(topic, topic)
+            val topics = Topic.findByUser(user).openOr(Nil)
+            val jsonTopics = topics.map { topic => 
+                """{"id": "%s", "label": "%s"}""" format(topic.title, topic.title)
             }
 
             JsonResponse(JsRaw("""[%s]""" format(jsonTopics.mkString(","))))

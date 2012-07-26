@@ -24,29 +24,28 @@ import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
 
-object StuffProject extends StuffProject with MetaRecord[StuffProject]
-class StuffProject extends Record[StuffProject] 
+object Reference extends Reference with MetaRecord[Reference]
+
+class Reference extends Record[Reference] with KeyedRecord[Int] 
 {
-    def meta = StuffProject
+    def meta = Reference
 
-    val stuffID = new IntField(this)
-    val projectID = new IntField(this)
+    @Column(name="id")
+    val idField = new IntField(this)
+    val userID = new IntField(this)
 
-    def project = Project.findByID(projectID.is).open_!
-    def stuff = Stuff.findByID(stuffID.is).open_!
+    val createTime = new DateTimeField(this)
+    val updateTime = new DateTimeField(this)
 
-    override def saveTheRecord = inTransaction ( tryo {
-        import BeDoneSchema.stuffProjects
+    val isTrash = new BooleanField(this, false)
 
-        val oldProjects = stuffProjects.where { t => 
-            t.stuffID === stuffID and t.projectID === projectID
-        }
+    val title = new StringField(this, "") {
+        override def displayName = "標題"
+        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
+    }
 
-        oldProjects.toList match {
-            case Nil => stuffProjects.insert(this)
-            case xs  => this
-        }
-    })
-
+    val description = new TextareaField(this, 1000) {
+        override def displayName = "描述"
+    }
 }
 

@@ -33,13 +33,12 @@ class Inbox
         stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
     }
 
-    def filterStuff(topic: String)(): JsCmd =
+    def filterStuff(topic: Topic)(): JsCmd =
     {
-        val stuffsOfTopic = stuffs.filter(_.topics.openOr(Nil).contains(topic))
-        val newTable = createStuffTable(stuffsOfTopic)
+        val newTable = createStuffTable(topic.stuffs.openOr(Nil))
 
         JqSetHtml("stuffTable", newTable) &
-        JqSetHtml("current", Text(topic)) &
+        JqSetHtml("current", Text(topic.title.is)) &
         JsRaw("""$('#showAll').prop("disabled", false)""")
     }
     
@@ -58,7 +57,7 @@ class Inbox
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
                 ".topic" #> stuff.topics.openOr(Nil).map{ topic =>
-                    "a" #> SHtml.a(filterStuff(topic)_, Text(topic))
+                    "a" #> SHtml.a(filterStuff(topic)_, Text(topic.title.is))
                 } &
                 ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
                 ".deadline *" #> formatDeadline(stuff)

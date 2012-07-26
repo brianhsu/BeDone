@@ -24,27 +24,27 @@ import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
 
-object Project extends Project with MetaRecord[Project]
+object Topic extends Topic with MetaRecord[Topic]
 {
     import net.liftweb.common.Box._
 
-    def findByID(id: Int): Box[Project] = inTransaction (
-        BeDoneSchema.projects.where(_.idField === id).headOption
+    def findByID(id: Int): Box[Topic] = inTransaction (
+        BeDoneSchema.topics.where(_.idField === id).headOption
     )
 
-    def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Project]] = inTransaction(tryo{
-        BeDoneSchema.projects.where(_.userID === userID).toList
+    def findByUser(user: User): Box[List[Topic]] = findByUser(user.idField.is)
+    def findByUser(userID: Int): Box[List[Topic]] = inTransaction(tryo{
+        BeDoneSchema.topics.where(_.userID === userID).toList
     })
 
-    def findByTitle(userID: Int, title: String): Box[Project] = inTransaction(
-        BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
+    def findByTitle(userID: Int, title: String): Box[Topic] = inTransaction(
+        BeDoneSchema.topics.where(t => t.userID === userID and t.title === title).headOption
     )
 }
 
-class Project extends Record[Project] with KeyedRecord[Int]
+class Topic extends Record[Topic] with KeyedRecord[Int]
 {
-    def meta = Project
+    def meta = Topic
 
     @Column(name="id")
     val idField = new IntField(this, 1)
@@ -52,9 +52,14 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.topics.insert(this)) }
+
+    def stuffs = inTransaction(tryo {
+        BeDoneSchema.stuffTopics.where(_.topicID === idField).map(_.stuff).toList
+    })
+
     def addStuff(stuff: Stuff) = inTransaction {
-        val record = StuffProject.createRecord.projectID(idField.is).stuffID(stuff.idField.is)
+        val record = StuffTopic.createRecord.topicID(idField.is).stuffID(stuff.idField.is)
         record.saveTheRecord()
     }
 }

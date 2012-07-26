@@ -9,7 +9,7 @@ import net.liftweb.util.FieldError
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
-import net.liftweb.record.field.LongField
+import net.liftweb.record.field.IntField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
@@ -26,11 +26,8 @@ import java.io.StringWriter
 
 object StuffTopic extends StuffTopic with MetaRecord[StuffTopic]
 {
-    def findByUser(user: User) = inTransaction (tryo {
-        from(BeDoneSchema.stuffs, BeDoneSchema.stuffTopics) { (stuff, topic) =>
-            where(stuff.userID === user.idField and stuff.idField === topic.stuffID)
-            select(topic)
-        }.toList
+    def findByStuff(stuff: Stuff) = inTransaction(tryo{
+        BeDoneSchema.stuffTopics.where(_.stuffID === stuff.idField).map(_.topic).toList   
     })
 }
 
@@ -38,21 +35,13 @@ class StuffTopic extends Record[StuffTopic]
 {
     def meta = StuffTopic
 
-    val stuffID = new LongField(this)
-    val topic = new StringField(this, "") {
-        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
-    }
+    val stuffID = new IntField(this)
+    val topicID = new IntField(this)
 
-    override def saveTheRecord = inTransaction ( tryo {
-        import BeDoneSchema.stuffTopics
+    def topic: Topic = Topic.findByID(topicID.is).open_!
+    def stuff: Stuff = Stuff.findByID(stuffID.is).open_!
 
-        val oldTopics = stuffTopics.where(t => t.stuffID === stuffID and t.topic === topic)
-
-        oldTopics.toList match {
-            case Nil => stuffTopics.insert(this)
-            case xs  => this
-        }
-    })
+    override def saveTheRecord = inTransaction(tryo(BeDoneSchema.stuffTopics.insert(this)))
 
 }
 
