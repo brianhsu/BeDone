@@ -3,6 +3,8 @@ package org.bedone.model
 import org.squeryl.Schema
 import net.liftweb.squerylrecord.RecordTypeMode._
 
+import ManyToMany.ReferenceProject
+
 object BeDoneSchema extends Schema {
     
     // Entity 
@@ -17,6 +19,12 @@ object BeDoneSchema extends Schema {
     val stuffTopics = table[StuffTopic]("stuff_topics")
     val stuffProjects = table[StuffProject]("stuff_projects")
     val referenceTopics = table[ReferenceTopic]("reference_topic")
+
+    // Many to Many
+    val referenceProjects = manyToManyRelation(references, projects).via[ReferenceProject](
+        (reference, project, relation) => 
+            (relation.referenceID === reference.idField, relation.projectID === project.idField)
+    )
 
     // Unique and Index
     on(users) { user => declare(user.username defineAs unique, user.email defineAs unique) }

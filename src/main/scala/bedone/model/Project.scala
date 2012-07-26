@@ -57,4 +57,6 @@ class Project extends Record[Project] with KeyedRecord[Int]
         val record = StuffProject.createRecord.projectID(idField.is).stuffID(stuff.idField.is)
         record.saveTheRecord()
     }
+
+    lazy val references = inTransaction { BeDoneSchema.referenceProjects.right(this).toList }
 }

@@ -58,5 +58,7 @@ class Reference extends Record[Reference] with KeyedRecord[Int]
     val description = new TextareaField(this, 1000) {
         override def displayName = "描述"
     }
+
+    lazy val projects = inTransaction { BeDoneSchema.referenceProjects.left(this).toList }
 }
 
