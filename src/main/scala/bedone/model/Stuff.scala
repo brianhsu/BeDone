@@ -34,7 +34,8 @@ object StuffTopic extends StuffTopic with MetaRecord[StuffTopic]
     })
 }
 
-class StuffTopic extends Record[StuffTopic] {
+class StuffTopic extends Record[StuffTopic] 
+{
     def meta = StuffTopic
 
     val stuffID = new LongField(this)
@@ -57,6 +58,10 @@ class StuffTopic extends Record[StuffTopic] {
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
+    def findByID(id: Long): Box[Stuff] = inTransaction {
+        tryo { BeDoneSchema.stuffs.where(_.idField === id).single }
+    }
+
     def findByUser(user: User): Box[List[Stuff]] = inTransaction {
         tryo {
             from(BeDoneSchema.stuffs)(table =>
@@ -68,7 +73,8 @@ object Stuff extends Stuff with MetaRecord[Stuff]
     }
 }
 
-class Stuff extends Record[Stuff] with KeyedRecord[Long] {
+class Stuff extends Record[Stuff] with KeyedRecord[Long] 
+{
     def meta = Stuff
 
     @Column(name="id")
@@ -93,6 +99,10 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
         BeDoneSchema.stuffTopics.where(_.stuffID === this.idField).map(_.topic.is).toList
     })
 
+    def projects = inTransaction(tryo {
+        BeDoneSchema.stuffProjects.where(_.stuffID === this.idField).map(_.project).toList
+    })
+
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
         val reader = new StringReader(description.is)
@@ -105,5 +115,87 @@ class Stuff extends Record[Stuff] with KeyedRecord[Long] {
     }
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
+
+    def addTopics(topics: List[String]) {
+        val stuffTopic = StuffTopic.createRecord.stuffID(this.idField.is)
+        topics.foreach(topic => stuffTopic.topic(topic).saveTheRecord)
+    }
+
+    def addProjects(projectTitles: List[String]) {
+
+        def createProject(title: String) = {
+            val project = Project.createRecord
+            project.userID(this.userID.is).title(title)
+            project.saveTheRecord()
+            project
+        }
+
+        def getProject(title: String) = 
+            Project.findByTitle(userID.is, title).openOr(createProject(title))
+
+        projectTitles.map(getProject).foreach(_.addStuff(this))
+    }
+}
+
+object Project extends Project with MetaRecord[Project]
+{
+    import net.liftweb.common.Box._
+
+    def findByID(id: Long): Box[Project] = inTransaction (
+        BeDoneSchema.projects.where(_.idField === id).headOption
+    )
+
+    def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
+    def findByUser(userID: Long): Box[List[Project]] = inTransaction(tryo{
+        BeDoneSchema.projects.where(_.userID === userID).toList
+    })
+
+    def findByTitle(userID: Long, title: String): Box[Project] = inTransaction(
+        BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
+    )
+}
+
+class Project extends Record[Project] with KeyedRecord[Long]
+{
+    def meta = Project
+
+    @Column(name="id")
+    val idField = new LongField(this, 1)
+    val userID = new LongField(this)
+    val title = new StringField(this, "")
+    val description = new TextareaField(this, 1000)
+
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
+    def addStuff(stuff: Stuff) = inTransaction {
+        val record = StuffProject.createRecord.projectID(idField.is).stuffID(stuff.idField.is)
+        record.saveTheRecord()
+    }
+}
+
+
+object StuffProject extends StuffProject with MetaRecord[StuffProject]
+class StuffProject extends Record[StuffProject] 
+{
+    def meta = StuffProject
+
+    val stuffID = new LongField(this)
+    val projectID = new LongField(this)
+
+    def project = Project.findByID(projectID.is).open_!
+    def stuff = Stuff.findByID(stuffID.is).open_!
+
+    override def saveTheRecord = inTransaction ( tryo {
+        import BeDoneSchema.stuffProjects
+
+        val oldProjects = stuffProjects.where { t => 
+            t.stuffID === stuffID and t.projectID === projectID
+        }
+
+        oldProjects.toList match {
+            case Nil => stuffProjects.insert(this)
+            case xs  => this
+        }
+    })
+
 }
 
