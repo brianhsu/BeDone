@@ -202,6 +202,38 @@ abstract class AjaxForm[T <: Record[T]]
         error.map(showFieldError)
     }
 
+    def tagsInput(fieldID: String, title: String, placeHolder: String,
+                  autocompleteURL: String)(ajaxTest: String => JsCmd) = 
+    {
+
+        val messageID = fieldID + "_msg"
+        val tagID = fieldID + "_tag"
+
+        def tagItJS = """
+            $('#%s').tagsInput({
+                autocomplete_url:'%s',
+                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
+                defaultText: '%s',
+                width: 210,
+                height: 20,
+                onChange: function() { $('#%s').blur() }
+            });
+        """.format(tagID, autocompleteURL, placeHolder, tagID)
+
+        ".control-group [id]" #> fieldID &
+        ".control-group *" #> (
+            ".control-label *" #> title &
+            ".help-inline [id]" #> messageID &
+            ".help-inline *" #> "使用逗號分隔，按下 Enter 確認" &
+            "input" #> (
+                SHtml.textAjaxTest("", doNothing _, ajaxTest, "id" -> tagID) ++
+                <script type="text/javascript">{tagItJS}</script>
+            )
+        )
+    }
+
+    def cleanTag(fieldID: String): JsCmd = """$('#stuffTopic_tag').importTags("")"""
+
     def cssBinding = fields.map(toForm)
 
     def toForm: NodeSeq = {
