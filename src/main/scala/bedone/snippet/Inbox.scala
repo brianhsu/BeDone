@@ -1,6 +1,7 @@
 package org.bedone.snippet
 
 import org.bedone.model._
+import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
@@ -18,7 +19,7 @@ import scala.xml.Text
 
 import java.text.SimpleDateFormat
 
-class Inbox
+class Inbox extends JSImplicit
 {
 
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
@@ -57,21 +58,35 @@ class Inbox
         JsRaw("""$('#showAll').prop("disabled", true)""")
     }
 
+    def actionBar(stuff: Stuff) = {
+
+        def markAsTrash(): JsCmd = {
+            stuff.isTrash(true)
+            stuff.update()
+
+            new FadeOut("row" + stuff.idField, 0, 500)
+        }
+
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) 
+    }
+
     def createStuffTable(stuffs: List[Stuff]) = 
     {
         val template = Templates("templates-hidden" :: "stuffTable" :: Nil)
         val cssBinding = 
-            ".stuffs" #> stuffs.map ( stuff =>
+            ".stuffs" #> stuffs.filter(!_.isTrash.is).map ( stuff =>
+                actionBar(stuff) &
+                "tr [id]"  #> ("row" + stuff.idField) &
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
-                ".topic" #> stuff.topics.map{ topic =>
+                ".topic"   #> stuff.topics.map{ topic =>
                     "a" #> SHtml.a(filter(topic)_, Text(topic.title.is))
                 } &
                 ".project" #> stuff.projects.map{ project =>
                     "a" #> SHtml.a(filter(project)_, Text(project.title.is))
                 } &
                 ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
-                ".deadline *" #> formatDeadline(stuff)
+                ".deadline *"   #> formatDeadline(stuff)
             )
 
         template.map(cssBinding).open_!

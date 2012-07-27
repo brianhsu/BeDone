@@ -86,6 +86,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     }
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
+    def update() = inTransaction { tryo(BeDoneSchema.stuffs.update(this)) }
 
     def addTopics(topicTitles: List[String]) {
 

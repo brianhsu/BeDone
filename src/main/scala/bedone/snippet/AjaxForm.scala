@@ -1,6 +1,7 @@
 package org.bedone.snippet
 
 import org.bedone.model._
+import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
@@ -25,11 +26,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
-abstract class AjaxForm[T <: Record[T]]
+abstract class AjaxForm[T <: Record[T]] extends JSImplicit
 {
     protected val record: T
 
-    protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
     protected def fields: List[BaseField] = record.allFields.filter(_.name != "idField")
     protected def formID: Option[String] = None
 
