@@ -60,6 +60,18 @@ class Inbox extends JSImplicit
 
     def actionBar(stuff: Stuff) = {
 
+        def starClass = stuff.isStared.is match {
+            case true  => "myicon-starOn"
+            case false => "myicon-starOff"
+        }
+
+        def toogleStar(): JsCmd = {
+            stuff.isStared(!stuff.isStared.is)
+            stuff.update()
+            
+            """$('#row%s a.star i').attr('class', '%s')""".format(stuff.idField, starClass)
+        }
+
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.update()
@@ -67,7 +79,9 @@ class Inbox extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
-        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) 
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
+        ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
+        ".star" #> ("i [class]" #> starClass)
     }
 
     def createStuffTable(stuffs: List[Stuff]) = 
