@@ -32,7 +32,7 @@ class Inbox
         stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
     }
 
-    def filterStuff(topic: Topic)(): JsCmd =
+    def filter(topic: Topic)(): JsCmd =
     {
         val newTable = createStuffTable(topic.stuffs)
 
@@ -41,6 +41,15 @@ class Inbox
         JsRaw("""$('#showAll').prop("disabled", false)""")
     }
     
+    def filter(project: Project)(): JsCmd =
+    {
+        val newTable = createStuffTable(project.stuffs)
+
+        JqSetHtml("stuffTable", newTable) &
+        JqSetHtml("current", Text(project.title.is)) &
+        JsRaw("""$('#showAll').prop("disabled", false)""")
+    }
+
     def showAllStuff() = 
     {
         JqSetHtml("stuffTable", completeStuffTable) & 
@@ -56,7 +65,10 @@ class Inbox
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
                 ".topic" #> stuff.topics.map{ topic =>
-                    "a" #> SHtml.a(filterStuff(topic)_, Text(topic.title.is))
+                    "a" #> SHtml.a(filter(topic)_, Text(topic.title.is))
+                } &
+                ".project" #> stuff.projects.map{ project =>
+                    "a" #> SHtml.a(filter(project)_, Text(project.title.is))
                 } &
                 ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
                 ".deadline *" #> formatDeadline(stuff)

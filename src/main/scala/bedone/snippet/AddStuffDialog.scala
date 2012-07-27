@@ -32,10 +32,15 @@ class AddStuffDialog(postAction: => JsCmd) extends AjaxForm[Stuff] with ModalDia
     override protected val fields = List(record.title, record.description, record.deadline)
 
     private var topics: List[String] = Nil
+    private var projects: List[String] = Nil
 
     def saveAndClose(): JsCmd = {
 
-        record.saveTheRecord().foreach(_.addTopics(topics))
+        record.saveTheRecord().foreach { stuff =>
+            stuff.addTopics(topics)
+            stuff.addProjects(projects)
+        }
+
         hideModal & reInitForm & resetButton
     }
 
@@ -48,42 +53,25 @@ class AddStuffDialog(postAction: => JsCmd) extends AjaxForm[Stuff] with ModalDia
         }
     }
 
-    def topicForm = {
 
-        val fieldID = "stuffTopic"
-        val messageID = fieldID + "_msg"
-        val tagID = fieldID + "_tag"
-
-        def tagItJS = """
-            $('#%s').tagsInput({
-                autocomplete_url:'http://localhost:8081/autocomplete/topic',
-                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
-                defaultText: '新增主題',
-                width: 210,
-                height: 20,
-                onChange: function() { $('#%s').blur() }
-            });
-        """.format(tagID, tagID)
-
-        def ajaxTest(value: String) = {
-            this.topics = value.split(",").map(_.trim).filter(_.trim.length > 0).toList
-            Noop
-        }
-
-        ".control-group [id]" #> fieldID &
-        ".control-group *" #> (
-            ".control-label *" #> "主題" &
-            ".help-inline [id]" #> messageID &
-            ".help-inline *" #> "使用逗號分隔，按下 Enter 確認" &
-            "input" #> (
-                SHtml.textAjaxTest("", doNothing _, ajaxTest _, "id" -> tagID) ++
-                <script type="text/javascript">{tagItJS}</script>
-            )
-        )
+    def topicForm = tagsInput("stuffTopic", "主題", "新增主題", 
+                              "/autocomplete/topic") 
+    {
+        value: String => 
+            this.topics = value.split(",").map(_.trim).filter(_.length > 0).toList
     }
 
-    override def cssBinding = super.cssBinding :+ topicForm
-    override def reInitForm = super.reInitForm & """$('#stuffTopic_tag').importTags("")"""
+    def projectForm = tagsInput("stuffProject", "專案", "新增專案", 
+                              "/autocomplete/project") 
+    {
+        value: String => 
+            this.projects = value.split(",").map(_.trim).filter(_.length > 0).toList
+    }
+
+    override def cssBinding = super.cssBinding ++ List(topicForm, projectForm)
+    override def reInitForm = {
+        super.reInitForm & cleanTag("stuffTopic") & cleanTag("stuffProject")
+    }
 
     def render = {
         ".modal-body *" #> this.toForm &
