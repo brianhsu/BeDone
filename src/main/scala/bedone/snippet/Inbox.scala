@@ -2,7 +2,6 @@ package org.bedone.snippet
 
 import org.bedone.model._
 
-import net.liftweb.util.ClearClearable
 import net.liftweb.util.Helpers._
 
 import net.liftweb.http.S
