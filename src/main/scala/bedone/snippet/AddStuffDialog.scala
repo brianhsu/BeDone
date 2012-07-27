@@ -35,11 +35,7 @@ class AddStuffDialog(postAction: => JsCmd) extends AjaxForm[Stuff] with ModalDia
 
     def saveAndClose(): JsCmd = {
 
-        record.saveTheRecord().foreach { savedRecord => 
-            val stuffTopic = StuffTopic.createRecord.stuffID(record.idField.is)
-            topics.foreach(topic => stuffTopic.topic(topic).saveTheRecord)
-        }
-
+        record.saveTheRecord().foreach(_.addTopics(topics))
         hideModal & reInitForm & resetButton
     }
 

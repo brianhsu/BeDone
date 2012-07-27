@@ -6,7 +6,7 @@ import net.liftweb.util.FieldError
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
-import net.liftweb.record.field.LongField
+import net.liftweb.record.field.IntField
 import net.liftweb.record.field.StringField
 import net.liftweb.record.field.PasswordField
 import net.liftweb.record.field.EmailField
@@ -48,12 +48,12 @@ object User extends User with MetaRecord[User]
     def isLoggedIn = CurrentUser.get.isDefined
 }
 
-class User extends Record[User] with KeyedRecord[Long] with MyValidation
+class User extends Record[User] with KeyedRecord[Int] with MyValidation
 {
     def meta = User
 
     @Column(name="id")
-    val idField = new LongField(this, 1)
+    val idField = new IntField(this, 1)
 
     val username = new StringField(this, "") {
 
@@ -100,5 +100,4 @@ class User extends Record[User] with KeyedRecord[Long] with MyValidation
         CurrentUser.set(Full(this))
         postAction
     }
-
 }
