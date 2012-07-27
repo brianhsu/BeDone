@@ -23,4 +23,13 @@ object ManyToMany
     class StuffProject(val stuffID: Int, val projectID: Int) extends KeyedEntity[Key] {
         def id = compositeKey(stuffID, projectID)
     }
+
+    class MaybeTopic(val maybeID: Int, val topicID: Int) extends KeyedEntity[Key] {
+        def id = compositeKey(maybeID, topicID)
+    }
+
+    class MaybeProject(val maybeID: Int, val projectID: Int) extends KeyedEntity[Key] {
+        def id = compositeKey(maybeID, projectID)
+    }
+
 }

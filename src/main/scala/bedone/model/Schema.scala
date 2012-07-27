@@ -41,6 +41,18 @@ object BeDoneSchema extends Schema
              relation.projectID === project.idField)
     )
 
+    val maybeProjects = manyToManyRelation(maybes, projects).via[MaybeProject](
+        (maybe, project, relation) => 
+            (relation.maybeID === maybe.idField, 
+             relation.projectID === project.idField)
+    )
+
+    val maybeTopics = manyToManyRelation(maybes, topics).via[MaybeTopic](
+        (maybe, topic, relation) => 
+            (relation.maybeID === maybe.idField, 
+             relation.topicID === topic.idField)
+    )
+
     // Unique and Index
     on(users) { user => declare(user.username defineAs unique, user.email defineAs unique) }
     on(projects) { project => declare(columns(project.userID, project.title) are unique)}
@@ -51,5 +63,7 @@ object BeDoneSchema extends Schema
     oneToManyRelation(users, references).via { (u, r) => u.id === r.userID }
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
+    oneToManyRelation(users, maybes).via { (u, m) => u.id === m.userID }
+
 }
 
