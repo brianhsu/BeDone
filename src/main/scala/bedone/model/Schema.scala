@@ -10,11 +10,16 @@ object BeDoneSchema extends Schema
     // Entity 
     val users = table[User]("Users")
     val stuffs = table[Stuff]("Stuffs")
+
+
     val maybes = table[Maybe]("Maybes")
     val actions = table[Action]("Actions")
+    val scheduled = table[Scheduled]("Scheduled")
+    val delegated = table[Delegated]("Delegated")
 
     val projects = table[Project]("Projects")
     val topics = table[Topic]("Topics")
+    val contacts = table[Contacts]("Contacts")
 
     // Many to Many Relations
     val stuffTopics = manyToManyRelation(stuffs, topics).via[StuffTopic](
@@ -36,6 +41,8 @@ object BeDoneSchema extends Schema
 
     on(actions) { action => declare(action.stuffID is primaryKey) }
     on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
+    on(scheduled) { scheduled => declare(scheduled.stuffID is primaryKey) }
+    on(delegated) { delegated => declare(delegated.stuffID is primaryKey) }
 
     // Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
@@ -44,5 +51,10 @@ object BeDoneSchema extends Schema
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.stuffID }
+    oneToManyRelation(stuffs, scheduled).via { (st, sc) => st.id === sc.stuffID }
+    oneToManyRelation(stuffs, delegated).via { (s, d) => s.id === d.stuffID }
+
+    oneToManyRelation(contacts, delegated).via { (c, d) => c.id === d.contactID }
+
 }
 
