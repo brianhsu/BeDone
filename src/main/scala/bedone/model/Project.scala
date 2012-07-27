@@ -52,8 +52,7 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
+    def stuffs = inTransaction(BeDoneSchema.stuffProjects.right(this).toList)
 
-    def stuffs = inTransaction { BeDoneSchema.stuffProjects.right(this).toList }
-    def references = inTransaction { BeDoneSchema.referenceProjects.right(this).toList }
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
 }

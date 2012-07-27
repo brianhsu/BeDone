@@ -8,14 +8,6 @@ object ManyToMany
 {
     type Key = CompositeKey2[Int,Int]
 
-    class ReferenceProject(val referenceID: Int, val projectID: Int) extends KeyedEntity[Key] {
-        def id = compositeKey(referenceID, projectID)
-    }
-
-    class ReferenceTopic(val referenceID: Int, val topicID: Int) extends KeyedEntity[Key] {
-        def id = compositeKey(referenceID, topicID)
-    }
-
     class StuffTopic(val stuffID: Int, val topicID: Int) extends KeyedEntity[Key] {
         def id = compositeKey(stuffID, topicID)
     }
@@ -23,13 +15,4 @@ object ManyToMany
     class StuffProject(val stuffID: Int, val projectID: Int) extends KeyedEntity[Key] {
         def id = compositeKey(stuffID, projectID)
     }
-
-    class MaybeTopic(val maybeID: Int, val topicID: Int) extends KeyedEntity[Key] {
-        def id = compositeKey(maybeID, topicID)
-    }
-
-    class MaybeProject(val maybeID: Int, val projectID: Int) extends KeyedEntity[Key] {
-        def id = compositeKey(maybeID, projectID)
-    }
-
 }

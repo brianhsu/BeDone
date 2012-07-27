@@ -15,6 +15,7 @@ import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
 import net.liftweb.record.field.OptionalDateTimeField
 import net.liftweb.record.field.BooleanField
+import net.liftweb.record.field.EnumField
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -23,6 +24,11 @@ import org.squeryl.annotations.Column
 import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
+
+object StuffType extends Enumeration {
+    type StuffType = Value
+    val Stuff, Action, Refrence, Maybe  = Value
+}
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
@@ -49,6 +55,8 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val idField = new IntField(this, 1)
     val userID = new IntField(this)
     val createTime = new DateTimeField(this)
+    val stuffType = new EnumField(this, StuffType, StuffType.Stuff)
+
     val isTrash = new BooleanField(this, false)
 
     val title = new StringField(this, "") {
