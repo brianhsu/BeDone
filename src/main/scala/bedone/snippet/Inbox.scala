@@ -30,7 +30,10 @@ class Inbox extends JSImplicit
 
     def formatDeadline(stuff: Stuff) = 
     {
-        stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
+        stuff.deadline.is match {
+            case None => "*" #> ""
+            case Some(calendar) => ".label *" #> dateFormatter.format(calendar.getTime)
+        }
     }
 
     def filter(topic: Topic)(): JsCmd =
@@ -39,7 +42,9 @@ class Inbox extends JSImplicit
 
         JqSetHtml("stuffTable", newTable) &
         JqSetHtml("current", Text(topic.title.is)) &
-        JsRaw("""$('#showAll').prop("disabled", false)""")
+        JsRaw("""$('#showAll').prop("disabled", false)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-info")""")
+
     }
     
     def filter(project: Project)(): JsCmd =
@@ -48,7 +53,8 @@ class Inbox extends JSImplicit
 
         JqSetHtml("stuffTable", newTable) &
         JqSetHtml("current", Text(project.title.is)) &
-        JsRaw("""$('#showAll').prop("disabled", false)""")
+        JsRaw("""$('#showAll').prop("disabled", false)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-success")""")
     }
 
     def showAllStuff() = 
@@ -69,7 +75,7 @@ class Inbox extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.update()
             
-            """$('#row%s a.star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = {
@@ -81,7 +87,8 @@ class Inbox extends JSImplicit
 
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
-        ".star" #> ("i [class]" #> starClass)
+        ".star" #> ("i [class]" #> starClass) &
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
     }
 
     def createStuffTable(stuffs: List[Stuff]) = 
@@ -90,7 +97,8 @@ class Inbox extends JSImplicit
         val cssBinding = 
             ".stuffs" #> stuffs.filter(!_.isTrash.is).map ( stuff =>
                 actionBar(stuff) &
-                "tr [id]"  #> ("row" + stuff.idField) &
+                ".stuffs [id]"  #> ("row" + stuff.idField) &
+                ".collapse [id]" #> ("desc" + stuff.idField) &
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
                 ".topic"   #> stuff.topics.map{ topic =>
@@ -99,8 +107,7 @@ class Inbox extends JSImplicit
                 ".project" #> stuff.projects.map{ project =>
                     "a" #> SHtml.a(filter(project)_, Text(project.title.is))
                 } &
-                ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
-                ".deadline *"   #> formatDeadline(stuff)
+                ".deadline"   #> formatDeadline(stuff)
             )
 
         template.map(cssBinding).open_!
