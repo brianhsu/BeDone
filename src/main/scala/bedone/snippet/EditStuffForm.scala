@@ -1,6 +1,7 @@
 package org.bedone.snippet
 
 import org.bedone.model._
+import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
@@ -16,17 +17,27 @@ import scala.xml.Text
 import net.liftweb.record.Record
 import java.text.SimpleDateFormat
 
-class EditStuffForm(stuff: Stuff)(postAction: => JsCmd)
+class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
 {
     lazy val template = Templates("templates-hidden" :: "editStuff" :: Nil)
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+    private var topic: Option[String] = _
     
+    def setTopic(s: String) { topic = if (s.length > 0) Some(s) else None }
+
+    def addTopic(): JsCmd = {
+        println("AddTopic")
+        
+        """$('.inputTopic').val('')"""
+    }
+
     def cssBinder = {
         val deadline = stuff.deadline.is.map(x => dateFormatter.format(x.getTime)).getOrElse("")
 
         ".title [value]" #> stuff.title &
-        ".topic [value]" #> stuff.topics.map(_.title.is).mkString(",") &
-        ".project [value]" #> stuff.projects.map(_.title.is).mkString(",") &
+        ".inputTopic" #> (SHtml.text("", setTopic _)) &
+        ".inputTopicHidden" #> (SHtml.hidden(addTopic)) &
         ".desc *" #> stuff.description &
         ".deadline [value]" #> deadline &
         "#QQQQ" #> "QQQQ"

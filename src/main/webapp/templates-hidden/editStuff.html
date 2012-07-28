@@ -15,21 +15,40 @@
     </fieldset>
     <div class="pull-right form-inline">
       <div class="input-prepend" style="margin-right:0.5em;">
+        <form action="." data-lift="lift:Form.ajax">
         <span title="主題" class="add-on">
           <i class="icon-tags"></i>
-        </span><input id="topicTags" class="topic input-medium" type="text" placeholder="主題">
+        </span><input class="inputTopic input-medium" type="text" placeholder="主題">
+        <input type="hidden" class="inputTopicHidden">
+        </form>
       </div>
       <div class="input-prepend" style="margin-right: 0.5em">
         <span title="專案" class="add-on">
           <i class="icon-folder-open"></i>
-        </span><input id="projectTags" class="project input-medium" type="text" placeholder="專案">
+        </span><input class="inputProject input-medium" type="text" placeholder="專案">
       </div>
+    </div>
+  </div>
+  <div style="margin-top: 0.2em; margin-bottom: 1em; margin-right:0.5em;">
+    <div class="projectTags pull-right" style="margin-bottom: 1em">
+      <button class="project btn btn-success btn-mini">
+        <i class="icon-folder-open" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Project1</span>
+        <i class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </button>
+    </div>
+    <div class="topicTags pull-right" style="margin-bottom: 1em">
+      <button class="topic btn btn-info btn-mini">
+        <i class="icon-tags" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Topic</span>
+        <i class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </button>
     </div>
   </div>
   <div class="asTable" style="width: 100%">
     <textarea rows="5" class="desc valign" style="margin-left: 0.2em; width: 98%"></textarea>
   </div>
-  <fieldset class="control-group error">
+  <fieldset class="control-group">
     <div style="margin-right:0.5em;">
       <label class="help-inline">完成期限：</label>
       <input class="deadline input-medium" type="text" placeholder="">
@@ -40,23 +59,4 @@
       <button class="cancel btn" style="margin-right:0.5em">取消</button>
       <button class="save btn btn-primary">儲存</button>
   </div>
-  <script>
-            $('#topicTags').tagsInput({
-                autocomplete_url:'/autocomplete/topic',
-                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
-                defaultText: '',
-                width: 210,
-                height: 20,
-                onChange: function() { $('#topicTags').blur() }
-            });
-            $('#projectTags').tagsInput({
-                autocomplete_url:'/autocomplete/project',
-                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
-                defaultText: '',
-                width: 210,
-                height: 20,
-                onChange: function() { $('#topicTags').blur() }
-            });
-
-  </script>
 </div>
