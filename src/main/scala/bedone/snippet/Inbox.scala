@@ -112,7 +112,7 @@ class Inbox extends JSImplicit
                 ".deadline"   #> formatDeadline(stuff)
             )
 
-        template.map(cssBinding).open_!
+        template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
     def stuffTable = 
