@@ -117,7 +117,6 @@ class Inbox extends JSImplicit
 
     def stuffTable = 
     {
-        "#noStuff" #> "" &
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#stuffTable *" #> completeStuffTable
     }
