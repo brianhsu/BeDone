@@ -1,6 +1,7 @@
 package org.bedone.snippet
 
 import org.bedone.model._
+import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
@@ -18,7 +19,7 @@ import scala.xml.Text
 
 import java.text.SimpleDateFormat
 
-class Inbox
+class Inbox extends JSImplicit
 {
 
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
@@ -29,7 +30,10 @@ class Inbox
 
     def formatDeadline(stuff: Stuff) = 
     {
-        stuff.deadline.is.map(c => dateFormatter.format(c.getTime)).getOrElse("")
+        stuff.deadline.is match {
+            case None => "*" #> ""
+            case Some(calendar) => ".label *" #> dateFormatter.format(calendar.getTime)
+        }
     }
 
     def filter(topic: Topic)(): JsCmd =
@@ -38,7 +42,9 @@ class Inbox
 
         JqSetHtml("stuffTable", newTable) &
         JqSetHtml("current", Text(topic.title.is)) &
-        JsRaw("""$('#showAll').prop("disabled", false)""")
+        JsRaw("""$('#showAll').prop("disabled", false)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-info")""")
+
     }
     
     def filter(project: Project)(): JsCmd =
@@ -47,7 +53,8 @@ class Inbox
 
         JqSetHtml("stuffTable", newTable) &
         JqSetHtml("current", Text(project.title.is)) &
-        JsRaw("""$('#showAll').prop("disabled", false)""")
+        JsRaw("""$('#showAll').prop("disabled", false)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-success")""")
     }
 
     def showAllStuff() = 
@@ -57,21 +64,52 @@ class Inbox
         JsRaw("""$('#showAll').prop("disabled", true)""")
     }
 
+    def actionBar(stuff: Stuff) = {
+
+        def starClass = stuff.isStared.is match {
+            case true  => "myicon-starOn"
+            case false => "myicon-starOff"
+        }
+
+        def toogleStar(): JsCmd = {
+            stuff.isStared(!stuff.isStared.is)
+            stuff.update()
+            
+            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+        }
+
+        def markAsTrash(): JsCmd = {
+            stuff.isTrash(true)
+            stuff.update()
+
+            new FadeOut("row" + stuff.idField, 0, 500)
+        }
+
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
+        ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
+        ".star" #> ("i [class]" #> starClass) &
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
+    }
+
     def createStuffTable(stuffs: List[Stuff]) = 
     {
         val template = Templates("templates-hidden" :: "stuffTable" :: Nil)
         val cssBinding = 
-            ".stuffs" #> stuffs.map ( stuff =>
+            ".stuffs" #> stuffs.filter(!_.isTrash.is).map ( stuff =>
+                actionBar(stuff) &
+                ".stuffs [id]"  #> ("row" + stuff.idField) &
+                ".collapse [id]" #> ("desc" + stuff.idField) &
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
-                ".topic" #> stuff.topics.map{ topic =>
-                    "a" #> SHtml.a(filter(topic)_, Text(topic.title.is))
+                ".topic"   #> stuff.topics.map{ topic =>
+                    "a [onclick]" #> SHtml.onEvent(s => filter(topic)) &
+                    ".title" #> topic.title.is
                 } &
                 ".project" #> stuff.projects.map{ project =>
-                    "a" #> SHtml.a(filter(project)_, Text(project.title.is))
+                    "a [onclick]" #> SHtml.onEvent(s => filter(project)) &
+                    ".title" #> project.title.is
                 } &
-                ".createTime *" #> dateTimeFormatter.format(stuff.createTime.is.getTime) &
-                ".deadline *" #> formatDeadline(stuff)
+                ".deadline"   #> formatDeadline(stuff)
             )
 
         template.map(cssBinding).open_!

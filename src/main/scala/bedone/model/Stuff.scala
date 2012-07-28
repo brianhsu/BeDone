@@ -58,6 +58,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val stuffType = new EnumField(this, StuffType, StuffType.Stuff)
 
     val isTrash = new BooleanField(this, false)
+    val isStared = new BooleanField(this, false)
 
     val title = new StringField(this, "") {
         override def displayName = "標題"
@@ -86,6 +87,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     }
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
+    def update() = inTransaction { tryo(BeDoneSchema.stuffs.update(this)) }
 
     def addTopics(topicTitles: List[String]) {
 

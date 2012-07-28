@@ -1,11 +1,15 @@
+@sidebarBackground: #FAFAD2;
+@stuffBackground: lightgray;
+
+
 body {
-  /* 60px to make the container go all the way to the bottom of the topbar */
-  padding-top: 60px; 
+    /* 60px to make the container go all the way to the bottom of the topbar */
+    padding-top: 60px; 
 }
 
 .heroText {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 .alert ul {
@@ -24,21 +28,19 @@ body {
 }
 
 .rounded-corners (@radius: 5px) {
-  border-radius: @radius;
-  -webkit-border-radius: @radius;
-  -moz-border-radius: @radius;
+    border-radius: @radius;
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
 }
 
-@sidebarBackground: #FAFAD2;
-
 .box-shadow(@style, @c) when (iscolor(@c)) {
-  box-shadow:         @style @c;
-  -webkit-box-shadow: @style @c;
-  -moz-box-shadow:    @style @c;
+    box-shadow:         @style @c;
+    -webkit-box-shadow: @style @c;
+    -moz-box-shadow:    @style @c;
 }
 
 .box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
-  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+    .box-shadow(@style, rgba(0, 0, 0, @alpha));
 }
 
 .sidebar {
@@ -55,4 +57,46 @@ body {
 
 a.topic {
     margin-left: 0.2em;
+}
+
+a.project {
+    margin-left: 0.2em;
+}
+
+i.myicon-starOn {
+    background-image: url('../img/star_on.png');
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+i.myicon-starOff {
+    background-image: url('../img/star_off.png');
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+div.stuffs {
+    margin-bottom: 0.8em;
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+
+    background: @stuffBackground;
+    .rounded-corners(5px);
+    .box-shadow(0 0 4px, 30%);
+
+    div.desc {
+        margin: 1em;
+    }
+
+    .showDesc {
+        margin-left: 0.5em;
+    }
+}
+
+.inline {
+    display: inline-block;
 }
