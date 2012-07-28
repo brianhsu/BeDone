@@ -53,7 +53,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
     def meta = User
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
 
     val username = new StringField(this, "") {
 

@@ -52,7 +52,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     def meta = Stuff
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
     val userID = new IntField(this)
     val createTime = new DateTimeField(this)
     val stuffType = new EnumField(this, StuffType, StuffType.Stuff)

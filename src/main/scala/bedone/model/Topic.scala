@@ -47,7 +47,7 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
     def meta = Topic
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
     val userID = new IntField(this)
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
