@@ -102,10 +102,12 @@ class Inbox extends JSImplicit
                 ".title *" #> stuff.title &
                 ".desc *"  #> stuff.descriptionHTML &
                 ".topic"   #> stuff.topics.map{ topic =>
-                    "a" #> SHtml.a(filter(topic)_, Text(topic.title.is))
+                    "a [onclick]" #> SHtml.onEvent(s => filter(topic)) &
+                    ".title" #> topic.title.is
                 } &
                 ".project" #> stuff.projects.map{ project =>
-                    "a" #> SHtml.a(filter(project)_, Text(project.title.is))
+                    "a [onclick]" #> SHtml.onEvent(s => filter(project)) &
+                    ".title" #> project.title.is
                 } &
                 ".deadline"   #> formatDeadline(stuff)
             )
