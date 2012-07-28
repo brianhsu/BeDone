@@ -5,33 +5,58 @@
       <i class="icon-remove"></i>
       <i class="myicon-starOff"></i>
     </span>
-    <div class="inline input-prepend" style="margin-right:0.5em; margin-left: 0.5em">
-      <span title="標題" class="add-on">
-        <i class="icon-th-list"></i>
-      </span><input class="title input-xlarge" type="text" placeholder="標題">
-    </div>
+    <fieldset class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="title input-xlarge" type="text" placeholder="標題">
+        <span class="titleError help-inline"></span>
+      </div>
+    </fieldset>
     <div class="pull-right form-inline">
       <div class="input-prepend" style="margin-right:0.5em;">
         <span title="主題" class="add-on">
           <i class="icon-tags"></i>
-        </span><input class="topic input-medium" type="text" placeholder="主題">
+        </span><input id="topicTags" class="topic input-medium" type="text" placeholder="主題">
       </div>
       <div class="input-prepend" style="margin-right: 0.5em">
         <span title="專案" class="add-on">
           <i class="icon-folder-open"></i>
-        </span><input class="project input-medium" type="text" placeholder="專案">
+        </span><input id="projectTags" class="project input-medium" type="text" placeholder="專案">
       </div>
     </div>
   </div>
   <div class="asTable" style="width: 100%">
     <textarea rows="5" class="desc valign" style="margin-left: 0.2em; width: 98%"></textarea>
   </div>
-  <div class="form-inline pull-left" style="padding-left:0.5em">
-       <label for="deadline-edit">完成期限：</label>
-       <input type="text" class="deadline input-xlarge" id="deadline-edit">
-  </div>
+  <fieldset class="control-group error">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">完成期限：</label>
+      <input class="deadline input-medium" type="text" placeholder="">
+      <label class="deadlineError help-inline">SSSS</label>
+    </div>
+  </fieldset>
   <div style="text-align: right; margin-right: 0.5em">
       <button class="cancel btn" style="margin-right:0.5em">取消</button>
       <button class="save btn btn-primary">儲存</button>
   </div>
+  <script>
+            $('#topicTags').tagsInput({
+                autocomplete_url:'/autocomplete/topic',
+                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
+                defaultText: '',
+                width: 210,
+                height: 20,
+                onChange: function() { $('#topicTags').blur() }
+            });
+            $('#projectTags').tagsInput({
+                autocomplete_url:'/autocomplete/project',
+                autocomplete:{selectFirst:true,width:'100px',autoFill:true},
+                defaultText: '',
+                width: 210,
+                height: 20,
+                onChange: function() { $('#topicTags').blur() }
+            });
+
+  </script>
 </div>

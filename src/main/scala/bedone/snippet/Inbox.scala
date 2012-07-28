@@ -117,6 +117,8 @@ class Inbox extends JSImplicit
 
     def stuffTable = 
     {
+        val editStuff = new EditStuffForm(stuffs(0))(Noop)
+        "#editForm *" #> editStuff.toForm &
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#stuffTable *" #> completeStuffTable
     }
