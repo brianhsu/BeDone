@@ -1,6 +1,8 @@
 package org.bedone.model
 
 import org.squeryl.Schema
+import org.squeryl.ForeignKeyDeclaration
+
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import ManyToMany._
@@ -44,7 +46,7 @@ object BeDoneSchema extends Schema
     on(scheduled) { scheduled => declare(scheduled.stuffID is primaryKey) }
     on(delegated) { delegated => declare(delegated.stuffID is primaryKey) }
 
-    // Foreign Keys
+    // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
@@ -55,6 +57,10 @@ object BeDoneSchema extends Schema
     oneToManyRelation(stuffs, delegated).via { (s, d) => s.id === d.stuffID }
 
     oneToManyRelation(contacts, delegated).via { (c, d) => c.id === d.contactID }
+
+    // Foreign Key policy
+    override def applyDefaultForeignKeyPolicy(foreignKeyDeclaration: ForeignKeyDeclaration) =
+        foreignKeyDeclaration.constrainReference(onDelete cascade)
 
 }
 
