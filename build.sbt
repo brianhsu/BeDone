@@ -16,6 +16,8 @@ seq(lessSettings:_*)
 (resourceManaged in (Compile, LessKeys.less)) <<= 
     (sourceDirectory in Compile)(_ / "webapp" / "bootstrap" / "css")
 
+(compile in Compile) <<= compile in Compile dependsOn (LessKeys.less in Compile)
+
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 resolvers += "Scala-Tools Maven2 Snapshots Repository" at 
