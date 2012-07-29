@@ -16,45 +16,56 @@
     <div class="pull-right form-inline">
       <div class="input-prepend" style="margin-right:0.5em;">
         <form action="." data-lift="lift:Form.ajax">
-        <span title="主題" class="add-on">
-          <i class="icon-tags"></i>
-        </span><input class="inputTopic input-medium" type="text" placeholder="主題">
-        <input type="hidden" class="inputTopicHidden">
+          <span title="主題" class="add-on">
+            <i class="icon-tags"></i>
+          </span><input id="inputTopic" class="input-medium" type="text" placeholder="主題">
+          <input type="hidden" id="inputTopicHidden">
         </form>
       </div>
       <div class="input-prepend" style="margin-right: 0.5em">
-        <span title="專案" class="add-on">
-          <i class="icon-folder-open"></i>
-        </span><input class="inputProject input-medium" type="text" placeholder="專案">
+        <form action="." data-lift="lift:Form.ajax">
+          <span title="專案" class="add-on">
+            <i class="icon-folder-open"></i>
+          </span><input class="inputProject input-medium" type="text" placeholder="專案">
+        </form>
       </div>
     </div>
   </div>
-  <div style="margin-top: 0.2em; margin-bottom: 1em; margin-right:0.5em;">
-    <div class="projectTags pull-right" style="margin-bottom: 1em">
-      <button class="project btn btn-success btn-mini">
-        <i class="icon-folder-open" style="margin-top: 2px; margin-right: 2px"></i>
-        <span class="title">Project1</span>
-        <i class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
-      </button>
-    </div>
-    <div class="topicTags pull-right" style="margin-bottom: 1em">
-      <button class="topic btn btn-info btn-mini">
+  <div style="margin: 0.5em; display: table; width: 98%">
+    <div id="editStuffTopics" class="inline" style="float:right">
+      <div class="btn-tag btn btn-info btn-mini" id="buttonID1">
         <i class="icon-tags" style="margin-top: 2px; margin-right: 2px"></i>
-        <span class="title">Topic</span>
-        <i class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
-      </button>
+        <span class="title">Topic1</span>
+        <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </div>
+      <div class="btn-tag btn btn-info btn-mini" id="buttonID2">
+        <i class="icon-tags" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Topic1</span>
+        <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </div>
+    </div>
+    <div id="editStuffProjects" class="inline" style="float:right">
+      <div class="btn-tag btn btn-success btn-mini" id="buttonID">
+        <i class="icon-folder-open" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Project</span>
+        <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </div>
     </div>
   </div>
+
   <div class="asTable" style="width: 100%">
     <textarea rows="5" class="desc valign" style="margin-left: 0.2em; width: 98%"></textarea>
   </div>
-  <fieldset class="control-group">
+
+  <fieldset class="control-group" style="float: left">
     <div style="margin-right:0.5em;">
       <label class="help-inline">完成期限：</label>
       <input class="deadline input-medium" type="text" placeholder="">
       <label class="deadlineError help-inline">SSSS</label>
     </div>
   </fieldset>
+
+
   <div style="text-align: right; margin-right: 0.5em">
       <button class="cancel btn" style="margin-right:0.5em">取消</button>
       <button class="save btn btn-primary">儲存</button>
