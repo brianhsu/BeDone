@@ -28,22 +28,30 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     private var topic: Option[String] = _
+    private var project: Option[String] = _
+
     private var currentTopics: List[Topic] = stuff.topics
-   
+    private var currentProjects: List[Project] = stuff.projects
+  
     def setTopic(s: String) { topic = if (s.length > 0) Some(s) else None }
+    def setProject(s: String) { project = if (s.length > 0) Some(s) else None }
 
     def addTopic(title: String) = {
         val userID = CurrentUser.get.get.idField.is
-
-        def createTopic = {
-            Topic.createRecord.userID(userID).title(title).
-            saveTheRecord.get
-        }
-
+        def createTopic = Topic.createRecord.userID(userID).title(title)
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         ClearValue("inputTopic") &
         AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+    }
+
+    def addProject(title: String) = {
+        val userID = CurrentUser.get.get.idField.is
+        def createProject = Project.createRecord.userID(userID).title(title)
+        val project = Project.findByTitle(userID, title).getOrElse(createProject)
+
+        ClearValue("inputProject") &
+        AppendHtml("editStuffProjects", project.editButton(onProjectClick, onProjectRemove))
     }
 
     def addTopic(): JsCmd = topic match {
@@ -51,17 +59,22 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         case Some(title) => addTopic(title)
     }
 
-    def onTopicClick(button: String, topic: Topic) = Noop
-    def onProjectClick(button: String, project: Project) = Noop
+    def addProject(): JsCmd = project match {
+        case None => Noop
+        case Some(title) => addProject(title)
+    }
+
+    def onTopicClick(buttonID: String, topic: Topic) = Noop
+    def onProjectClick(buttonID: String, project: Project) = Noop
+
+    def onProjectRemove(buttonID: String, project: Project) = {
+        currentProjects = currentProjects.filterNot(_ == project)
+        FadeOutAndRemove(buttonID)
+    }
 
     def onTopicRemove(buttonID: String, topic: Topic) = {
         currentTopics = currentTopics.filterNot(_ == topic)
-
-        """
-            $('#%s').fadeOut(500, function() { 
-                $('#%s').remove() 
-            })
-        """.format(buttonID, buttonID)
+        FadeOutAndRemove(buttonID)
     }
 
     def cssBinder = {
@@ -72,7 +85,10 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         ".deadline [value]" #> deadline &
         "#inputTopic" #> (SHtml.text("", setTopic _)) &
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
+        "#inputProject" #> (SHtml.text("", setProject _)) &
+        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
+        "#editStuffProjects *" #> currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
     }
 
     def toForm = {

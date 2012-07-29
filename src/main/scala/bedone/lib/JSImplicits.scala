@@ -11,6 +11,16 @@ trait JSImplicit
         def apply(id: String) = """$('#%s').val('')""".format(id)
     }
 
+    object FadeOutAndRemove
+    {
+        def apply(id: String, timespan: Int = 500) = 
+            """
+                $('#%s').fadeOut(%d, function() { 
+                    $('#%s').remove() 
+                })
+            """.format(id, timespan, id)
+    }
+
     protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
 }
 
