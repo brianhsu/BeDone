@@ -33,16 +33,7 @@ body {
   margin-top: 3px;
   padding-right: 5px;
 }
-a.topic {
-  margin-left: 0.2em;
-}
-a.project {
-  margin-left: 0.2em;
-}
-button.topic {
-  margin-left: 0.2em;
-}
-button.project {
+div.btn-tag {
   margin-left: 0.2em;
 }
 i.myicon-starOn {
@@ -99,11 +90,4 @@ div.stuffs .showDesc {
 }
 .inline {
   display: inline-block;
-}
-.asTable {
-  display: table;
-}
-.valign {
-  vertical-align: middle;
-  text-align: left;
 }

@@ -19,7 +19,8 @@ import java.text.SimpleDateFormat
 
 class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
 {
-    lazy val template = Templates("templates-hidden" :: "editStuff" :: Nil)
+    private def template = Templates("templates-hidden" :: "editStuff" :: Nil)
+
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     private var topic: Option[String] = _
