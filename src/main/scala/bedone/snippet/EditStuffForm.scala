@@ -95,13 +95,15 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
 
         ".title [value]" #> stuff.title &
         ".desc *" #> stuff.description &
-        ".deadline [value]" #> deadline &
+        "#deadline [value]" #> deadline &
         "#inputTopic" #> (SHtml.text("", setTopic _)) &
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
         "#inputProject" #> (SHtml.text("", setProject _)) &
         "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
         "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+        "#editStuffProjects *" #> (
+            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+        )
     }
 
     def toForm = {
