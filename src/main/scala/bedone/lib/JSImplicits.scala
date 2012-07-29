@@ -8,12 +8,12 @@ trait JSImplicit
 {
     object ClearValue
     {
-        def apply(id: String) = """$('#%s').val('')""".format(id)
+        def apply(id: String): JsCmd = """$('#%s').val('')""".format(id)
     }
 
     object FadeOutAndRemove
     {
-        def apply(id: String, timespan: Int = 500) = 
+        def apply(id: String, timespan: Int = 500): JsCmd = 
             """
                 $('#%s').fadeOut(%d, function() { 
                     $('#%s').remove() 

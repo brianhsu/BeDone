@@ -41,8 +41,13 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         def createTopic = Topic.createRecord.userID(userID).title(title)
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
-        ClearValue("inputTopic") &
-        AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+        currentTopics.contains(topic) match {
+            case true => ClearValue("inputTopic")
+            case false =>
+                currentTopics ::= topic
+                ClearValue("inputTopic") &
+                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+        }
     }
 
     def addProject(title: String) = {
@@ -50,8 +55,16 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         def createProject = Project.createRecord.userID(userID).title(title)
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
-        ClearValue("inputProject") &
-        AppendHtml("editStuffProjects", project.editButton(onProjectClick, onProjectRemove))
+        currentProjects.contains(project) match {
+            case true  => ClearValue("inputProject")
+            case false =>
+                currentProjects ::= project
+                ClearValue("inputProject") &
+                AppendHtml(
+                    "editStuffProjects", 
+                    project.editButton(onProjectClick, onProjectRemove)
+                )
+        }
     }
 
     def addTopic(): JsCmd = topic match {
