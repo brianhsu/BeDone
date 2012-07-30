@@ -4,6 +4,7 @@ import net.liftweb.common.Box
 import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.today
 
 import net.liftweb.util.FieldError
 
@@ -21,9 +22,10 @@ import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
-import net.liftweb.util.Helpers.tryo
+
 import java.io.StringReader
 import java.io.StringWriter
+import java.util.Calendar
 
 object StuffType extends Enumeration {
     type StuffType = Value
@@ -67,9 +69,17 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val description = new TextareaField(this, 1000) {
         override def displayName = "描述"
     }
+
     val deadline = new OptionalDateTimeField(this) {
-        override def displayName = "期限"
+
+        def afterToday(calendar: Option[Calendar]): List[FieldError] = {
+            val error = FieldError(this, "完成期限要比今天晚")
+            calendar.filter(_.before(today)).map(x => error).toList
+        }
+
+        override def displayName = "完成期限"
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
+        override def validations = afterToday _ :: super.validations
     }
 
     def topics = inTransaction(BeDoneSchema.stuffTopics.left(this).toList)
