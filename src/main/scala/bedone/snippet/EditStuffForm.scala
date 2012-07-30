@@ -3,6 +3,10 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Full
+import net.liftweb.common.Empty
+import net.liftweb.common.Failure
+
 import net.liftweb.util.Helpers._
 
 import net.liftweb.http.S
@@ -13,16 +17,17 @@ import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds._
 
-import scala.xml.NodeSeq
-import scala.xml.Text
-import net.liftweb.record.Record
+
 import java.text.SimpleDateFormat
+import java.text.ParseException
+import java.util.Calendar
 
 import TagButton.Implicit._
 
-
 class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
 {
+    private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
+
     private def template = Templates("templates-hidden" :: "editStuff" :: Nil)
 
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -33,9 +38,6 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
   
-    def setTopic(s: String) { topic = if (s.length > 0) Some(s) else None }
-    def setProject(s: String) { project = if (s.length > 0) Some(s) else None }
-
     def addTopic(title: String) = {
         val userID = CurrentUser.get.get.idField.is
         def createTopic = Topic.createRecord.userID(userID).title(title)
@@ -77,6 +79,7 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         case Some(title) => addProject(title)
     }
 
+    def doNothing(s: String) {}
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
 
@@ -90,20 +93,77 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
         FadeOutAndRemove(buttonID)
     }
 
+    def setTitle(title: String): JsCmd = {
+        val errors = stuff.title(title).validate
+        setError(errors, "editStuffTitle")._2
+    }
+
+    def setDeadline(deadline: String): JsCmd = {
+        println("deadline:" + deadline)
+        val newDeadline = optFromStr(deadline) match {
+            case None    => Empty
+            case Some(x) => try {
+                dateFormatter.setLenient(false)
+                val calendar = Calendar.getInstance
+                calendar.setTime(dateFormatter.parse(x))
+                Full(calendar)
+            } catch {
+                case e: ParseException => Failure("日期格式錯誤")
+            }
+        }
+
+        println("deadline:" + newDeadline)
+        stuff.deadline.setBox(newDeadline)
+
+        val errors = stuff.deadline.validate
+        setError(errors, "editStuffDeadline")._2
+    }
+
+    def setDescription(desc: String): JsCmd = {
+        stuff.description(desc)
+        Noop
+    }
+
+    def save(): JsCmd = {
+
+        val status = List(
+            setError(stuff.title.validate, "editStuffTitle"),
+            setError(stuff.deadline.validate, "editStuffDeadline")
+        )
+
+        val hasError = status.map(_._1).contains(true)
+        val jsCmds = status.map(_._2)
+
+        hasError match {
+            case true  => jsCmds
+            case false => 
+                stuff.setTopics(currentTopics)
+                stuff.setProjects(currentProjects)
+                stuff.update()
+                FadeOutAndRemove("stuffEdit")
+        }
+    }
+
     def cssBinder = {
+
         val deadline = stuff.deadline.is.map(x => dateFormatter.format(x.getTime)).getOrElse("")
 
-        ".title [value]" #> stuff.title &
-        ".desc *" #> stuff.description &
-        "#deadline [value]" #> deadline &
-        "#inputTopic" #> (SHtml.text("", setTopic _)) &
+        val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
+        val deadlineInput = SHtml.textAjaxTest(deadline, doNothing _, setDeadline _)
+
+        "#editStuffTitle" #> ("input" #> titleInput) &
+        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#editStuffDeadline" #> ("input" #> deadlineInput) &
+        "#inputTopic" #> (SHtml.text("", topic = _)) &
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", setProject _)) &
+        "#inputProject" #> (SHtml.text("", project = _)) &
         "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
         "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        )
+        ) &
+        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("editForm")) &
+        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save())
     }
 
     def toForm = {

@@ -1,16 +1,16 @@
-<div class="stuffs-edit" id="edit0" >
+<div id="stuffEdit" class="stuffs-edit">
   <div>
-    <span class="valign actionBar">
+    <span class="actionBar">
       <i class="icon-ok"></i>
       <i class="icon-remove"></i>
       <i class="myicon-starOff"></i>
     </span>
-    <fieldset class="inline control-group">
+    <fieldset id="editStuffTitle" class="inline control-group">
       <div class="input-prepend" style="margin-left: 0.5em">
         <span title="標題" class="add-on">
           <i class="icon-th-list"></i>
-        </span><input class="title input-xlarge" type="text" placeholder="標題">
-        <span class="titleError help-inline"></span>
+        </span><input class="input-xlarge" type="text" placeholder="標題">
+        <span id="editStuffTitle_msg" class="help-inline"></span>
       </div>
     </fieldset>
     <div class="pull-right form-inline">
@@ -47,25 +47,24 @@
         <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
       </div>
     </div>
-
   </div>
 
-  <div class="asTable" style="width: 100%">
-    <textarea rows="5" class="desc valign" style="margin-left: 0.2em; width: 98%"></textarea>
+  <div style="width: 100%">
+    <textarea rows="5" id="editStuffDesc" style="margin-left: 0.2em; width: 98%"></textarea>
   </div>
 
-  <fieldset class="control-group" style="float: left">
+  <fieldset id="editStuffDeadline" class="control-group" style="float: left">
     <div style="margin-right:0.5em;">
       <label class="help-inline">完成期限：</label>
-      <input id="deadline" class="input-medium" type="text" placeholder="">
-      <label id="deadlineError" class="help-inline"></label>
+      <input class="input-medium" type="text">
+      <label id="editStuffDeadline_msg" class="help-inline"></label>
     </div>
   </fieldset>
 
 
   <div style="text-align: right; margin-right: 0.5em">
-      <button class="cancel btn" style="margin-right:0.5em">取消</button>
-      <button class="save btn btn-primary">儲存</button>
+      <button id="editStuffCancel" class="btn" style="margin-right:0.5em">取消</button>
+      <button id="editStuffSave" class="btn btn-primary">儲存</button>
   </div>
   <script type="text/javascript">
       $( "#inputTopic" ).autocomplete({
@@ -85,9 +84,12 @@
       });
 
       $(function() {
-          $( "#deadline" ).datepicker({
+          $( "#editStuffDeadline input" ).datepicker({
               dateFormat: "yy-mm-dd",
-              onClose: function(dateText) {$("#deadline").blur();}
+              onClose: function(dateText) {
+                  $("#editStuffDeadline input").val(dateText);
+                  $("#editStuffDeadline input").blur();
+              }
           });
       });
   </script>

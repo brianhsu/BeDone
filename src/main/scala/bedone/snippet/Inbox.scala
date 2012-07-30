@@ -12,8 +12,6 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JE._
 import net.liftweb.http.js.jquery.JqJsCmds._
 
-import scala.xml.Text
-
 import java.text.SimpleDateFormat
 
 class Inbox extends JSImplicit
@@ -65,7 +63,7 @@ class Inbox extends JSImplicit
         val newTable = createStuffTable(topic.stuffs)
 
         JqSetHtml("stuffTable", newTable) &
-        JqSetHtml("current", Text(topic.title.is)) &
+        JqSetHtml("current", topic.title.is) &
         JsRaw("""$('#showAll').prop("disabled", false)""") &
         JsRaw("""$('#current').attr("class", "btn btn-info")""")
     }
@@ -75,7 +73,7 @@ class Inbox extends JSImplicit
         val newTable = createStuffTable(project.stuffs)
 
         JqSetHtml("stuffTable", newTable) &
-        JqSetHtml("current", Text(project.title.is)) &
+        JqSetHtml("current", project.title.is) &
         JsRaw("""$('#showAll').prop("disabled", false)""") &
         JsRaw("""$('#current').attr("class", "btn btn-success")""")
     }
@@ -83,7 +81,7 @@ class Inbox extends JSImplicit
     def showAllStuff() = 
     {
         JqSetHtml("stuffTable", completeStuffTable) & 
-        JqSetHtml("current", Text("全部")) &
+        JqSetHtml("current", "全部") &
         JsRaw("""$('#showAll').prop("disabled", true)""")
     }
 

@@ -119,9 +119,40 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         projectTitles.map(getProject).foreach(addProject)
     }
 
+    def removeProject(project: Project) = inTransaction {
+        BeDoneSchema.stuffProjects.left(this).dissociate(project)
+    }
+
     def addProject(project: Project) = inTransaction { 
+        if (!project.isPersisted) { project.saveTheRecord() }
         BeDoneSchema.stuffProjects.left(this).associate(project)
     }
+
+    def setProjects(projects: List[Project]) = inTransaction {
+        val shouldRemove = this.projects.filterNot(projects.contains)
+        val shouldAdd = projects.filterNot(this.projects.contains)
+
+        shouldRemove.foreach(removeProject)
+        shouldAdd.foreach(addProject)
+    }
+
+    def removeTopic(topic: Topic) = inTransaction {
+        BeDoneSchema.stuffTopics.left(this).dissociate(topic)
+    }
+
+    def addTopic(topic: Topic) = inTransaction { 
+        if (!topic.isPersisted) { topic.saveTheRecord() }
+        BeDoneSchema.stuffTopics.left(this).associate(topic)
+    }
+
+    def setTopics(topics: List[Topic]) = inTransaction {
+        val shouldRemove = this.topics.filterNot(topics.contains)
+        val shouldAdd = topics.filterNot(this.topics.contains)
+
+        shouldRemove.foreach(removeTopic)
+        shouldAdd.foreach(addTopic)
+    }
+
 }
 
 

@@ -10,10 +10,6 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 
-import scala.xml.NodeSeq
-import scala.xml.Text
-import net.liftweb.record.Record
-
 trait ModalDialog {
     protected val modalID: String
     protected val buttonID: String
@@ -76,8 +72,8 @@ class AddStuffDialog(postAction: => JsCmd) extends AjaxForm[Stuff] with ModalDia
     def render = {
         ".modal-body *" #> this.toForm &
         ".close" #> SHtml.ajaxButton("×", reInitForm _) &
-        ".close-link" #> SHtml.a(reInitForm _, Text("取消"), "href" -> "javascript:void(0)") &
-        "#addStuffButton" #> SHtml.ajaxButton(Text("新增"), addStuff _)
+        ".close-link" #> SHtml.a(reInitForm _, "取消", "href" -> "javascript:void(0)") &
+        "#addStuffButton" #> SHtml.ajaxButton("新增", addStuff _)
     }
 }
 
