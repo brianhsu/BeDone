@@ -113,9 +113,9 @@ class Inbox extends JSImplicit
     }
 
     def showEditForm(stuff: Stuff): JsCmd = {
-        val editStuff = new EditStuffForm(stuffs(0), editPostAction _)
+        val editStuff = new EditStuffForm(stuff, editPostAction _)
 
-        """$('editForm').empty()""" &
+        """$('#stuffEdit').remove()""" &
         AppendHtml("editForm", editStuff.toForm) &
         """prepareStuffEditForm()"""
     }
