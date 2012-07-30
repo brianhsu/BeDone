@@ -105,9 +105,14 @@ class Inbox extends JSImplicit
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
+    def editPostAction(stuff: Stuff) = {
+        FadeOutAndRemove("row" + stuff.idField.is)
+    }
+
     def stuffTable = 
     {
-        val editStuff = new EditStuffForm(stuffs(0))(Noop)
+        val editStuff = new EditStuffForm(stuffs(0), editPostAction _)
+
         "#editForm *" #> editStuff.toForm &
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#stuffTable *" #> completeStuffTable

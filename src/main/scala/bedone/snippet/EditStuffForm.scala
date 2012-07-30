@@ -24,7 +24,7 @@ import java.util.Calendar
 
 import TagButton.Implicit._
 
-class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
+class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
@@ -140,7 +140,7 @@ class EditStuffForm(stuff: Stuff)(postAction: => JsCmd) extends JSImplicit
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 stuff.update()
-                FadeOutAndRemove("stuffEdit")
+                FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
 
