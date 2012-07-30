@@ -28,7 +28,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
-    private def template = Templates("templates-hidden" :: "editStuff" :: Nil)
+    private def template = Templates("templates-hidden" :: "stuff" :: "edit" :: Nil)
 
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 

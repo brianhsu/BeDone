@@ -85,28 +85,31 @@ class Inbox extends JSImplicit
         JsRaw("""$('#showAll').prop("disabled", true)""")
     }
 
-    def createStuffTable(stuffs: List[Stuff]) = 
-    {
+    def createStuffTable(stuffs: List[Stuff]) = stuffs.map(createStuffRow).flatten
+
+    def createStuffRow(stuff: Stuff) = {
+
         import TagButton.Implicit._
 
-        def template = Templates("templates-hidden" :: "stuffTable" :: Nil)
+        def template = Templates("templates-hidden" :: "stuff" :: "table" :: Nil)
+
         val cssBinding = 
-            ".stuffs" #> stuffs.filter(!_.isTrash.is).map ( stuff =>
-                actionBar(stuff) &
-                ".stuffs [id]"   #> ("row" + stuff.idField) &
-                ".collapse [id]" #> ("desc" + stuff.idField) &
-                ".title *"       #> stuff.title &
-                ".desc *"        #> stuff.descriptionHTML &
-                ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
-                ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
-                ".deadline"      #> formatDeadline(stuff)
-            )
+            actionBar(stuff) &
+            ".stuffs [id]"   #> ("row" + stuff.idField) &
+            ".collapse [id]" #> ("desc" + stuff.idField) &
+            ".title *"       #> stuff.title &
+            ".desc *"        #> stuff.descriptionHTML &
+            ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
+            ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
+            ".deadline"      #> formatDeadline(stuff)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
+
     def editPostAction(stuff: Stuff) = {
-        FadeOutAndRemove("row" + stuff.idField.is)
+        val newRow = createStuffRow(stuff).flatMap(_.child)
+        JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
     def stuffTable = 
