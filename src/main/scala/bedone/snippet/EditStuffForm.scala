@@ -162,7 +162,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         ) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("editForm")) &
+        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
         "#editStuffSave [onclick]" #> SHtml.onEvent(x => save())
     }
 

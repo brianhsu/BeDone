@@ -101,22 +101,27 @@ class Inbox extends JSImplicit
             ".desc *"        #> stuff.descriptionHTML &
             ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
             ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
-            ".deadline"      #> formatDeadline(stuff)
+            ".deadline"      #> formatDeadline(stuff) &
+            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff))
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
-
-    def editPostAction(stuff: Stuff) = {
+    def editPostAction(stuff: Stuff): JsCmd = {
         val newRow = createStuffRow(stuff).flatMap(_.child)
         JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
-    def stuffTable = 
-    {
+    def showEditForm(stuff: Stuff): JsCmd = {
         val editStuff = new EditStuffForm(stuffs(0), editPostAction _)
 
-        "#editForm *" #> editStuff.toForm &
+        """$('editForm').empty()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
+    }
+
+    def stuffTable = 
+    {
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#stuffTable *" #> completeStuffTable
     }

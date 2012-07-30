@@ -1,9 +1,9 @@
 <div id="stuffEdit" class="stuffs-edit">
   <div>
     <span class="actionBar">
-      <i class="icon-ok"></i>
-      <i class="icon-remove"></i>
-      <i class="myicon-starOff"></i>
+      <i class="icon-white icon-ok"></i>
+      <i class="icon-white icon-remove"></i>
+      <i class="icon-white icon-star"></i>
     </span>
     <fieldset id="editStuffTitle" class="inline control-group">
       <div class="input-prepend" style="margin-left: 0.5em">
@@ -66,31 +66,5 @@
       <button id="editStuffCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="editStuffSave" class="btn btn-primary">儲存</button>
   </div>
-  <script type="text/javascript">
-      $( "#inputTopic" ).autocomplete({
-          source: "/autocomplete/topic",
-          select: function(event, ui) { 
-              $("#inputTopic").val(ui.item.label);
-              $(this).closest("form").submit()
-          }
-      });
 
-      $( "#inputProject" ).autocomplete({
-          source: "/autocomplete/project",
-          select: function(event, ui) { 
-              $("#inputProject").val(ui.item.label);
-              $(this).closest("form").submit()
-          }
-      });
-
-      $(function() {
-          $( "#editStuffDeadline input" ).datepicker({
-              dateFormat: "yy-mm-dd",
-              onClose: function(dateText) {
-                  $("#editStuffDeadline input").val(dateText);
-                  $("#editStuffDeadline input").blur();
-              }
-          });
-      });
-  </script>
 </div>
