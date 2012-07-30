@@ -112,7 +112,22 @@ class Inbox extends JSImplicit
         JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
-    def showEditForm(stuff: Stuff): JsCmd = {
+    def showInsertForm(): JsCmd = 
+    {
+        def userID = CurrentUser.is.map(_.idField.is).get
+        def createNewStuff: Stuff = Stuff.createRecord.userID(userID)
+
+        val editStuff = new EditStuffForm(createNewStuff, {stuff =>
+            AppendHtml("stuffTable", createStuffRow(stuff))
+        })
+
+        """$('#stuffEdit').remove()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
+    }
+
+    def showEditForm(stuff: Stuff): JsCmd = 
+    {
         val editStuff = new EditStuffForm(stuff, editPostAction _)
 
         """$('#stuffEdit').remove()""" &
@@ -123,6 +138,7 @@ class Inbox extends JSImplicit
     def stuffTable = 
     {
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#addStuffButton [onclick]" #> SHtml.onEvent(s => showInsertForm) &
         "#stuffTable *" #> completeStuffTable
     }
 

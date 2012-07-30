@@ -132,7 +132,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         )
 
         val hasError = status.map(_._1).contains(true)
-        val jsCmds = status.map(_._2)
+        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -163,7 +163,8 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         ) &
         "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save())
+        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {
