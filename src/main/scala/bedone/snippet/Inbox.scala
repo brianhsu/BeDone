@@ -40,14 +40,14 @@ class Inbox extends JSImplicit
 
         def toogleStar(): JsCmd = {
             stuff.isStared(!stuff.isStared.is)
-            stuff.update()
+            stuff.saveTheRecord()
             
             """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
-            stuff.update()
+            stuff.saveTheRecord()
 
             new FadeOut("row" + stuff.idField, 0, 500)
         }
@@ -127,18 +127,4 @@ class Inbox extends JSImplicit
     }
 
     def render = stuffTable
-
-    def addStuffDialog = {
-
-        object InboxAddStuffDialog extends AddStuffDialog {
-            override def saveAndClose() = {
-                val originJS = super.saveAndClose()
-                val newTable = createStuffTable(stuffs)
-
-                originJS & reInitForm & showAllStuff
-            }
-        }
-
-        InboxAddStuffDialog.render
-    }
 }

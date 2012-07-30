@@ -86,8 +86,14 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         scala.xml.XML.loadString(rawHTML)
     }
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
-    def update() = inTransaction { tryo(BeDoneSchema.stuffs.update(this)) }
+    override def saveTheRecord() = inTransaction(tryo{
+        this.isPersisted match {
+            case true  => BeDoneSchema.stuffs.update(this)
+            case false => BeDoneSchema.stuffs.insert(this)
+        }
+
+        this
+    })
 
     def addTopics(topicTitles: List[String]) {
 

@@ -139,7 +139,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
             case false => 
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
-                stuff.update()
+                stuff.saveTheRecord()
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
