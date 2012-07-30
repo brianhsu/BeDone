@@ -18,7 +18,7 @@ class Contacts extends Record[Contacts] with KeyedRecord[Int]
     def meta = Contacts
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
     val userID = new IntField(this)
     val name = new StringField(this, "")
 

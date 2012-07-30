@@ -25,15 +25,15 @@ class Login
 
     def login() = {
 
-        val user = for {
+        val authUser = for {
             username <- this.username
             password <- this.password
             user <- User.findByUsername(username) if user.password.match_?(password)
         } yield user
 
-        user.isDefined match {
-            case true => user.open_!.login(S.redirectTo("/dashboard"))
-            case false => S.error("帳號密碼錯誤")
+        authUser match {
+            case Full(user) => user.login(S.redirectTo("/dashboard"))
+            case _          => S.error("帳號密碼錯誤")
         }
     }
 

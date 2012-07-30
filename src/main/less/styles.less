@@ -1,7 +1,6 @@
 @sidebarBackground: #FAFAD2;
 @stuffBackground: lightgray;
 
-
 body {
     /* 60px to make the container go all the way to the bottom of the topbar */
     padding-top: 60px; 
@@ -55,27 +54,45 @@ body {
     padding-right: 5px;
 }
 
-a.topic {
-    margin-left: 0.2em;
-}
-
-a.project {
+div.btn-tag {
     margin-left: 0.2em;
 }
 
 i.myicon-starOn {
-    background-image: url('../img/star_on.png');
+    background-image: url('/img/star_on.png');
     display: inline-block;
     width: 16px;
     height: 16px;
 }
 
 i.myicon-starOff {
-    background-image: url('../img/star_off.png');
+    background-image: url('/img/star_off.png');
     display: inline-block;
     width: 16px;
     height: 16px;
 }
+
+div.stuffs-edit {
+
+    margin-bottom: 0.8em;
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+
+    background: @sidebarBackground;
+    .rounded-corners(5px);
+    .box-shadow(0 0 4px, 30%);
+
+    div.desc {
+        margin: 1em;
+    }
+
+    .showDesc {
+        margin-left: 0.5em;
+    }
+}
+
 
 div.stuffs {
     margin-bottom: 0.8em;
@@ -100,3 +117,4 @@ div.stuffs {
 .inline {
     display: inline-block;
 }
+

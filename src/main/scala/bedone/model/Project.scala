@@ -47,7 +47,7 @@ class Project extends Record[Project] with KeyedRecord[Int]
     def meta = Project
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
     val userID = new IntField(this)
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)

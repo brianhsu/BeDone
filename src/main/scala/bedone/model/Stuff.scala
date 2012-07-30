@@ -4,6 +4,7 @@ import net.liftweb.common.Box
 import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.today
 
 import net.liftweb.util.FieldError
 
@@ -21,9 +22,10 @@ import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
-import net.liftweb.util.Helpers.tryo
+
 import java.io.StringReader
 import java.io.StringWriter
+import java.util.Calendar
 
 object StuffType extends Enumeration {
     type StuffType = Value
@@ -52,7 +54,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     def meta = Stuff
 
     @Column(name="id")
-    val idField = new IntField(this, 1)
+    val idField = new IntField(this)
     val userID = new IntField(this)
     val createTime = new DateTimeField(this)
     val stuffType = new EnumField(this, StuffType, StuffType.Stuff)
@@ -67,9 +69,17 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val description = new TextareaField(this, 1000) {
         override def displayName = "描述"
     }
+
     val deadline = new OptionalDateTimeField(this) {
-        override def displayName = "期限"
+
+        def afterToday(calendar: Option[Calendar]): List[FieldError] = {
+            val error = FieldError(this, "完成期限要比今天晚")
+            calendar.filter(_.before(today)).map(x => error).toList
+        }
+
+        override def displayName = "完成期限"
         override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
+        override def validations = afterToday _ :: super.validations
     }
 
     def topics = inTransaction(BeDoneSchema.stuffTopics.left(this).toList)
@@ -86,8 +96,14 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         scala.xml.XML.loadString(rawHTML)
     }
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.stuffs.insert(this)) }
-    def update() = inTransaction { tryo(BeDoneSchema.stuffs.update(this)) }
+    override def saveTheRecord() = inTransaction(tryo{
+        this.isPersisted match {
+            case true  => BeDoneSchema.stuffs.update(this)
+            case false => BeDoneSchema.stuffs.insert(this)
+        }
+
+        this
+    })
 
     def addTopics(topicTitles: List[String]) {
 
@@ -119,9 +135,40 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         projectTitles.map(getProject).foreach(addProject)
     }
 
+    def removeProject(project: Project) = inTransaction {
+        BeDoneSchema.stuffProjects.left(this).dissociate(project)
+    }
+
     def addProject(project: Project) = inTransaction { 
+        if (!project.isPersisted) { project.saveTheRecord() }
         BeDoneSchema.stuffProjects.left(this).associate(project)
     }
+
+    def setProjects(projects: List[Project]) = inTransaction {
+        val shouldRemove = this.projects.filterNot(projects.contains)
+        val shouldAdd = projects.filterNot(this.projects.contains)
+
+        shouldRemove.foreach(removeProject)
+        shouldAdd.foreach(addProject)
+    }
+
+    def removeTopic(topic: Topic) = inTransaction {
+        BeDoneSchema.stuffTopics.left(this).dissociate(topic)
+    }
+
+    def addTopic(topic: Topic) = inTransaction { 
+        if (!topic.isPersisted) { topic.saveTheRecord() }
+        BeDoneSchema.stuffTopics.left(this).associate(topic)
+    }
+
+    def setTopics(topics: List[Topic]) = inTransaction {
+        val shouldRemove = this.topics.filterNot(topics.contains)
+        val shouldAdd = topics.filterNot(this.topics.contains)
+
+        shouldRemove.foreach(removeTopic)
+        shouldAdd.foreach(addTopic)
+    }
+
 }
 
 

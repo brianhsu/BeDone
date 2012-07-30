@@ -1,0 +1,93 @@
+body {
+  /* 60px to make the container go all the way to the bottom of the topbar */
+
+  padding-top: 60px;
+}
+.heroText {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.alert ul {
+  list-style: none;
+  margin-top: 0.4em;
+}
+.ajax-loader {
+  margin-top: 0.3%;
+  display: none;
+}
+.ajax-loader-modal {
+  float: left;
+  display: none;
+}
+.sidebar {
+  background: #fafad2;
+  padding: 5px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.sidebarIcon {
+  margin-top: 3px;
+  padding-right: 5px;
+}
+div.btn-tag {
+  margin-left: 0.2em;
+}
+i.myicon-starOn {
+  background-image: url('/img/star_on.png');
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+i.myicon-starOff {
+  background-image: url('/img/star_off.png');
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+div.stuffs-edit {
+  margin-bottom: 0.8em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: #fafad2;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+div.stuffs-edit div.desc {
+  margin: 1em;
+}
+div.stuffs-edit .showDesc {
+  margin-left: 0.5em;
+}
+div.stuffs {
+  margin-bottom: 0.8em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: #d3d3d3;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+div.stuffs div.desc {
+  margin: 1em;
+}
+div.stuffs .showDesc {
+  margin-left: 0.5em;
+}
+.inline {
+  display: inline-block;
+}
