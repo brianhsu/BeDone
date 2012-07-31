@@ -137,9 +137,9 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         hasError match {
             case true  => jsCmds
             case false => 
+                stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
-                stuff.saveTheRecord()
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
