@@ -5,6 +5,8 @@ import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
+import net.liftweb.http.js.JsCmd
+import net.liftweb.http.js.jquery.JqJsCmds._
 
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
@@ -12,7 +14,7 @@ import net.liftweb.http.Templates
 import net.liftweb.util.ClearClearable
 import java.text.SimpleDateFormat
 
-class NextAction
+class NextAction extends JSImplicit
 {
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -34,6 +36,18 @@ class NextAction
     def projectFilter(buttonID: String, project: Project) = Noop
     def showEditForm(stuff: Stuff) = Noop
 
+    def updateList(action: Action)(isDone: Boolean): JsCmd = 
+    {
+        action.isDone(isDone)
+        action.saveTheRecord()
+
+        val doneList = doneActions.map(createActionRow).flatten
+        val notDoneList = notDoneActions.map(createActionRow).flatten
+
+        JqSetHtml("isDone", doneList) &
+        JqSetHtml("notDone", notDoneList)
+    }
+
     def createActionRow(action: Action) = 
     {
         import TagButton.Implicit._
@@ -50,7 +64,8 @@ class NextAction
             ".topic"         #> action.topics.map(_.viewButton(topicFilter)) &
             ".project"       #> action.projects.map(_.viewButton(projectFilter)) &
             ".deadline"      #> formatDeadline(stuff) &
-            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff))
+            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
+            ".isDone"         #> SHtml.ajaxCheckbox(action.isDone.is, updateList(action)_)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
@@ -61,7 +76,8 @@ class NextAction
         println(notDoneActions)
 
         ClearClearable &
-        "#notDone" #> notDoneActions.map(createActionRow) &
+        "#notDone *" #> notDoneActions.map(createActionRow) &
+        "#isDone *"  #> doneActions.map(createActionRow) &
         ".contextTab" #> contexts.zipWithIndex.map { case (context, i) =>
             "li [class]" #> (if(i == 0) "active" else "") &
             "a *"        #> context.title

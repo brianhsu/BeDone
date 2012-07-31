@@ -42,4 +42,13 @@ class Action extends Record[Action] with KeyedRecord[Int]
     def projects = stuff.projects
 
     val isDone = new BooleanField(this, false)
+
+    override def saveTheRecord() = inTransaction(tryo{
+        this.isPersisted match {
+            case true  => BeDoneSchema.actions.update(this)
+            case false => BeDoneSchema.actions.insert(this)
+        }
+
+        this
+    })
 }
