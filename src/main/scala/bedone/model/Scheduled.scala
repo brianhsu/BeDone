@@ -12,7 +12,7 @@ class Scheduled extends Record[Scheduled]
 {
     def meta = Scheduled
 
-    val stuffID = new IntField(this)
+    val actionID = new IntField(this)
     val startTime = new DateTimeField(this)
     val durationInMinute = new OptionalIntField(this)
 }

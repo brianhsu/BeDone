@@ -37,16 +37,22 @@ object BeDoneSchema extends Schema
              relation.projectID === project.idField)
     )
 
+    val actionContexts = manyToManyRelation(actions, contexts).via[ActionContext](
+        (action, context, relation) => 
+            (relation.actionID === action.idField, 
+             relation.contextID === context.idField)
+    )
+
     // Unique and Index
     on(users) { user => declare(user.username defineAs unique, user.email defineAs unique) }
     on(projects) { project => declare(columns(project.userID, project.title) are unique)}
     on(topics) { topic => declare(columns(topic.userID, topic.title) are unique)}
     on(contexts) { context => declare(columns(context.userID, context.title) are unique)}
 
-    on(actions) { action => declare(action.stuffID is primaryKey) }
+    on(actions) { action => declare(action.idField is primaryKey) }
     on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
-    on(scheduled) { scheduled => declare(scheduled.stuffID is primaryKey) }
-    on(delegated) { delegated => declare(delegated.stuffID is primaryKey) }
+    on(scheduled) { scheduled => declare(scheduled.actionID is primaryKey) }
+    on(delegated) { delegated => declare(delegated.actionID is primaryKey) }
 
     // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
@@ -55,9 +61,9 @@ object BeDoneSchema extends Schema
     oneToManyRelation(users, contexts).via { (u, c) => u.id === c.userID }
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
-    oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.stuffID }
-    oneToManyRelation(stuffs, scheduled).via { (st, sc) => st.id === sc.stuffID }
-    oneToManyRelation(stuffs, delegated).via { (s, d) => s.id === d.stuffID }
+    oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }
+    oneToManyRelation(stuffs, scheduled).via { (st, sc) => st.id === sc.actionID }
+    oneToManyRelation(stuffs, delegated).via { (s, d) => s.id === d.actionID }
 
     oneToManyRelation(contacts, delegated).via { (c, d) => c.id === d.contactID }
 
