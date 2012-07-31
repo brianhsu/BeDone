@@ -27,9 +27,14 @@ import java.io.StringReader
 import java.io.StringWriter
 import java.util.Calendar
 
-object StuffType extends Enumeration {
+object StuffType extends Enumeration 
+{
     type StuffType = Value
-    val Stuff, Action, Refrence, Maybe  = Value
+
+    val Stuff    = Value(0, "Stuff")
+    val Action   = Value(1, "Value")
+    val Refrence = Value(2, "Reference")
+    val Maybe    = Value(3, "Maybe")
 }
 
 object Stuff extends Stuff with MetaRecord[Stuff]
@@ -41,7 +46,7 @@ object Stuff extends Stuff with MetaRecord[Stuff]
     def findByUser(user: User): Box[List[Stuff]] = inTransaction {
         tryo {
             from(BeDoneSchema.stuffs)(table =>
-                where(table.userID === user.idField) 
+                where(table.userID === user.idField and table.stuffType === StuffType.Stuff) 
                 select(table)
                 orderBy(table.createTime asc)
             ).toList
