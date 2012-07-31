@@ -39,14 +39,18 @@ div.btn-tag {
 i.myicon-starOn {
   background-image: url('/img/star_on.png');
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  vertical-align: text-middle;
 }
 i.myicon-starOff {
   background-image: url('/img/star_off.png');
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  vertical-align: text-middle;
 }
 div.stuffs-edit {
   margin-bottom: 0.8em;
@@ -68,19 +72,33 @@ div.stuffs-edit div.desc {
 div.stuffs-edit .showDesc {
   margin-left: 0.5em;
 }
-div.stuffs {
+div.action {
+  background: #d3d3d3;
   margin-bottom: 0.8em;
   padding-top: 0.6em;
-  padding-bottom: 0.6em;
+  padding-bottom: 0.7em;
   padding-left: 0.5em;
   padding-right: 0.5em;
-  background: #d3d3d3;
   border-radius: 5px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+div.action div.desc {
+  margin: 1em;
+}
+div.action .showDesc {
+  margin-left: 0.5em;
+}
+div.stuffs {
+  background: #d3d3d3;
+  margin-bottom: 0.8em;
+  padding-top: 0.6em;
+  padding-bottom: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
 }
 div.stuffs div.desc {
   margin: 1em;
@@ -90,4 +108,10 @@ div.stuffs .showDesc {
 }
 .inline {
   display: inline-block;
+}
+.topic {
+  margin-right: 0.2em;
+}
+.project {
+  margin-right: 0.2em;
 }

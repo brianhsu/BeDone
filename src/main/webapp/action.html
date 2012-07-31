@@ -9,14 +9,15 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div>
+      <div data-lift="Action">
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#">@ Home</a></li>
-          <li><a href="#">@ Office</a></li>
-          <li><a href="#">@ Computer</a></li>
+          <li class="contextTab"><a href="#">@ Home</a></li>
         </ul>
         <div>
-          <div class="page-header"><h3>儘快去做</h3></div>
+          <div>
+            <div class="page-header"><h3>儘快去做</h3></div>
+            <div id="notDone"><div data-lift="lift:embed?what=action/item"></div></div>
+          </div>
           <div class="page-header"><h3>已完成</h3></div>
         </div>
       </div>
