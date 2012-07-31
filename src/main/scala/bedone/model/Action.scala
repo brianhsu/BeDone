@@ -36,7 +36,10 @@ class Action extends Record[Action] with KeyedRecord[Int]
     
     @Column(name="stuffID")
     val idField = new IntField(this)
-    def stuffID = idField
+
+    def stuff = Stuff.findByID(idField.is).get
+    def topics = stuff.topics
+    def projects = stuff.projects
 
     val isDone = new BooleanField(this, false)
 }

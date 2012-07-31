@@ -45,7 +45,7 @@ class Boot
             Menu.i("Index") / "index",
             (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Inbox") / "inbox") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Action") / "action") >> If(User.isLoggedIn _, "請先登入")
+            (Menu.i("Action") / "nextAction") >> If(User.isLoggedIn _, "請先登入")
         )
 
         LiftRules.setSiteMap(siteMap)
