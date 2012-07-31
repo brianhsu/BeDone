@@ -82,7 +82,8 @@ class Inbox extends JSImplicit
     {
         JqSetHtml("stuffTable", completeStuffTable) & 
         JqSetHtml("current", "全部") &
-        JsRaw("""$('#showAll').prop("disabled", true)""")
+        JsRaw("""$('#showAll').prop("disabled", true)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-inverse")""")
     }
 
     def createStuffTable(stuffs: List[Stuff]) = stuffs.map(createStuffRow).flatten

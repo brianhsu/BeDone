@@ -11,9 +11,6 @@
       </div>
       <div>
         <div data-lift="Inbox">
-
-          <div id="editForm"></div>
-
           <div style="float: right">
             <div class="btn-group inline">
               <a class="btn btn-primary" href="#" id="addStuffButton">新增雜事</a>
@@ -24,11 +21,12 @@
               <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
             </div>
           </div>
-
-          <div class="page-header">
-            <h3>雜事列表</h3>
-          </div>
-
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#">全部</a>
+            </li>
+          </ul>
+          <div id="editForm"></div>
           <div id="stuffTable"></div>
         </div>
       </div>
