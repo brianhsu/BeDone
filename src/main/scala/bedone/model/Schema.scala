@@ -22,6 +22,7 @@ object BeDoneSchema extends Schema
     val projects = table[Project]("Projects")
     val topics = table[Topic]("Topics")
     val contacts = table[Contacts]("Contacts")
+    val contexts = table[Context]("Contexts")
 
     // Many to Many Relations
     val stuffTopics = manyToManyRelation(stuffs, topics).via[StuffTopic](
@@ -40,6 +41,7 @@ object BeDoneSchema extends Schema
     on(users) { user => declare(user.username defineAs unique, user.email defineAs unique) }
     on(projects) { project => declare(columns(project.userID, project.title) are unique)}
     on(topics) { topic => declare(columns(topic.userID, topic.title) are unique)}
+    on(contexts) { context => declare(columns(context.userID, context.title) are unique)}
 
     on(actions) { action => declare(action.stuffID is primaryKey) }
     on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
@@ -50,6 +52,7 @@ object BeDoneSchema extends Schema
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
+    oneToManyRelation(users, contexts).via { (u, c) => u.id === c.userID }
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.stuffID }
