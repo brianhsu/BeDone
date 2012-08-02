@@ -35,6 +35,34 @@ class NextAction extends JSImplicit
         }
     }
 
+    def actionBar(stuff: Stuff) = 
+    {
+        def starClass = stuff.isStared.is match {
+            case true  => "myicon-starOn"
+            case false => "myicon-starOff"
+        }
+
+        def toogleStar(): JsCmd = {
+            stuff.isStared(!stuff.isStared.is)
+            stuff.saveTheRecord()
+            
+            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+        }
+
+        def markAsTrash(): JsCmd = {
+            stuff.isTrash(true)
+            stuff.saveTheRecord()
+
+            new FadeOut("row" + stuff.idField, 0, 500)
+        }
+
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
+        ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
+        ".star" #> ("i [class]" #> starClass) &
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
+    }
+
     def showAllStuff() = 
     {
         this.currentTopic = None
@@ -125,14 +153,15 @@ class NextAction extends JSImplicit
         }
 
         val cssBinding = 
+            actionBar(stuff) &
             ".action [style]" #> displayStyle &
-            ".action [id]"   #> ("row" + action.idField) &
-            ".collapse [id]" #> ("desc" + action.stuff.idField) &
-            ".title *"       #> stuff.title &
-            ".desc *"        #> stuff.descriptionHTML &
-            ".topic"         #> action.topics.map(_.viewButton(topicFilter)) &
-            ".project"       #> action.projects.map(_.viewButton(projectFilter)) &
-            ".deadline"      #> formatDeadline(stuff) &
+            ".action [id]"    #> ("row" + action.idField) &
+            ".collapse [id]"  #> ("desc" + action.stuff.idField) &
+            ".title *"        #> stuff.title &
+            ".desc *"         #> stuff.descriptionHTML &
+            ".topic"          #> action.topics.map(_.viewButton(topicFilter)) &
+            ".project"        #> action.projects.map(_.viewButton(projectFilter)) &
+            ".deadline"       #> formatDeadline(stuff) &
             ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
             ".isDone"         #> SHtml.ajaxCheckbox(action.isDone.is, updateList(action)_)
 

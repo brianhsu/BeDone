@@ -52,6 +52,7 @@ class Inbox extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
@@ -102,8 +103,7 @@ class Inbox extends JSImplicit
             ".desc *"        #> stuff.descriptionHTML &
             ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
             ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
-            ".deadline"      #> formatDeadline(stuff) &
-            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff))
+            ".deadline"      #> formatDeadline(stuff)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
