@@ -45,6 +45,10 @@ trait JSImplicit
         }
     }
 
+    object JqEmpty {
+        def apply(uid: String): JsCmd = """$('#isDone').empty()"""
+    }
+
     def setError(fieldErrors: List[FieldError], fieldID: String): (Boolean, JsCmd) = {
         fieldErrors match {
             case Nil    => (false, ClearFieldError(fieldID))

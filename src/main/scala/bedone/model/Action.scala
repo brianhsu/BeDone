@@ -40,6 +40,7 @@ class Action extends Record[Action] with KeyedRecord[Int]
     def stuff = Stuff.findByID(idField.is).get
     def topics = stuff.topics
     def projects = stuff.projects
+    def contexts = inTransaction(BeDoneSchema.actionContexts.left(this).toList)
 
     val isDone = new BooleanField(this, false)
 

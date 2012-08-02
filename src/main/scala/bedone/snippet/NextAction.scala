@@ -21,8 +21,11 @@ class NextAction extends JSImplicit
 
     val currentUser = CurrentUser.get.get
     val contexts = Context.findByUser(currentUser).openOr(Nil)
-    def doneActions = Action.findByUser(currentUser).openOr(Nil).filter(_.isDone.is)
-    def notDoneActions = Action.findByUser(currentUser).openOr(Nil).filterNot(_.isDone.is)
+
+    private var currentTopic: Option[Topic] = None
+    private var currentProject: Option[Project] = None
+    private var currentContext: Option[Context] = contexts.headOption
+    private var currentAction: Option[Action] = None
 
     def formatDeadline(stuff: Stuff) = 
     {
@@ -32,20 +35,81 @@ class NextAction extends JSImplicit
         }
     }
 
-    def topicFilter(buttonID: String, topic: Topic) = Noop
-    def projectFilter(buttonID: String, project: Project) = Noop
+    def showAllStuff() = 
+    {
+        this.currentTopic = None
+        this.currentProject = None
+
+        updateList() &
+        JqSetHtml("current", "全部") &
+        """$('#showAll').prop("disabled", true)""" &
+        """$('#current').attr("class", "btn btn-inverse")"""
+    }
+
+    def topicFilter(buttonID: String, topic: Topic) = 
+    {
+        this.currentTopic = Some(topic)
+
+        updateList() &
+        JqSetHtml("current", topic.title.is) &
+        """$('#showAll').prop("disabled", false)""" &
+        """$('#current').attr("class", "btn btn-info")"""
+    }
+
+    def projectFilter(buttonID: String, project: Project) =
+    {
+        this.currentProject = Some(project)
+
+        updateList() &
+        JqSetHtml("current", project.title.is) &
+        """$('#showAll').prop("disabled", false)""" &
+        """$('#current').attr("class", "btn btn-success")"""
+    }
+
     def showEditForm(stuff: Stuff) = Noop
+
+
+    def shouldDisplay(action: Action) = 
+    {
+        val hasCurrentTopic = currentTopic.map(action.topics.contains).getOrElse(true)
+        val hasCurrentProject = currentProject.map(action.projects.contains).getOrElse(true)
+        val hasCurrentContext = currentContext.map(action.contexts.contains).getOrElse(true)
+   
+        hasCurrentTopic && 
+        hasCurrentProject &&
+        hasCurrentContext
+    }
+
+    def actions: (List[Action], List[Action]) = {
+        Action.findByUser(currentUser).openOr(Nil)
+              .filterNot(_.stuff.isTrash.is)
+              .partition(_.isDone.is)
+    }
+
+    def updateList(): JsCmd =
+    {
+        val (doneList, notDoneList) = actions
+        val doneHTML = doneList.filter(shouldDisplay).map(createActionRow).flatten
+        val notDoneHTML = notDoneList.filter(shouldDisplay).map(createActionRow).flatten
+
+        this.currentAction = None
+
+        JqEmpty("isDone") &
+        JqEmpty("notDone") &
+        JqSetHtml("isDone", doneHTML) &
+        JqSetHtml("notDone", notDoneHTML)
+    }
 
     def updateList(action: Action)(isDone: Boolean): JsCmd = 
     {
+        val rowID = "row" + action.idField.is
+
+        currentAction = Some(action)
         action.isDone(isDone)
         action.saveTheRecord()
 
-        val doneList = doneActions.map(createActionRow).flatten
-        val notDoneList = notDoneActions.map(createActionRow).flatten
-
-        JqSetHtml("isDone", doneList) &
-        JqSetHtml("notDone", notDoneList)
+        updateList &
+        new FadeIn(rowID, 200, 2500)
     }
 
     def createActionRow(action: Action) = 
@@ -55,9 +119,14 @@ class NextAction extends JSImplicit
         def template = Templates("templates-hidden" :: "action" :: "item" :: Nil)
 
         val stuff = action.stuff
+        val displayStyle = currentAction match {
+            case Some(current) if current.idField.is == action.idField.is => "display: none"
+            case _ => "display: block"
+        }
 
         val cssBinding = 
-            ".stuffs [id]"   #> ("row" + action.idField) &
+            ".action [style]" #> displayStyle &
+            ".action [id]"   #> ("row" + action.idField) &
             ".collapse [id]" #> ("desc" + action.stuff.idField) &
             ".title *"       #> stuff.title &
             ".desc *"        #> stuff.descriptionHTML &
@@ -70,17 +139,33 @@ class NextAction extends JSImplicit
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
+    def switchContext(context: Context, str: String) = {
+
+        val contextTabID = ("contextTab" + context.idField.is)
+        this.currentContext = Some(context)
+
+        """$('.contextTab').removeClass('active')""" &
+        """$('#%s').addClass('active')""".format(contextTabID) &
+        updateList()
+    }
+
     def render = 
     {
-        println(doneActions)
-        println(notDoneActions)
+        val (doneActions, notDoneActions) = actions
 
         ClearClearable &
-        "#notDone *" #> notDoneActions.map(createActionRow) &
-        "#isDone *"  #> doneActions.map(createActionRow) &
-        ".contextTab" #> contexts.zipWithIndex.map { case (context, i) =>
-            "li [class]" #> (if(i == 0) "active" else "") &
-            "a *"        #> context.title
+        "#showAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#isDone *"  #> doneActions.filter(shouldDisplay).map(createActionRow).flatten &
+        "#notDone *" #> notDoneActions.filter(shouldDisplay).map(createActionRow).flatten &
+        ".contextTab" #> contexts.map { context =>
+
+            val contextTabID = ("contextTab" + context.idField.is)
+            val activtedStyle = if (currentContext == Some(context)) "active" else ""
+
+            "li [class]"  #> activtedStyle &
+            "li [id]"     #> contextTabID &
+            "a *"         #> context.title &
+            "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
         }
     }
 }
