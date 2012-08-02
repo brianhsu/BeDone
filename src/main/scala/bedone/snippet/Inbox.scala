@@ -93,7 +93,7 @@ class Inbox extends JSImplicit
 
         import TagButton.Implicit._
 
-        def template = Templates("templates-hidden" :: "stuff" :: "table" :: Nil)
+        def template = Templates("templates-hidden" :: "stuff" :: "item" :: Nil)
 
         val cssBinding = 
             actionBar(stuff) &
