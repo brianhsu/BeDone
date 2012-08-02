@@ -35,8 +35,10 @@ class NextAction extends JSImplicit
         }
     }
 
-    def actionBar(stuff: Stuff) = 
+    def actionBar(action: Action) = 
     {
+        val stuff = action.stuff
+
         def starClass = stuff.isStared.is match {
             case true  => "myicon-starOn"
             case false => "myicon-starOff"
@@ -56,7 +58,7 @@ class NextAction extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
-        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(action)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
@@ -94,7 +96,18 @@ class NextAction extends JSImplicit
         """$('#current').attr("class", "btn btn-success")"""
     }
 
-    def showEditForm(stuff: Stuff) = Noop
+    def editPostAction(stuff: Stuff): JsCmd = {
+        updateList()
+    }
+
+    def showEditForm(action: Action) = 
+    {
+        val editStuff = new EditActionForm(action, editPostAction)
+
+        """$('#stuffEdit').remove()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
+    }
 
 
     def shouldDisplay(action: Action) = 
@@ -153,7 +166,7 @@ class NextAction extends JSImplicit
         }
 
         val cssBinding = 
-            actionBar(stuff) &
+            actionBar(action) &
             ".action [style]" #> displayStyle &
             ".action [id]"    #> ("row" + action.idField) &
             ".collapse [id]"  #> ("desc" + action.stuff.idField) &
@@ -162,7 +175,6 @@ class NextAction extends JSImplicit
             ".topic"          #> action.topics.map(_.viewButton(topicFilter)) &
             ".project"        #> action.projects.map(_.viewButton(projectFilter)) &
             ".deadline"       #> formatDeadline(stuff) &
-            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
             ".isDone"         #> SHtml.ajaxCheckbox(action.isDone.is, updateList(action)_)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)

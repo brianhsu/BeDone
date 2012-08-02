@@ -32,7 +32,11 @@ object Context extends Context with MetaRecord[Context]
 
     def findByUser(user: User): Box[List[Context]] = findByUser(user.idField.is)
     def findByUser(userID: Int): Box[List[Context]] = inTransaction(tryo{
-        BeDoneSchema.contexts.where(_.userID === userID).toList
+        from(BeDoneSchema.contexts)(c => 
+            where(c.userID === userID)
+            select(c)
+            orderBy(c.idField)
+        ).toList
     })
 
     def findByTitle(userID: Int, title: String): Box[Context] = inTransaction(

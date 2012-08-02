@@ -1,4 +1,5 @@
 function prepareStuffEditForm() {
+
     $( "#inputTopic" ).autocomplete({
         source: "/autocomplete/topic",
         select: function(event, ui) { 
@@ -20,6 +21,14 @@ function prepareStuffEditForm() {
         onClose: function(dateText) {
             $("#editStuffDeadline input").val(dateText)
             $("#editStuffDeadline input").blur()
+        }
+    });
+
+    $( "#inputContext" ).autocomplete({
+        source: "/autocomplete/context",
+        select: function(event, ui) { 
+            $("#inputContext").val(ui.item.label)
+            $(this).closest("form").submit()
         }
     });
 

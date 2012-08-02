@@ -15,6 +15,10 @@ import org.squeryl.annotations.Column
 
 object Action extends Action with MetaRecord[Action]
 {
+    def findByID(id: Int): Box[Action] = inTransaction {
+        tryo { BeDoneSchema.actions.where(_.idField === id).single }
+    }
+
     def findByUser(user: User): Box[List[Action]] = inTransaction {
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.actions) ( (stuff, action) =>
@@ -43,6 +47,23 @@ class Action extends Record[Action] with KeyedRecord[Int]
     def contexts = inTransaction(BeDoneSchema.actionContexts.left(this).toList)
 
     val isDone = new BooleanField(this, false)
+
+    def removeContext(context: Context) = inTransaction {
+        BeDoneSchema.actionContexts.left(this).dissociate(context)
+    }
+
+    def addContext(context: Context) = inTransaction { 
+        if (!context.isPersisted) { context.saveTheRecord() }
+        BeDoneSchema.actionContexts.left(this).associate(context)
+    }
+
+    def setContexts(contexts: List[Context]) = inTransaction {
+        val shouldRemove = this.contexts.filterNot(contexts.contains)
+        val shouldAdd = contexts.filterNot(this.contexts.contains)
+
+        shouldRemove.foreach(removeContext)
+        shouldAdd.foreach(addContext)
+    }
 
     override def saveTheRecord() = inTransaction(tryo{
         this.isPersisted match {
