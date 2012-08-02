@@ -34,8 +34,22 @@ object AutoComplete {
         }
     }
 
+    def contexts = {
+
+        for (term <- S.param("term"); user <- CurrentUser.is) yield {
+
+            val contexts = Context.findByUser(user).openOr(Nil)
+            val jsonContexts = contexts.filter(_.title.is.contains(term)).map { context => 
+                """{"id": "%s", "label": "%s"}""" format(context.title, context.title)
+            }
+
+            JsonResponse(JsRaw("""[%s]""" format(jsonContexts.mkString(","))))
+        }
+    }
+
     lazy val autoComplete: LiftRules.DispatchPF = {
         case Req("autocomplete" :: "topic" :: Nil, suffix, GetRequest) => topics _
         case Req("autocomplete" :: "project" :: Nil, suffix, GetRequest) => projects _
+        case Req("autocomplete" :: "context" :: Nil, suffix, GetRequest) => contexts _
     }
 }
