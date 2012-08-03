@@ -166,8 +166,17 @@ class NextAction extends JSImplicit
 
     def updateList(): JsCmd =
     {
+        def byDoneTime(action1: Action, action2: Action) = {
+            val time1: Long = action1.doneTime.is.map(_.getTime.getTime).getOrElse(0)
+            val time2: Long = action2.doneTime.is.map(_.getTime.getTime).getOrElse(0)
+            time1 < time2
+        }
+
         val (doneList, notDoneList) = actions
-        val doneHTML = doneList.filter(shouldDisplay).map(createActionRow).flatten
+        val doneHTML = 
+            doneList.filter(shouldDisplay).sortWith(byDoneTime)
+                    .map(createActionRow).flatten
+
         val notDoneHTML = notDoneList.filter(shouldDisplay).map(createActionRow).flatten
         val contextTab = contexts.map(createContextTab)
 
