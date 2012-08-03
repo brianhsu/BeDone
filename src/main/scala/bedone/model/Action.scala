@@ -9,6 +9,8 @@ import net.liftweb.squerylrecord.KeyedRecord
 
 import net.liftweb.record.field.IntField
 import net.liftweb.record.field.BooleanField
+import net.liftweb.record.field.OptionalDateTimeField
+
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
@@ -40,13 +42,13 @@ class Action extends Record[Action] with KeyedRecord[Int]
     
     @Column(name="stuffID")
     val idField = new IntField(this)
+    val isDone = new BooleanField(this, false)
+    val doneTime = new OptionalDateTimeField(this)
 
     def stuff = Stuff.findByID(idField.is).get
     def topics = stuff.topics
     def projects = stuff.projects
     def contexts = inTransaction(BeDoneSchema.actionContexts.left(this).toList)
-
-    val isDone = new BooleanField(this, false)
 
     def removeContext(context: Context) = inTransaction {
         BeDoneSchema.actionContexts.left(this).dissociate(context)

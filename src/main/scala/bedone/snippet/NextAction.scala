@@ -12,6 +12,9 @@ import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 
 import net.liftweb.util.ClearClearable
+
+import java.util.Calendar
+import java.util.Date
 import java.text.SimpleDateFormat
 
 class NextAction extends JSImplicit
@@ -25,13 +28,26 @@ class NextAction extends JSImplicit
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentContext: Option[Context] = contexts.headOption
-    private var currentAction: Option[Action] = None
 
-    def formatDeadline(stuff: Stuff) = 
+    def formatDoneTime(action: Action) = 
     {
-        stuff.deadline.is match {
+        action.doneTime.is match {
             case None => "*" #> ""
-            case Some(calendar) => ".label *" #> dateFormatter.format(calendar.getTime)
+            case Some(calendar) => ".label *" #> dateTimeFormatter.format(calendar.getTime)
+        }
+    }
+
+    def formatDeadline(action: Action) = 
+    {
+        val isDone = action.isDone.is
+
+        def dateBinding(calendar: Calendar) = {
+            ".label *" #> dateFormatter.format(calendar.getTime)
+        }
+
+        action.stuff.deadline.is match {
+            case Some(calendar) if !isDone => dateBinding(calendar)
+            case _ => "*" #> ""
         }
     }
 
@@ -58,11 +74,32 @@ class NextAction extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
+        {
+            val rowID = "row" + action.idField.is
+            val doneTime = isDone match {
+                case false => None
+                case true  =>
+                    val calendar = Calendar.getInstance
+                    calendar.setTime(new Date)
+                    Some(calendar)
+            }
+
+            action.isDone(isDone)
+            action.doneTime(doneTime)
+            action.saveTheRecord()
+
+            updateList &
+            Hide(rowID) &
+            new FadeIn(rowID, 200, 2500)
+        }
+
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(action)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag(action, _))
     }
 
     def showAllStuff() = 
@@ -78,6 +115,7 @@ class NextAction extends JSImplicit
 
     def topicFilter(buttonID: String, topic: Topic) = 
     {
+        this.currentProject = None
         this.currentTopic = Some(topic)
 
         updateList() &
@@ -89,6 +127,7 @@ class NextAction extends JSImplicit
     def projectFilter(buttonID: String, project: Project) =
     {
         this.currentProject = Some(project)
+        this.currentTopic = None
 
         updateList() &
         JqSetHtml("current", project.title.is) &
@@ -129,30 +168,25 @@ class NextAction extends JSImplicit
 
     def updateList(): JsCmd =
     {
+        def byDoneTime(action1: Action, action2: Action) = {
+            val time1: Long = action1.doneTime.is.map(_.getTime.getTime).getOrElse(0)
+            val time2: Long = action2.doneTime.is.map(_.getTime.getTime).getOrElse(0)
+            time1 < time2
+        }
+
         val (doneList, notDoneList) = actions
-        val doneHTML = doneList.filter(shouldDisplay).map(createActionRow).flatten
+        val doneHTML = 
+            doneList.filter(shouldDisplay).sortWith(byDoneTime)
+                    .map(createActionRow).flatten
+
         val notDoneHTML = notDoneList.filter(shouldDisplay).map(createActionRow).flatten
         val contextTab = contexts.map(createContextTab)
-
-        this.currentAction = None
 
         JqEmpty("isDone") &
         JqEmpty("notDone") &
         JqSetHtml("isDone", doneHTML) &
         JqSetHtml("notDone", notDoneHTML) &
         JqSetHtml("contextTabFolder", contextTab.flatten)
-    }
-
-    def updateList(action: Action)(isDone: Boolean): JsCmd = 
-    {
-        val rowID = "row" + action.idField.is
-
-        currentAction = Some(action)
-        action.isDone(isDone)
-        action.saveTheRecord()
-
-        updateList &
-        new FadeIn(rowID, 200, 2500)
     }
 
     def createActionRow(action: Action) = 
@@ -162,22 +196,17 @@ class NextAction extends JSImplicit
         def template = Templates("templates-hidden" :: "action" :: "item" :: Nil)
 
         val stuff = action.stuff
-        val displayStyle = currentAction match {
-            case Some(current) if current.idField.is == action.idField.is => "display: none"
-            case _ => "display: block"
-        }
 
         val cssBinding = 
             actionBar(action) &
-            ".action [style]" #> displayStyle &
             ".action [id]"    #> ("row" + action.idField) &
             ".collapse [id]"  #> ("desc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic"          #> action.topics.map(_.viewButton(topicFilter)) &
             ".project"        #> action.projects.map(_.viewButton(projectFilter)) &
-            ".deadline"       #> formatDeadline(stuff) &
-            ".isDone"         #> SHtml.ajaxCheckbox(action.isDone.is, updateList(action)_)
+            ".deadline"       #> formatDeadline(action) &
+            ".doneTime"       #> formatDoneTime(action)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
