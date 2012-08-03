@@ -8,6 +8,9 @@ import org.squeryl.adapters.MySQLInnoDBAdapter
 
 import java.sql.DriverManager
 
+import com.jolbox.bonecp.BoneCP
+import com.jolbox.bonecp.BoneCPConfig
+
 object DBSettings
 {
     Class.forName("com.mysql.jdbc.Driver")
@@ -16,12 +19,24 @@ object DBSettings
     private val dbUsername = Props.get("DatabaseUsername").openOr("username")
     private val dbPassword = Props.get("DatabasePassword").openOr("password")
 
+    private lazy val connectionPool = {
+        val config = new BoneCPConfig()
+        config.setJdbcUrl(dbURL)
+        config.setUsername(dbUsername)
+        config.setPassword(dbPassword)
+        config.setMinConnectionsPerPartition(5)
+        config.setMaxConnectionsPerPartition(10)
+        config.setPartitionCount(1)
+
+        new BoneCP(config)
+    }
+
     def initDB()
     {
         val adapter = new MySQLInnoDBAdapter
 
-        SquerylRecord.initWithSquerylSession(Session.create(
-            DriverManager.getConnection(dbURL, dbUsername, dbPassword), adapter
-        ))
+        SquerylRecord.initWithSquerylSession {
+            Session.create(connectionPool.getConnection(), adapter)
+        }
     }
 }

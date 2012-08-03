@@ -24,21 +24,40 @@ import java.util.Calendar
 
 import TagButton.Implicit._
 
-class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
+class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
-    private def template = Templates("templates-hidden" :: "stuff" :: "edit" :: Nil)
+    private def template = Templates("templates-hidden" :: "action" :: "edit" :: Nil)
 
-    lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+    private lazy val stuff = action.stuff
+    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     private var topic: Option[String] = _
     private var project: Option[String] = _
+    private var context: Option[String] = _
 
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
-  
-    def addTopic(title: String) = {
+    private var currentContexts: List[Context] = action.contexts
+ 
+    def addContext(title: String) = 
+    {
+        val userID = CurrentUser.get.get.idField.is
+        def createContext = Context.createRecord.userID(userID).title(title)
+        val context = Context.findByTitle(userID, title).getOrElse(createContext)
+
+        currentContexts.contains(context) match {
+            case true => ClearValue("inputContext")
+            case false =>
+                currentContexts ::= context
+                ClearValue("inputContext") &
+                AppendHtml("editActionContexts", context.editButton(onContextClick, onContextRemove))
+        }
+    }
+
+    def addTopic(title: String) = 
+    {
         val userID = CurrentUser.get.get.idField.is
         def createTopic = Topic.createRecord.userID(userID).title(title)
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
@@ -52,7 +71,8 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         }
     }
 
-    def addProject(title: String) = {
+    def addProject(title: String) = 
+    {
         val userID = CurrentUser.get.get.idField.is
         def createProject = Project.createRecord.userID(userID).title(title)
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
@@ -69,6 +89,11 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         }
     }
 
+    def addContext(): JsCmd = context match {
+        case None => Noop
+        case Some(context) => addContext(context)
+    }
+
     def addTopic(): JsCmd = topic match {
         case None => Noop
         case Some(title) => addTopic(title)
@@ -82,6 +107,16 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
     def doNothing(s: String) {}
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
+    def onContextClick(buttonID: String, project: Context) = Noop
+
+    def onContextRemove(buttonID: String, context: Context) = {
+        (currentContexts.size - 1)  match {
+            case 0 => Alert("至少需要一個 Context")
+            case _ =>
+                currentContexts = currentContexts.filterNot(_ == context)
+                FadeOutAndRemove(buttonID)
+        }
+    }
 
     def onProjectRemove(buttonID: String, project: Project) = {
         currentProjects = currentProjects.filterNot(_ == project)
@@ -140,6 +175,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
                 stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
+                action.setContexts(currentContexts)
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
@@ -154,10 +190,15 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         "#editStuffTitle" #> ("input" #> titleInput) &
         "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
         "#editStuffDeadline" #> ("input" #> deadlineInput) &
+        "#inputContext" #> (SHtml.text("", context = _)) &
+        "#inputContextHidden" #> (SHtml.hidden(addContext)) &
         "#inputTopic" #> (SHtml.text("", topic = _)) &
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
         "#inputProject" #> (SHtml.text("", project = _)) &
         "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#editActionContexts *" #> (
+            currentContexts.map(_.editButton(onContextClick, onContextRemove))
+        ) &
         "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))

@@ -20,8 +20,10 @@ seq(lessSettings:_*)
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
-resolvers += "Scala-Tools Maven2 Snapshots Repository" at 
-    "https://oss.sonatype.org/content/repositories/snapshots/"
+resolvers ++= Seq(
+    "Scala-Tools" at "https://oss.sonatype.org/content/repositories/snapshots/",
+    "BoneCP" at "http://jolbox.com/bonecp/downloads/maven"
+)
 
 libraryDependencies ++= Seq(
     "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
@@ -29,7 +31,8 @@ libraryDependencies ++= Seq(
     "mysql" % "mysql-connector-java" % "5.1.6",
     "net.liftweb" % "lift-webkit_2.9.2" % "2.5-SNAPSHOT" % "compile->default",
     "net.liftweb" % "lift-squeryl-record_2.9.2" % "2.5-SNAPSHOT",
-    "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7"
+    "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7",
+    "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
 )
 
 port in container.Configuration := 8081

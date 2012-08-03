@@ -24,27 +24,29 @@ import net.liftweb.util.Helpers.tryo
 import java.io.StringReader
 import java.io.StringWriter
 
-object Project extends Project with MetaRecord[Project]
+object Context extends Context with MetaRecord[Context]
 {
-    import net.liftweb.common.Box._
-
-    def findByID(id: Int): Box[Project] = inTransaction (
-        BeDoneSchema.projects.where(_.idField === id).headOption
+    def findByID(id: Int): Box[Context] = inTransaction (
+        BeDoneSchema.contexts.where(_.idField === id).headOption
     )
 
-    def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Project]] = inTransaction(tryo{
-        BeDoneSchema.projects.where(_.userID === userID).toList
+    def findByUser(user: User): Box[List[Context]] = findByUser(user.idField.is)
+    def findByUser(userID: Int): Box[List[Context]] = inTransaction(tryo{
+        from(BeDoneSchema.contexts)(c => 
+            where(c.userID === userID)
+            select(c)
+            orderBy(c.idField)
+        ).toList
     })
 
-    def findByTitle(userID: Int, title: String): Box[Project] = inTransaction(
-        BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
+    def findByTitle(userID: Int, title: String): Box[Context] = inTransaction(
+        BeDoneSchema.contexts.where(t => t.userID === userID and t.title === title).headOption
     )
 }
 
-class Project extends Record[Project] with KeyedRecord[Int]
+class Context extends Record[Context] with KeyedRecord[Int]
 {
-    def meta = Project
+    def meta = Context
 
     @Column(name="id")
     val idField = new IntField(this)
@@ -52,10 +54,5 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    def stuffs = inTransaction {
-        BeDoneSchema.stuffProjects.right(this)
-                    .filter(_.stuffType.is == StuffType.Stuff).toList
-    }
-
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
+    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.contexts.insert(this)) }
 }

@@ -15,6 +15,8 @@ object TagButton
 {
     def topicView   = Templates("templates-hidden" :: "button" :: "topic" :: Nil)
     def projectView = Templates("templates-hidden" :: "button" :: "project" :: Nil)
+    def contextView = Templates("templates-hidden" :: "button" :: "context" :: Nil)
+
 
     object Implicit {
         implicit def fromTopic(topic: Topic) = 
@@ -22,6 +24,10 @@ object TagButton
 
         implicit def fromProject(project: Project) = 
             new TagViewButton(projectView, project, project.title.is)
+
+        implicit def fromContext(context: Context) = 
+            new TagViewButton(contextView, context, context.title.is)
+
     }
 }
 

@@ -11,7 +11,7 @@ class Delegated extends Record[Delegated]
 {
     def meta = Delegated
 
-    val stuffID = new IntField(this)
+    val actionID = new IntField(this)
     val contactID = new IntField(this)
 
     val hasInformed = new BooleanField(this, false)

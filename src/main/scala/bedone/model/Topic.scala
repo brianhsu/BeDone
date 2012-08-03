@@ -54,7 +54,10 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
 
     override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.topics.insert(this)) }
 
-    def stuffs = inTransaction(BeDoneSchema.stuffTopics.right(this).toList)
+    def stuffs = inTransaction { 
+        BeDoneSchema.stuffTopics.right(this)
+                    .filter(_.stuffType.is == StuffType.Stuff)toList
+    }
 
     def addStuff(stuff: Stuff) = inTransaction {
         BeDoneSchema.stuffTopics.right(this).associate(stuff)

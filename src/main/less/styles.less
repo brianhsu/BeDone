@@ -61,15 +61,20 @@ div.btn-tag {
 i.myicon-starOn {
     background-image: url('/img/star_on.png');
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    vertical-align: text-middle;
+
 }
 
 i.myicon-starOff {
     background-image: url('/img/star_off.png');
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    vertical-align: text-middle;
 }
 
 div.stuffs-edit {
@@ -93,17 +98,33 @@ div.stuffs-edit {
     }
 }
 
-
-div.stuffs {
+.post-it (@background) {
+    background: @background;
     margin-bottom: 0.8em;
     padding-top: 0.6em;
-    padding-bottom: 0.6em;
+    padding-bottom: 0.7em;
     padding-left: 0.5em;
     padding-right: 0.5em;
 
-    background: @stuffBackground;
     .rounded-corners(5px);
-    .box-shadow(0 0 4px, 30%);
+}
+
+div.action {
+
+    .post-it(fade(@stuffBackground, 50%));
+
+    div.desc {
+        margin: 1em;
+    }
+
+    .showDesc {
+        margin-left: 0.5em;
+    }
+}
+
+div.stuffs {
+
+    .post-it(@stuffBackground);
 
     div.desc {
         margin: 1em;
@@ -116,5 +137,13 @@ div.stuffs {
 
 .inline {
     display: inline-block;
+}
+
+.topic {
+    margin-right: 0.2em;
+}
+
+.project {
+    margin-right: 0.2em;
 }
 

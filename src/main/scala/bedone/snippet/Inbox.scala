@@ -52,6 +52,7 @@ class Inbox extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
@@ -82,7 +83,8 @@ class Inbox extends JSImplicit
     {
         JqSetHtml("stuffTable", completeStuffTable) & 
         JqSetHtml("current", "全部") &
-        JsRaw("""$('#showAll').prop("disabled", true)""")
+        JsRaw("""$('#showAll').prop("disabled", true)""") &
+        JsRaw("""$('#current').attr("class", "btn btn-inverse")""")
     }
 
     def createStuffTable(stuffs: List[Stuff]) = stuffs.map(createStuffRow).flatten
@@ -91,7 +93,7 @@ class Inbox extends JSImplicit
 
         import TagButton.Implicit._
 
-        def template = Templates("templates-hidden" :: "stuff" :: "table" :: Nil)
+        def template = Templates("templates-hidden" :: "stuff" :: "item" :: Nil)
 
         val cssBinding = 
             actionBar(stuff) &
@@ -101,8 +103,7 @@ class Inbox extends JSImplicit
             ".desc *"        #> stuff.descriptionHTML &
             ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
             ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
-            ".deadline"      #> formatDeadline(stuff) &
-            ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff))
+            ".deadline"      #> formatDeadline(stuff)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
