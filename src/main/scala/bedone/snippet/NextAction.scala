@@ -115,6 +115,7 @@ class NextAction extends JSImplicit
 
     def topicFilter(buttonID: String, topic: Topic) = 
     {
+        this.currentProject = None
         this.currentTopic = Some(topic)
 
         updateList() &
@@ -126,6 +127,7 @@ class NextAction extends JSImplicit
     def projectFilter(buttonID: String, project: Project) =
     {
         this.currentProject = Some(project)
+        this.currentTopic = None
 
         updateList() &
         JqSetHtml("current", project.title.is) &
