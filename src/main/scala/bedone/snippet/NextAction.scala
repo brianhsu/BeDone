@@ -90,6 +90,7 @@ class NextAction extends JSImplicit
             action.saveTheRecord()
 
             updateList &
+            Hide(rowID) &
             new FadeIn(rowID, 200, 2500)
         }
 
