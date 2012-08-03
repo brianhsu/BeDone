@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div>
+        <div>
+          <div style="float: right">
+            <div class="btn-group inline">
+              <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
+              <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
+            </div>
+          </div>
+          <ul class="nav nav-tabs">
+            <li id="thisWeekTab" class="active"><a href="#">本週</a></li>
+            <li id="thisMonthTab"><a href="#">本月</a></li>
+            <li id="allTab"><a href="#">全部</a></li>
+          </ul>
+          <div>
+            <h3 style="margin-bottom:0.5em">本日</h3>
+            <div id="todayList"></div>
+          </div>
+          <div>
+            <h3 style="margin-top:1em; margin-bottom:0.5em">本週</h3>
+            <div id="thisWeekList"></div>
+          </div>
+          <div>
+            <h3 style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
+            <div id="doneList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
