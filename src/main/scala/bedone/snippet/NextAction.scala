@@ -20,7 +20,7 @@ class NextAction extends JSImplicit
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     val currentUser = CurrentUser.get.get
-    val contexts = Context.findByUser(currentUser).openOr(Nil)
+    def contexts = Context.findByUser(currentUser).openOr(Nil)
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
@@ -132,13 +132,15 @@ class NextAction extends JSImplicit
         val (doneList, notDoneList) = actions
         val doneHTML = doneList.filter(shouldDisplay).map(createActionRow).flatten
         val notDoneHTML = notDoneList.filter(shouldDisplay).map(createActionRow).flatten
+        val contextTab = contexts.map(createContextTab)
 
         this.currentAction = None
 
         JqEmpty("isDone") &
         JqEmpty("notDone") &
         JqSetHtml("isDone", doneHTML) &
-        JqSetHtml("notDone", notDoneHTML)
+        JqSetHtml("notDone", notDoneHTML) &
+        JqSetHtml("contextTabFolder", contextTab.flatten)
     }
 
     def updateList(action: Action)(isDone: Boolean): JsCmd = 
@@ -190,6 +192,19 @@ class NextAction extends JSImplicit
         updateList()
     }
 
+    def createContextTab(context: Context) = 
+    {
+        val contextTabID = ("contextTab" + context.idField.is)
+        val activtedStyle = if (currentContext == Some(context)) "active" else ""
+        val cssBinding = 
+            "li [class]"  #> activtedStyle &
+            "li [id]"     #> contextTabID &
+            "a *"         #> context.title &
+            "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
+
+        cssBinding(<li class="contextTab"><a href="#">@ Home</a></li>)
+    }
+
     def render = 
     {
         val (doneActions, notDoneActions) = actions
@@ -198,15 +213,6 @@ class NextAction extends JSImplicit
         "#showAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#isDone *"  #> doneActions.filter(shouldDisplay).map(createActionRow).flatten &
         "#notDone *" #> notDoneActions.filter(shouldDisplay).map(createActionRow).flatten &
-        ".contextTab" #> contexts.map { context =>
-
-            val contextTabID = ("contextTab" + context.idField.is)
-            val activtedStyle = if (currentContext == Some(context)) "active" else ""
-
-            "li [class]"  #> activtedStyle &
-            "li [id]"     #> contextTabID &
-            "a *"         #> context.title &
-            "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
-        }
+        "#contextTabFolder *" #> contexts.map(createContextTab).flatten
     }
 }
