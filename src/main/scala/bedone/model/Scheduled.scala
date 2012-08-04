@@ -8,6 +8,7 @@ import net.liftweb.record.Record
 import net.liftweb.record.field.IntField
 import net.liftweb.record.field.OptionalIntField
 import net.liftweb.record.field.OptionalStringField
+import net.liftweb.record.field.OptionalDateTimeField
 import net.liftweb.record.field.DateTimeField
 
 import net.liftweb.squerylrecord.KeyedRecord
@@ -39,7 +40,7 @@ class Scheduled extends Record[Scheduled] with KeyedRecord[Int]
     @Column(name="actionID")
     val idField = new IntField(this)
     val startTime = new DateTimeField(this)
-    val durationInMinute = new OptionalIntField(this)
+    val endTime = new OptionalDateTimeField(this)
     val location = new OptionalStringField(this, 255)
 
     def action = Action.findByID(idField.is).get
