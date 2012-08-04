@@ -15,24 +15,27 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
 
+import StuffType.StuffType
+
 object Action extends Action with MetaRecord[Action]
 {
     def findByID(id: Int): Box[Action] = inTransaction {
         tryo { BeDoneSchema.actions.where(_.idField === id).single }
     }
 
-    def findByUser(user: User): Box[List[Action]] = inTransaction {
-        tryo {
+    def findByUser(user: User, stuffType: StuffType = StuffType.Action): Box[List[Action]] = 
+    {
+        inTransaction(tryo{
             from(BeDoneSchema.stuffs, BeDoneSchema.actions) ( (stuff, action) =>
                 where(
                     stuff.userID === user.idField and 
-                    stuff.stuffType === StuffType.Action and
+                    stuff.stuffType === stuffType and
                     action.idField === stuff.idField
                 ) 
                 select(action) 
                 orderBy(stuff.deadline desc)
             ).toList
-        }
+        })
     }
 }
 

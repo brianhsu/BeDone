@@ -33,8 +33,10 @@ object StuffType extends Enumeration
 
     val Stuff    = Value(0, "Stuff")
     val Action   = Value(1, "Value")
-    val Refrence = Value(2, "Reference")
-    val Maybe    = Value(3, "Maybe")
+    val Delegated = Value(2, "Delegated")
+    val Scheduled = Value(3, "Scheduled")
+    val Refrence = Value(4, "Reference")
+    val Maybe    = Value(5, "Maybe")
 }
 
 object Stuff extends Stuff with MetaRecord[Stuff]
