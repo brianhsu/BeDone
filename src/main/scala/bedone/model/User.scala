@@ -29,7 +29,7 @@ object User extends User with MetaRecord[User]
 {
     import BeDoneSchema._
 
-    def findByUsername(username: String): Box[User] = inTransaction {
+    def findByUsername(username: String): Box[User] = {
         users.where(_.username === username).toList match {
             case List(user) => Full(user)
             case Nil => Empty
@@ -37,7 +37,7 @@ object User extends User with MetaRecord[User]
         }
     }
 
-    def findByEmail(email: String): Box[User] = inTransaction {
+    def findByEmail(email: String): Box[User] = {
         users.where(_.email === email).toList match {
             case List(user) => Full(user)
             case Nil => Empty
@@ -88,7 +88,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         override def helpAsHtml = Full(Text("至少需要七個字元"))
     }
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.users.insert(this)) }
+    override def saveTheRecord() = tryo(BeDoneSchema.users.insert(this))
 
     def logout(postAction: => Any = ()) {
         CurrentUser.set(Empty)

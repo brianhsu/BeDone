@@ -28,18 +28,16 @@ object Topic extends Topic with MetaRecord[Topic]
 {
     import net.liftweb.common.Box._
 
-    def findByID(id: Int): Box[Topic] = inTransaction (
+    def findByID(id: Int): Box[Topic] = 
         BeDoneSchema.topics.where(_.idField === id).headOption
-    )
 
     def findByUser(user: User): Box[List[Topic]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Topic]] = inTransaction(tryo{
+    def findByUser(userID: Int): Box[List[Topic]] = tryo{
         BeDoneSchema.topics.where(_.userID === userID).toList
-    })
+    }
 
-    def findByTitle(userID: Int, title: String): Box[Topic] = inTransaction(
+    def findByTitle(userID: Int, title: String): Box[Topic] = 
         BeDoneSchema.topics.where(t => t.userID === userID and t.title === title).headOption
-    )
 }
 
 class Topic extends Record[Topic] with KeyedRecord[Int]
@@ -52,14 +50,12 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.topics.insert(this)) }
+    override def saveTheRecord() = tryo(BeDoneSchema.topics.insert(this))
 
-    def stuffs = inTransaction { 
+    def stuffs = { 
         BeDoneSchema.stuffTopics.right(this)
                     .filter(_.stuffType.is == StuffType.Stuff)toList
     }
 
-    def addStuff(stuff: Stuff) = inTransaction {
-        BeDoneSchema.stuffTopics.right(this).associate(stuff)
-    }
+    def addStuff(stuff: Stuff) = BeDoneSchema.stuffTopics.right(this).associate(stuff)
 }

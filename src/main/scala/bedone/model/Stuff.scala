@@ -41,11 +41,10 @@ object StuffType extends Enumeration
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
-    def findByID(id: Int): Box[Stuff] = inTransaction {
+    def findByID(id: Int): Box[Stuff] = 
         tryo { BeDoneSchema.stuffs.where(_.idField === id).single }
-    }
 
-    def findByUser(user: User): Box[List[Stuff]] = inTransaction {
+    def findByUser(user: User): Box[List[Stuff]] =
         tryo {
             from(BeDoneSchema.stuffs)(table =>
                 where(table.userID === user.idField and table.stuffType === StuffType.Stuff) 
@@ -53,7 +52,6 @@ object Stuff extends Stuff with MetaRecord[Stuff]
                 orderBy(table.createTime asc)
             ).toList
         }
-    }
 }
 
 class Stuff extends Record[Stuff] with KeyedRecord[Int] 
@@ -89,8 +87,8 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         override def validations = afterToday _ :: super.validations
     }
 
-    def topics = inTransaction(BeDoneSchema.stuffTopics.left(this).toList)
-    def projects = inTransaction(BeDoneSchema.stuffProjects.left(this).toList)
+    def topics = BeDoneSchema.stuffTopics.left(this).toList
+    def projects = BeDoneSchema.stuffProjects.left(this).toList
 
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
@@ -103,14 +101,14 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         scala.xml.XML.loadString(rawHTML)
     }
 
-    override def saveTheRecord() = inTransaction(tryo{
+    override def saveTheRecord() = tryo{
         this.isPersisted match {
             case true  => BeDoneSchema.stuffs.update(this)
             case false => BeDoneSchema.stuffs.insert(this)
         }
 
         this
-    })
+    }
 
     def addTopics(topicTitles: List[String]) {
 
@@ -142,16 +140,15 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         projectTitles.map(getProject).foreach(addProject)
     }
 
-    def removeProject(project: Project) = inTransaction {
+    def removeProject(project: Project) = 
         BeDoneSchema.stuffProjects.left(this).dissociate(project)
-    }
 
-    def addProject(project: Project) = inTransaction { 
+    def addProject(project: Project) = {
         if (!project.isPersisted) { project.saveTheRecord() }
         BeDoneSchema.stuffProjects.left(this).associate(project)
     }
 
-    def setProjects(projects: List[Project]) = inTransaction {
+    def setProjects(projects: List[Project]) = {
         val shouldRemove = this.projects.filterNot(projects.contains)
         val shouldAdd = projects.filterNot(this.projects.contains)
 
@@ -159,16 +156,16 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         shouldAdd.foreach(addProject)
     }
 
-    def removeTopic(topic: Topic) = inTransaction {
+    def removeTopic(topic: Topic) = {
         BeDoneSchema.stuffTopics.left(this).dissociate(topic)
     }
 
-    def addTopic(topic: Topic) = inTransaction { 
+    def addTopic(topic: Topic) = { 
         if (!topic.isPersisted) { topic.saveTheRecord() }
         BeDoneSchema.stuffTopics.left(this).associate(topic)
     }
 
-    def setTopics(topics: List[Topic]) = inTransaction {
+    def setTopics(topics: List[Topic]) = {
         val shouldRemove = this.topics.filterNot(topics.contains)
         val shouldAdd = topics.filterNot(this.topics.contains)
 

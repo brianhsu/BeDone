@@ -26,22 +26,20 @@ import java.io.StringWriter
 
 object Context extends Context with MetaRecord[Context]
 {
-    def findByID(id: Int): Box[Context] = inTransaction (
+    def findByID(id: Int): Box[Context] = 
         BeDoneSchema.contexts.where(_.idField === id).headOption
-    )
 
     def findByUser(user: User): Box[List[Context]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Context]] = inTransaction(tryo{
+    def findByUser(userID: Int): Box[List[Context]] = tryo{
         from(BeDoneSchema.contexts)(c => 
             where(c.userID === userID)
             select(c)
             orderBy(c.idField)
         ).toList
-    })
+    }
 
-    def findByTitle(userID: Int, title: String): Box[Context] = inTransaction(
+    def findByTitle(userID: Int, title: String): Box[Context] = 
         BeDoneSchema.contexts.where(t => t.userID === userID and t.title === title).headOption
-    )
 }
 
 class Context extends Record[Context] with KeyedRecord[Int]
@@ -54,5 +52,5 @@ class Context extends Record[Context] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.contexts.insert(this)) }
+    override def saveTheRecord() = tryo(BeDoneSchema.contexts.insert(this))
 }

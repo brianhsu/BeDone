@@ -15,6 +15,9 @@ import net.liftweb.sitemap.SiteMap
 import net.liftweb.sitemap.Menu
 import net.liftweb.sitemap.Loc._
 import org.bedone.view.AutoComplete
+import net.liftweb.http.S
+import net.liftweb.util.LoanWrapper
+import net.liftweb.squerylrecord.RecordTypeMode._
 
 class Boot 
 {
@@ -55,6 +58,14 @@ class Boot
         PasswordField.minPasswordLength = 7
 
         LiftRules.dispatch.append(AutoComplete.autoComplete)
+           
+        S.addAround(new LoanWrapper{
+            override def apply[T](f: => T): T = {
+                inTransaction{
+                    f
+                }
+            }
+        })
 
         DBSettings.initDB()
     }

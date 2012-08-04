@@ -17,7 +17,7 @@ import org.squeryl.annotations.Column
 
 object Scheduled extends Scheduled with MetaRecord[Scheduled]
 {
-    def findByUser(user: User): Box[List[Scheduled]] = inTransaction {
+    def findByUser(user: User): Box[List[Scheduled]] = 
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.scheduleds) ( (stuff, scheduled) =>
                 where(
@@ -29,7 +29,6 @@ object Scheduled extends Scheduled with MetaRecord[Scheduled]
                 orderBy(scheduled.startTime)
             ).toList
         }
-    }
 
 }
 
@@ -45,15 +44,14 @@ class Scheduled extends Record[Scheduled] with KeyedRecord[Int]
 
     def action = Action.findByID(idField.is).get
 
-    override def saveTheRecord() = inTransaction(tryo{
+    override def saveTheRecord() = tryo{
         this.isPersisted match {
             case true  => BeDoneSchema.scheduleds.update(this)
             case false => BeDoneSchema.scheduleds.insert(this)
         }
 
         this
-    })
-
+    }
 }
 
 
