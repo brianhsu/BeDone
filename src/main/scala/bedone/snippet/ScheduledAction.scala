@@ -124,6 +124,7 @@ class ScheduledAction extends JSImplicit
         val stuff = action.stuff
 
         val cssBinding = 
+            actionBar(scheduled) &
             ".action [id]"    #> ("row" + action.idField) &
             ".collapse [id]"  #> ("desc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
@@ -144,23 +145,18 @@ class ScheduledAction extends JSImplicit
         val hasCurrentProject = 
             currentProject.map(scheduled.action.projects.contains).getOrElse(true)
    
-        println("currentTopic:" + currentTopic)
-        println("currentProject:" + currentProject)
-        println("hasCurrentTopic:" + hasCurrentTopic)
-        println("hasCurrentProject:" + hasCurrentProject)
-
         hasCurrentTopic && hasCurrentProject
     }
 
     def createActionList(intervalAction: List[Scheduled]) = 
     {
-        val todayList = todayAction.filter(!_.action.isDone.is).filter(shouldDisplay)
-        val intervalList = intervalAction.filter(!_.action.isDone.is).filter(shouldDisplay)
+        val todayList = todayAction.filter(shouldDisplay)
+        val intervalList = intervalAction.filter(shouldDisplay)
         val doneList = 
             todayList.filter(_.action.isDone.is) ++ 
             intervalList.filter(_.action.isDone.is)
 
-        (todayList, intervalList, doneList)
+        (todayList.filterNot(_.action.isDone.is), intervalList.filterNot(_.action.isDone.is), doneList)
     }
 
     def updateList(tabID: String): JsCmd =
@@ -192,6 +188,58 @@ class ScheduledAction extends JSImplicit
         JqSetHtml("intervalList", intervalList.flatMap(createActionRow)) &
         JqSetHtml("todayList", todayList.flatMap(createActionRow)) &
         JqSetHtml("doneList", doneList.flatMap(createActionRow))
+    }
+
+    def actionBar(scheduled: Scheduled) = 
+    {
+        val action = scheduled.action
+        val stuff = action.stuff
+
+        def starClass = stuff.isStared.is match {
+            case true  => "myicon-starOn"
+            case false => "myicon-starOff"
+        }
+
+        def toogleStar(): JsCmd = {
+            stuff.isStared(!stuff.isStared.is)
+            stuff.saveTheRecord()
+            
+            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+        }
+
+        def markAsTrash(): JsCmd = {
+            stuff.isTrash(true)
+            stuff.saveTheRecord()
+
+            new FadeOut("row" + stuff.idField, 0, 500)
+        }
+
+        def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
+        {
+            val rowID = "row" + action.idField.is
+            val doneTime = isDone match {
+                case false => None
+                case true  =>
+                    val calendar = Calendar.getInstance
+                    calendar.setTime(new Date)
+                    Some(calendar)
+            }
+
+            action.isDone(isDone)
+            action.doneTime(doneTime)
+            action.saveTheRecord()
+
+            updateList &
+            Hide(rowID) &
+            new FadeIn(rowID, 200, 2500)
+        }
+
+        //".edit [onclick]" #> SHtml.onEvent(s => showEditForm(action)) &
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
+        ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
+        ".star" #> ("i [class]" #> starClass) &
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag(action, _))
     }
 
     def render = 
