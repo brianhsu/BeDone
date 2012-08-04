@@ -18,21 +18,21 @@
             </div>
           </div>
           <ul class="nav nav-tabs">
-            <li id="thisWeekTab" class="active"><a href="#">本週</a></li>
-            <li id="thisMonthTab"><a href="#">本月</a></li>
-            <li id="allTab"><a href="#">全部</a></li>
+            <li class="intervalTab active" id="thisWeekTab"><a href="#">本週</a></li>
+            <li class="intervalTab" id="thisMonthTab"><a href="#">本月</a></li>
+            <li class="intervalTab" id="allTab"><a href="#">全部</a></li>
           </ul>
-          <div id="todayList">
+          <div>
             <h3 style="margin-bottom:0.5em">本日</h3>
-            <div class="actionList"></div>
+            <div id="todayList" class="actionList"></div>
           </div>
-          <div id="weekList">
-            <h3 style="margin-top:1em; margin-bottom:0.5em">本週</h3>
-            <div class="actionList"></div>
+          <div>
+            <h3 id="intervalLabel" style="margin-top:1em; margin-bottom:0.5em">本週</h3>
+            <div id="intervalList" class="actionList"></div>
           </div>
-          <div id="doneList">
-            <h3 style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
-            <div class="actionList"></div>
+          <div>
+            <h3 id="doneLabel" style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
+            <div id="doneList" class="actionList"></div>
           </div>
         </div>
       </div>
