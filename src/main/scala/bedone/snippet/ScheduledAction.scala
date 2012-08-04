@@ -26,8 +26,10 @@ class ScheduledAction extends JSImplicit
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
+    private var currentTabID: String = "thisWeekTab"
 
     val currentUser = CurrentUser.get.get
+
 
     def scheduledAction = Scheduled.findByUser(currentUser).openOr(Nil)
     def todayAction = scheduledAction.filter(isToday)
@@ -110,10 +112,7 @@ class ScheduledAction extends JSImplicit
         """$('#current').attr("class", "btn btn-success")"""
     }
 
-    def updateList(): JsCmd =
-    {
-        Noop
-    }
+    def updateList(): JsCmd = updateList(this.currentTabID)
 
     def createActionRow(scheduled: Scheduled) = 
     {
@@ -137,15 +136,50 @@ class ScheduledAction extends JSImplicit
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
+    def shouldDisplay(scheduled: Scheduled) = 
+    {
+        val hasCurrentTopic = 
+            currentTopic.map(scheduled.action.topics.contains).getOrElse(true)
+
+        val hasCurrentProject = 
+            currentProject.map(scheduled.action.projects.contains).getOrElse(true)
+   
+        println("currentTopic:" + currentTopic)
+        println("currentProject:" + currentProject)
+        println("hasCurrentTopic:" + hasCurrentTopic)
+        println("hasCurrentProject:" + hasCurrentProject)
+
+        hasCurrentTopic && hasCurrentProject
+    }
+
     def createActionList(intervalAction: List[Scheduled]) = 
     {
-        val todayList = todayAction.filter(!_.action.isDone.is)
-        val intervalList = intervalAction.filter(!_.action.isDone.is)
+        val todayList = todayAction.filter(!_.action.isDone.is).filter(shouldDisplay)
+        val intervalList = intervalAction.filter(!_.action.isDone.is).filter(shouldDisplay)
         val doneList = 
             todayList.filter(_.action.isDone.is) ++ 
             intervalList.filter(_.action.isDone.is)
 
         (todayList, intervalList, doneList)
+    }
+
+    def updateList(tabID: String): JsCmd =
+    {
+        this.currentTabID = tabID
+
+        val title = tabID match {
+            case "thisWeekTab"  => "本週"
+            case "thisMonthTab" => "本月"
+            case "allTab" => "全部"
+        }
+
+        val intervalAction = tabID match {
+            case "thisWeekTab"  => weekAction
+            case "thisMonthTab" => monthAction
+            case "allTab" => allAction
+        }
+
+        updateList(tabID, title, intervalAction)
     }
 
     def updateList(tabID: String, title: String, intervalAction: List[Scheduled]): JsCmd = 
@@ -164,12 +198,10 @@ class ScheduledAction extends JSImplicit
     {
         val (todayList, intervalList, doneList) = createActionList(weekAction)
 
-        "#thisWeekTab [onclick]" #> 
-            SHtml.onEvent(s => updateList("thisWeekTab", "本週", weekAction)) &
-        "#thisMonthTab [onclick]" #> 
-            SHtml.onEvent(s => updateList("thisMonthTab", "本月", monthAction)) &
-        "#allTab [onclick]" #> 
-            SHtml.onEvent(s => updateList("allTab", "全部", allAction)) &
+        "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
+        "#thisWeekTab [onclick]" #> SHtml.onEvent(s => updateList("thisWeekTab")) &
+        "#thisMonthTab [onclick]" #> SHtml.onEvent(s => updateList("thisMonthTab")) &
+        "#allTab [onclick]" #> SHtml.onEvent(s => updateList("allTab")) &
         "#todayList *"    #> todayList.flatMap(createActionRow) &
         "#intervalList *" #> intervalList.flatMap(createActionRow) &
         "#doneList *"     #> doneList.flatMap(createActionRow)
