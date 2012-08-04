@@ -24,6 +24,24 @@ function prepareStuffEditForm() {
         }
     });
 
+    $( "#editStartTime input" ).datetimepicker({
+        dateFormat: "yy-mm-dd",
+        timeFormat: 'hh:mm',
+        onClose: function(dateText) {
+            $("#editStartTime input").val(dateText)
+            $("#editStartTime input").blur()
+        }
+    });
+
+    $( "#editEndTime input" ).datetimepicker({
+        dateFormat: "yy-mm-dd",
+        timeFormat: 'hh:mm',
+        onClose: function(dateText) {
+            $("#editEndTime input").val(dateText)
+            $("#editEndTime input").blur()
+        }
+    });
+
     $( "#inputContext" ).autocomplete({
         source: "/autocomplete/context",
         select: function(event, ui) { 

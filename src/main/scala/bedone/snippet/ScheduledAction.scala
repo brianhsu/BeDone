@@ -190,6 +190,19 @@ class ScheduledAction extends JSImplicit
         JqSetHtml("doneList", doneList.flatMap(createActionRow))
     }
 
+    def editPostAction(stuff: Stuff): JsCmd = {
+        updateList()
+    }
+
+    def showEditForm(scheduled: Scheduled) = 
+    {
+        val editStuff = new EditScheduledForm(scheduled, editPostAction)
+
+        """$('#stuffEdit').remove()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
+    }
+
     def actionBar(scheduled: Scheduled) = 
     {
         val action = scheduled.action
@@ -234,7 +247,7 @@ class ScheduledAction extends JSImplicit
             new FadeIn(rowID, 200, 2500)
         }
 
-        //".edit [onclick]" #> SHtml.onEvent(s => showEditForm(action)) &
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(scheduled)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &

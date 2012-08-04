@@ -1,0 +1,89 @@
+<div id="stuffEdit" class="stuffs-edit">
+  <div>
+    <span class="actionBar">
+      <i class="icon-white icon-ok"></i>
+      <i class="icon-white icon-remove"></i>
+      <i class="icon-white icon-star"></i>
+    </span>
+    <fieldset id="editStuffTitle" class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題">
+        <span id="editStuffTitle_msg" class="help-inline"></span>
+      </div>
+    </fieldset>
+    <div class="pull-right form-inline">
+
+      <div class="input-prepend" style="margin-right:0.5em;">
+        <form id="topicForm" action="." data-lift="lift:Form.ajax">
+          <span title="主題" class="add-on">
+            <i class="icon-tags"></i>
+          </span><input id="inputTopic" class="input-medium" type="text" placeholder="主題">
+          <input type="hidden" id="inputTopicHidden">
+        </form>
+      </div>
+
+      <div class="input-prepend" style="margin-right: 0.5em">
+        <form id="projectForm" action="." data-lift="lift:Form.ajax">
+          <span title="專案" class="add-on">
+            <i class="icon-folder-open"></i>
+          </span><input id="inputProject" class="input-medium" type="text" placeholder="專案">
+          <input type="hidden" id="inputProjectHidden">
+        </form>
+      </div>
+    </div>
+  </div>
+  <div style="margin: 0.5em; display: table; width: 98%">
+
+    <div id="editStuffProjects" class="inline" style="float:right">
+      <div class="btn-tag btn btn-success btn-mini" id="buttonID">
+        <i class="icon-folder-open" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Project</span>
+        <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </div>
+    </div>
+    <div id="editStuffTopics" class="inline" style="float:right">
+      <div class="btn-tag btn btn-info btn-mini" id="buttonID1">
+        <i class="icon-tags" style="margin-top: 2px; margin-right: 2px"></i>
+        <span class="title">Topic1</span>
+        <i title="移除" class="icon-remove" style="margin-top: 2px; margin-right: 2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%">
+    <textarea rows="5" id="editStuffDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+  </div>
+
+  <fieldset id="editStartTime" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">開始時間：</label>
+      <input class="input-medium" type="text">
+      <label id="editStartTime_msg" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+  <fieldset id="editEndTime" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">預計結束時間：</label>
+      <input class="input-medium" type="text">
+      <label id="editEndTime_msg" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+  <fieldset id="editScheduledLocation" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">地點：</label>
+      <input class="input-medium" type="text">
+      <label id="editScheduledLocation" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+
+  <div style="text-align: right; margin-right: 0.5em">
+      <button id="editStuffCancel" class="btn" style="margin-right:0.5em">取消</button>
+      <button id="editStuffSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
+  </div>
+
+</div>
