@@ -21,7 +21,7 @@ import org.joda.time._
 
 class ScheduledAction extends JSImplicit
 {
-    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
+    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     private var currentTopic: Option[Topic] = None
@@ -114,6 +114,16 @@ class ScheduledAction extends JSImplicit
 
     def updateList(): JsCmd = updateList(this.currentTabID)
 
+    def createTooltip(scheduled: Scheduled) = 
+    {
+        val endTime = scheduled.endTime.is.map { x => 
+            "結束時間：<br>" + dateTimeFormatter.format(x.getTime) + "<br>"
+        }
+        val location = scheduled.location.is.map(x => "地點：<br>" + x)
+
+        endTime.getOrElse("") + location.getOrElse("")
+    }
+
     def createActionRow(scheduled: Scheduled) = 
     {
         import TagButton.Implicit._
@@ -132,7 +142,8 @@ class ScheduledAction extends JSImplicit
             ".topic"          #> action.topics.map(_.viewButton(topicFilter)) &
             ".project"        #> action.projects.map(_.viewButton(projectFilter)) &
             ".startTime"      #> formatStartTime(scheduled) &
-            ".doneTime"       #> formatDoneTime(action)
+            ".doneTime"       #> formatDoneTime(action) &
+            "rel=tooltip [title]" #> createTooltip(scheduled)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
