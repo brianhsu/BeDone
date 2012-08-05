@@ -3,21 +3,26 @@
 package bootstrap.liftweb
 
 import org.bedone.model.User
+import org.bedone.view.AutoComplete
 
 import net.liftweb.common.Full
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.Html5Properties
+import net.liftweb.http.OldHtmlProperties
+import net.liftweb.http.XHtmlInHtml5OutProperties
 import net.liftweb.http.Req
 
 import net.liftweb.record.field.PasswordField
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.sitemap.Menu
 import net.liftweb.sitemap.Loc._
-import org.bedone.view.AutoComplete
 import net.liftweb.http.S
 import net.liftweb.util.LoanWrapper
 import net.liftweb.squerylrecord.RecordTypeMode._
+
+import java.io.Writer
+import scala.xml.Node
 
 class Boot 
 {
@@ -35,14 +40,8 @@ class Boot
 
     def boot 
     {
-
         // 我們的程式碼放在 org.bedone 這個 package 中
         LiftRules.addToPackages("org.bedone")
-
-        // 使用 HTML 5 做為模版
-        LiftRules.htmlProperties.default.set { r: Req => 
-            new Html5Properties(r.userAgent)
-        }
 
         def siteMap = SiteMap(
             Menu.i("Index") / "index",
@@ -58,6 +57,13 @@ class Boot
         PasswordField.minPasswordLength = 7
 
         LiftRules.dispatch.append(AutoComplete.autoComplete)
+
+        LiftRules.htmlProperties.default.set { r: Req => 
+            val xhtml = new OldHtmlProperties(r.userAgent)
+            val html5 = new XHtmlInHtml5OutProperties(r.userAgent)
+
+            html5.setHtmlWriter(xhtml.htmlWriter)
+        }
            
         S.addAround(new LoanWrapper{
             override def apply[T](f: => T): T = {

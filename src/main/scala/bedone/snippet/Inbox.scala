@@ -101,8 +101,8 @@ class Inbox extends JSImplicit
             ".collapse [id]" #> ("desc" + stuff.idField) &
             ".title *"       #> stuff.title &
             ".desc *"        #> stuff.descriptionHTML &
-            ".topic"         #> stuff.topics.map(_.viewButton(topicFilter)) &
-            ".project"       #> stuff.projects.map(_.viewButton(projectFilter)) &
+            ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"     #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".deadline"      #> formatDeadline(stuff)
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
