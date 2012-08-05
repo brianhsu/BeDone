@@ -3,6 +3,7 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
 import net.liftweb.common.Full
 import net.liftweb.common.Empty
 import net.liftweb.common.Failure
@@ -32,7 +33,9 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
 
     private lazy val action = scheduled.action
     private lazy val stuff = action.stuff
+
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     private var topic: Option[String] = _
     private var project: Option[String] = _
@@ -103,28 +106,48 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         setError(errors, "editStuffTitle")._2
     }
 
-    def setDeadline(deadline: String): JsCmd = {
-        println("deadline:" + deadline)
-        val newDeadline = optFromStr(deadline) match {
-            case None    => Empty
+    def dateTimeFromStr(dateTimeStr: String, defaultValue: Box[Calendar]) = 
+    {
+        optFromStr(dateTimeStr) match {
+            case None    => defaultValue
             case Some(x) => try {
-                dateFormatter.setLenient(false)
+                dateTimeFormatter.setLenient(false)
                 val calendar = Calendar.getInstance
-                calendar.setTime(dateFormatter.parse(x))
+                calendar.setTime(dateTimeFormatter.parse(x))
                 Full(calendar)
             } catch {
                 case e: ParseException => Failure("日期格式錯誤")
             }
         }
 
-        println("deadline:" + newDeadline)
-        stuff.deadline.setBox(newDeadline)
-
-        val errors = stuff.deadline.validate
-        setError(errors, "editStuffDeadline")._2
     }
 
-    def setDescription(desc: String): JsCmd = {
+    def setEndTime(endTimeStr: String): JsCmd = 
+    {
+        val endTime = dateTimeFromStr(endTimeStr, Empty)
+        scheduled.endTime.setBox(endTime)
+        val errors = scheduled.endTime.validate
+        setError(errors, "editEndTime")._2
+    }
+
+    def setStartTime(startTimeStr: String): JsCmd = 
+    {
+        val startTime = dateTimeFromStr(startTimeStr, Failure("此為必填欄位"))
+
+        scheduled.startTime.setBox(startTime)
+
+        val errors = scheduled.startTime.validate
+        setError(errors, "editStartTime")._2
+    }
+
+    def setLocation(location: String): JsCmd = 
+    {
+        scheduled.location(location)
+        Noop
+    }
+
+    def setDescription(desc: String): JsCmd = 
+    {
         stuff.description(desc)
         Noop
     }
@@ -133,7 +156,8 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
 
         val status = List(
             setError(stuff.title.validate, "editStuffTitle"),
-            setError(stuff.deadline.validate, "editStuffDeadline")
+            setError(scheduled.startTime.validate, "editStartTime"),
+            setError(scheduled.endTime.validate, "editEndTime")
         )
 
         val hasError = status.map(_._1).contains(true)
@@ -145,16 +169,24 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
                 stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
+                scheduled.saveTheRecord()
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
 
     def cssBinder = {
 
-        val deadline = stuff.deadline.is.map(x => dateFormatter.format(x.getTime)).getOrElse("")
+        val startTime = dateTimeFormatter.format(scheduled.startTime.is.getTime)
+        val endTime = scheduled.endTime.is.map(x => dateTimeFormatter.format(x.getTime))
+                               .getOrElse("")
 
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
-        val deadlineInput = SHtml.textAjaxTest(deadline, doNothing _, setDeadline _)
+        val startTimeInput = SHtml.textAjaxTest(startTime, doNothing _, setStartTime _)
+        val endTimeInput = SHtml.textAjaxTest(endTime, doNothing _, setEndTime _)
+        val locationInput = SHtml.textAjaxTest(
+            scheduled.location.is.getOrElse(""), doNothing _,
+            setLocation _
+        )
 
         "#editStuffTitle" #> ("input" #> titleInput) &
         "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
@@ -166,6 +198,9 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         ) &
+        "#editStartTime" #> ("input" #> startTimeInput) &
+        "#editEndTime" #> ("input" #> endTimeInput) &
+        "#editLocation" #> ("input" #> locationInput) &
         "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
         "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
