@@ -9,6 +9,7 @@ import net.liftweb.common.Full
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.Html5Properties
+import net.liftweb.http.OldHtmlProperties
 import net.liftweb.http.XHtmlInHtml5OutProperties
 import net.liftweb.http.Req
 
@@ -58,7 +59,10 @@ class Boot
         LiftRules.dispatch.append(AutoComplete.autoComplete)
 
         LiftRules.htmlProperties.default.set { r: Req => 
-            new XHtmlInHtml5OutProperties(r.userAgent)
+            val xhtml = new OldHtmlProperties(r.userAgent)
+            val html5 = new XHtmlInHtml5OutProperties(r.userAgent)
+
+            html5.setHtmlWriter(xhtml.htmlWriter)
         }
            
         S.addAround(new LoanWrapper{
