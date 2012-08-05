@@ -16,8 +16,8 @@ object BeDoneSchema extends Schema
 
     val maybes = table[Maybe]("Maybes")
     val actions = table[Action]("Actions")
-    val scheduled = table[Scheduled]("Scheduled")
-    val delegated = table[Delegated]("Delegated")
+    val scheduleds = table[Scheduled]("Scheduled")
+    val delegateds = table[Delegated]("Delegated")
 
     val projects = table[Project]("Projects")
     val topics = table[Topic]("Topics")
@@ -51,8 +51,8 @@ object BeDoneSchema extends Schema
 
     on(actions) { action => declare(action.idField is primaryKey) }
     on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
-    on(scheduled) { scheduled => declare(scheduled.actionID is primaryKey) }
-    on(delegated) { delegated => declare(delegated.actionID is primaryKey) }
+    on(scheduleds) { scheduled => declare(scheduled.idField is primaryKey) }
+    on(delegateds) { delegated => declare(delegated.actionID is primaryKey) }
 
     // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
@@ -62,10 +62,10 @@ object BeDoneSchema extends Schema
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }
-    oneToManyRelation(stuffs, scheduled).via { (st, sc) => st.id === sc.actionID }
-    oneToManyRelation(stuffs, delegated).via { (s, d) => s.id === d.actionID }
+    oneToManyRelation(stuffs, scheduleds).via { (st, sc) => st.id === sc.idField }
+    oneToManyRelation(stuffs, delegateds).via { (s, d) => s.id === d.actionID }
 
-    oneToManyRelation(contacts, delegated).via { (c, d) => c.id === d.contactID }
+    oneToManyRelation(contacts, delegateds).via { (c, d) => c.id === d.contactID }
 
     // Foreign Key policy
     override def applyDefaultForeignKeyPolicy(foreignKeyDeclaration: ForeignKeyDeclaration) =

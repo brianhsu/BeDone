@@ -15,18 +15,20 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
 
+import StuffType.StuffType
+
 object Action extends Action with MetaRecord[Action]
 {
-    def findByID(id: Int): Box[Action] = inTransaction {
-        tryo { BeDoneSchema.actions.where(_.idField === id).single }
-    }
+    def findByID(id: Int): Box[Action] = 
+        tryo(BeDoneSchema.actions.where(_.idField === id).single)
 
-    def findByUser(user: User): Box[List[Action]] = inTransaction {
+    def findByUser(user: User, stuffType: StuffType = StuffType.Action): Box[List[Action]] = 
+    {
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.actions) ( (stuff, action) =>
                 where(
                     stuff.userID === user.idField and 
-                    stuff.stuffType === StuffType.Action and
+                    stuff.stuffType === stuffType and
                     action.idField === stuff.idField
                 ) 
                 select(action) 
@@ -48,18 +50,17 @@ class Action extends Record[Action] with KeyedRecord[Int]
     def stuff = Stuff.findByID(idField.is).get
     def topics = stuff.topics
     def projects = stuff.projects
-    def contexts = inTransaction(BeDoneSchema.actionContexts.left(this).toList)
+    def contexts = BeDoneSchema.actionContexts.left(this).toList
 
-    def removeContext(context: Context) = inTransaction {
+    def removeContext(context: Context) = 
         BeDoneSchema.actionContexts.left(this).dissociate(context)
-    }
 
-    def addContext(context: Context) = inTransaction { 
+    def addContext(context: Context) = {
         if (!context.isPersisted) { context.saveTheRecord() }
         BeDoneSchema.actionContexts.left(this).associate(context)
     }
 
-    def setContexts(contexts: List[Context]) = inTransaction {
+    def setContexts(contexts: List[Context]) = {
         val shouldRemove = this.contexts.filterNot(contexts.contains)
         val shouldAdd = contexts.filterNot(this.contexts.contains)
 
@@ -67,12 +68,12 @@ class Action extends Record[Action] with KeyedRecord[Int]
         shouldAdd.foreach(addContext)
     }
 
-    override def saveTheRecord() = inTransaction(tryo{
+    override def saveTheRecord() = tryo {
         this.isPersisted match {
             case true  => BeDoneSchema.actions.update(this)
             case false => BeDoneSchema.actions.insert(this)
         }
 
         this
-    })
+    }
 }

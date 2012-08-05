@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div>
+        <div data-lift="ScheduledAction">
+          <div style="float: right">
+            <div class="btn-group inline">
+              <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
+              <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
+            </div>
+          </div>
+          <ul class="nav nav-tabs">
+            <li class="intervalTab active" id="thisWeekTab"><a href="#">本週</a></li>
+            <li class="intervalTab" id="thisMonthTab"><a href="#">本月</a></li>
+            <li class="intervalTab" id="allTab"><a href="#">全部</a></li>
+          </ul>
+          <div id="editForm"></div>
+          <div>
+            <h3 style="margin-bottom:0.5em">本日</h3>
+            <div id="todayList" class="actionList"></div>
+          </div>
+          <div>
+            <h3 id="intervalLabel" style="margin-top:1em; margin-bottom:0.5em">本週</h3>
+            <div id="intervalList" class="actionList"></div>
+          </div>
+          <div>
+            <h3 id="doneLabel" style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
+            <div id="doneList" class="actionList"></div>
+          </div>
+        </div>
+        <script>
+            $('a[rel="tooltip"]').tooltip()
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
+

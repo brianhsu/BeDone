@@ -28,18 +28,16 @@ object Project extends Project with MetaRecord[Project]
 {
     import net.liftweb.common.Box._
 
-    def findByID(id: Int): Box[Project] = inTransaction (
+    def findByID(id: Int): Box[Project] = 
         BeDoneSchema.projects.where(_.idField === id).headOption
-    )
 
     def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Project]] = inTransaction(tryo{
+    def findByUser(userID: Int): Box[List[Project]] = tryo{
         BeDoneSchema.projects.where(_.userID === userID).toList
-    })
+    }
 
-    def findByTitle(userID: Int, title: String): Box[Project] = inTransaction(
+    def findByTitle(userID: Int, title: String): Box[Project] = 
         BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
-    )
 }
 
 class Project extends Record[Project] with KeyedRecord[Int]
@@ -52,10 +50,9 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    def stuffs = inTransaction {
+    def stuffs = 
         BeDoneSchema.stuffProjects.right(this)
                     .filter(_.stuffType.is == StuffType.Stuff).toList
-    }
 
-    override def saveTheRecord() = inTransaction { tryo(BeDoneSchema.projects.insert(this)) }
+    override def saveTheRecord() = tryo(BeDoneSchema.projects.insert(this))
 }
