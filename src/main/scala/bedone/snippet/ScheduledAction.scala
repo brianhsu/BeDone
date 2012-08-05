@@ -139,8 +139,8 @@ class ScheduledAction extends JSImplicit
             ".collapse [id]"  #> ("desc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic"          #> action.topics.map(_.viewButton(topicFilter)) &
-            ".project"        #> action.projects.map(_.viewButton(projectFilter)) &
+            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
             ".startTime"      #> formatStartTime(scheduled) &
             ".doneTime"       #> formatDoneTime(action) &
             "rel=tooltip [title]" #> createTooltip(scheduled)
