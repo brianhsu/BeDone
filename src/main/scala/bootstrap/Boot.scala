@@ -58,7 +58,7 @@ class Boot
         LiftRules.dispatch.append(AutoComplete.autoComplete)
 
         LiftRules.htmlProperties.default.set { r: Req => 
-            new XHtmlInHtml5OutProperties(r.userAgent)
+            new Html5Properties(r.userAgent)
         }
            
         S.addAround(new LoanWrapper{
