@@ -49,6 +49,14 @@ trait JSImplicit
         def apply(uid: String): JsCmd = """$('#isDone').empty()"""
     }
 
+    object JqSetVisible
+    {
+        def apply(uid: String, display: Boolean) = display match {
+            case true  => Show(uid)
+            case false => Hide(uid)
+        }
+    }
+
     def setError(fieldErrors: List[FieldError], fieldID: String): (Boolean, JsCmd) = {
         fieldErrors match {
             case Nil    => (false, ClearFieldError(fieldID))

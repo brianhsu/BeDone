@@ -206,7 +206,11 @@ class ScheduledAction extends JSImplicit
         JqSetHtml("intervalList", intervalList.flatMap(createActionRow)) &
         JqSetHtml("todayList", todayList.flatMap(createActionRow)) &
         JqSetHtml("doneList", doneList.flatMap(createActionRow)) &
-        JqSetHtml("outdatedList", outdatedList.flatMap(createActionRow))
+        JqSetHtml("outdatedList", outdatedList.flatMap(createActionRow)) &
+        JqSetVisible("outdatedBlock", !outdatedList.isEmpty) &
+        JqSetVisible("intervalBlock", !intervalList.isEmpty) &
+        JqSetVisible("todayBlock", !todayList.isEmpty) &
+        JqSetVisible("doneBlock", !doneList.isEmpty)
     }
 
     def editPostAction(stuff: Stuff): JsCmd = {
@@ -277,6 +281,7 @@ class ScheduledAction extends JSImplicit
     def render = 
     {
         val (todayList, intervalList, doneList, outdatedList) = createActionList(weekAction)
+        val hidden = "display: none;";
 
         "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
         "#thisWeekTab [onclick]" #> SHtml.onEvent(s => updateList("thisWeekTab")) &
@@ -285,6 +290,10 @@ class ScheduledAction extends JSImplicit
         "#todayList *"    #> todayList.flatMap(createActionRow) &
         "#intervalList *" #> intervalList.flatMap(createActionRow) &
         "#doneList *"     #> doneList.flatMap(createActionRow) &
-        "#outdatedList *" #> outdatedList.flatMap(createActionRow)
+        "#outdatedList *" #> outdatedList.flatMap(createActionRow) &
+        "#outdatedBlock [style+]" #> (if (outdatedList.isEmpty) hidden else "") &
+        "#intervalBlock [style+]" #> (if (intervalList.isEmpty) hidden else "") &
+        "#todayBlock [style+]" #> (if (todayList.isEmpty) hidden else "") &
+        "#doneBlock [style+]" #> (if (doneList.isEmpty) hidden else "")
     }
 }
