@@ -37,6 +37,14 @@ class ScheduledAction extends JSImplicit
     def monthAction = scheduledAction.filter(isThisMonth).filterNot(isToday)
     def allAction = scheduledAction.filterNot(isToday)
 
+    def isOutdated(scheduled: Scheduled): Boolean = 
+    {
+        val todayStart = (new DateMidnight())
+
+        scheduled.startTime.is.getTime.before(todayStart.toDate) &&
+        !scheduled.action.isDone.is
+    }
+
     def isThisMonth(scheduled: Scheduled): Boolean =
     {
         val monthStart = (new DateMidnight).withDayOfMonth(1)
@@ -57,8 +65,6 @@ class ScheduledAction extends JSImplicit
 
     def isToday(scheduled: Scheduled): Boolean = 
     {
-        import net.liftweb.util.TimeHelpers._
-
         val todayStart = (new DateMidnight())
         val todayEnd = (new DateMidnight()).plusDays(1)
 
@@ -161,13 +167,14 @@ class ScheduledAction extends JSImplicit
 
     def createActionList(intervalAction: List[Scheduled]) = 
     {
-        val todayList = todayAction.filter(shouldDisplay)
-        val intervalList = intervalAction.filter(shouldDisplay)
+        val outdatedList = allAction.filter(isOutdated).filter(shouldDisplay)
+        val todayList = todayAction.filter(shouldDisplay).filterNot(isOutdated)
+        val intervalList = intervalAction.filter(shouldDisplay).filterNot(isOutdated)
         val doneList = 
             todayList.filter(_.action.isDone.is) ++ 
             intervalList.filter(_.action.isDone.is)
 
-        (todayList.filterNot(_.action.isDone.is), intervalList.filterNot(_.action.isDone.is), doneList)
+        (todayList.filterNot(_.action.isDone.is), intervalList.filterNot(_.action.isDone.is), doneList, outdatedList)
     }
 
     def updateList(tabID: String): JsCmd =
@@ -191,14 +198,19 @@ class ScheduledAction extends JSImplicit
 
     def updateList(tabID: String, title: String, intervalAction: List[Scheduled]): JsCmd = 
     {
-        val (todayList, intervalList, doneList) = createActionList(intervalAction)
+        val (todayList, intervalList, doneList, outdatedList) = createActionList(intervalAction)
 
         """$('.intervalTab').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
         JqSetHtml("intervalLabel", title)  &
         JqSetHtml("intervalList", intervalList.flatMap(createActionRow)) &
         JqSetHtml("todayList", todayList.flatMap(createActionRow)) &
-        JqSetHtml("doneList", doneList.flatMap(createActionRow))
+        JqSetHtml("doneList", doneList.flatMap(createActionRow)) &
+        JqSetHtml("outdatedList", outdatedList.flatMap(createActionRow)) &
+        JqSetVisible("outdatedBlock", !outdatedList.isEmpty) &
+        JqSetVisible("intervalBlock", !intervalList.isEmpty) &
+        JqSetVisible("todayBlock", !todayList.isEmpty) &
+        JqSetVisible("doneBlock", !doneList.isEmpty)
     }
 
     def editPostAction(stuff: Stuff): JsCmd = {
@@ -268,7 +280,8 @@ class ScheduledAction extends JSImplicit
 
     def render = 
     {
-        val (todayList, intervalList, doneList) = createActionList(weekAction)
+        val (todayList, intervalList, doneList, outdatedList) = createActionList(weekAction)
+        val hidden = "display: none;";
 
         "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
         "#thisWeekTab [onclick]" #> SHtml.onEvent(s => updateList("thisWeekTab")) &
@@ -276,6 +289,11 @@ class ScheduledAction extends JSImplicit
         "#allTab [onclick]" #> SHtml.onEvent(s => updateList("allTab")) &
         "#todayList *"    #> todayList.flatMap(createActionRow) &
         "#intervalList *" #> intervalList.flatMap(createActionRow) &
-        "#doneList *"     #> doneList.flatMap(createActionRow)
+        "#doneList *"     #> doneList.flatMap(createActionRow) &
+        "#outdatedList *" #> outdatedList.flatMap(createActionRow) &
+        "#outdatedBlock [style+]" #> (if (outdatedList.isEmpty) hidden else "") &
+        "#intervalBlock [style+]" #> (if (intervalList.isEmpty) hidden else "") &
+        "#todayBlock [style+]" #> (if (todayList.isEmpty) hidden else "") &
+        "#doneBlock [style+]" #> (if (doneList.isEmpty) hidden else "")
     }
 }
