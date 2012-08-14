@@ -48,6 +48,7 @@ class Boot
             (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Inbox") / "inbox") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Action") / "nextAction") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Delegated") / "delegated") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Scheduled") / "scheduled") >> If(User.isLoggedIn _, "請先登入")
         )
 
@@ -59,10 +60,7 @@ class Boot
         LiftRules.dispatch.append(AutoComplete.autoComplete)
 
         LiftRules.htmlProperties.default.set { r: Req => 
-            val xhtml = new OldHtmlProperties(r.userAgent)
-            val html5 = new XHtmlInHtml5OutProperties(r.userAgent)
-
-            html5.setHtmlWriter(xhtml.htmlWriter)
+            new XHtmlInHtml5OutProperties(r.userAgent)
         }
            
         S.addAround(new LoanWrapper{
