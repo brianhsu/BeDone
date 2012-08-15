@@ -21,7 +21,7 @@ object BeDoneSchema extends Schema
 
     val projects = table[Project]("Projects")
     val topics = table[Topic]("Topics")
-    val contacts = table[Contacts]("Contacts")
+    val contacts = table[Contact]("Contacts")
     val contexts = table[Context]("Contexts")
 
     // Many to Many Relations
@@ -51,8 +51,6 @@ object BeDoneSchema extends Schema
 
     on(actions) { action => declare(action.idField is primaryKey) }
     on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
-    on(scheduleds) { scheduled => declare(scheduled.idField is primaryKey) }
-    on(delegateds) { delegated => declare(delegated.actionID is primaryKey) }
 
     // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
@@ -63,7 +61,7 @@ object BeDoneSchema extends Schema
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }
     oneToManyRelation(stuffs, scheduleds).via { (st, sc) => st.id === sc.idField }
-    oneToManyRelation(stuffs, delegateds).via { (s, d) => s.id === d.actionID }
+    oneToManyRelation(stuffs, delegateds).via { (s, d) => s.id === d.idField }
 
     oneToManyRelation(contacts, delegateds).via { (c, d) => c.id === d.contactID }
 

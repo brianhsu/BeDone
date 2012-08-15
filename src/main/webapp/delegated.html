@@ -14,16 +14,14 @@
           <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
           <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
         </div>
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#">需要通知</a></li>
-          <li><a href="#">等待回應</a></li>
+        <ul class="nav nav-tabs delegatedTab">
+          <li id="notInformed" class="active"><a href="#">需要通知</a></li>
+          <li id="notRespond"><a href="#">等待回應</a></li>
+          <li id="isDone"><a href="#">已完成</a></li>
         </ul>
         <div>
           <div id="editForm"></div>
-          <div>
-            <h3 style="margin-bottom:0.5em">需要通知</h3>
-            <div id="notDone"></div>
-          </div>
+          <div id="eventList"></div>
         </div>
       </div>
     </div>

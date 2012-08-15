@@ -1,5 +1,8 @@
 package org.bedone.model
 
+import net.liftweb.common.Box
+import net.liftweb.util.Helpers.tryo
+
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
 import net.liftweb.record.field.IntField
@@ -12,10 +15,15 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
 
-object Contacts extends Contacts with MetaRecord[Contacts]
-class Contacts extends Record[Contacts] with KeyedRecord[Int]
+object Contact extends Contact with MetaRecord[Contact]
 {
-    def meta = Contacts
+    def findByID(id: Int): Box[Contact] = 
+        tryo(BeDoneSchema.contacts.where(_.idField === id).single)
+}
+
+class Contact extends Record[Contact] with KeyedRecord[Int]
+{
+    def meta = Contact
 
     @Column(name="id")
     val idField = new IntField(this)

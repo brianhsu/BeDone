@@ -22,7 +22,7 @@ import scala.xml.Text
 
 object Scheduled extends Scheduled with MetaRecord[Scheduled]
 {
-    def findByUser(user: User): Box[List[Scheduled]] = 
+    def findByUser(user: User): Box[List[Scheduled]] = {
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.scheduleds) ( (stuff, scheduled) =>
                 where(
@@ -34,7 +34,7 @@ object Scheduled extends Scheduled with MetaRecord[Scheduled]
                 orderBy(scheduled.startTime)
             ).toList
         }
-
+    }
 }
 
 class Scheduled extends Record[Scheduled] with KeyedRecord[Int]
