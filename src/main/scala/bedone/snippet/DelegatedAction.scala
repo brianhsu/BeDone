@@ -86,12 +86,26 @@ class DelegatedAction extends JSImplicit
             FadeOutAndRemove("row" + stuff.idField)
         }
 
-        // ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(scheduled)) &
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(delegated)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
         ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
         ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag _)
+    }
+
+    def editPostAction(stuff: Stuff): JsCmd = 
+    {
+        updateList(currentTabID)
+    }
+
+    def showEditForm(delegated: Delegated) = 
+    {
+        val editStuff = new EditDelegatedForm(delegated, editPostAction)
+
+        """$('#stuffEdit').remove()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
     }
 
     def topicFilter(buttonID: String, topic: Topic) = 
@@ -180,9 +194,6 @@ class DelegatedAction extends JSImplicit
 
     def render = 
     {
-        println("==>" + delegatedAction)
-        println("==>" + notInformedAction)
-
         ClearClearable &
         "#eventList *" #> notInformedAction.flatMap(createActionRow) &
         "#notInformed [onclick]" #> SHtml.onEvent(s => updateList("notInformed")) &
