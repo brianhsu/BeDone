@@ -51,6 +51,7 @@ class ReferenceList extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
@@ -111,6 +112,21 @@ class ReferenceList extends JSImplicit
         JsRaw("""$('#showAll').prop("disabled", true)""") &
         JsRaw("""$('#current').attr("class", "btn btn-inverse")""") &
         updateList(currentTabID)
+    }
+
+    def showEditForm(stuff: Stuff): JsCmd = 
+    {
+        val editStuff = new EditStuffForm(stuff, editPostAction _)
+
+        """$('#stuffEdit').remove()""" &
+        AppendHtml("editForm", editStuff.toForm) &
+        """prepareStuffEditForm()"""
+    }
+
+    def editPostAction(stuff: Stuff): JsCmd = 
+    {
+        val newRow = createStuffRow(stuff).flatMap(_.child)
+        JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
     def createStuffRow(stuff: Stuff) = 
