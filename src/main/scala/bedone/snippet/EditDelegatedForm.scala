@@ -25,7 +25,8 @@ import java.util.Calendar
 
 import TagButton.Implicit._
 
-class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extends JSImplicit
+class EditDelegatedForm(user: User, delegated: Delegated, 
+                        postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
@@ -39,7 +40,8 @@ class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extend
 
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
- 
+    private var currentContact: Option[Contact] = Option(delegated.contact)
+
     def addTopic(title: String) = 
     {
         val userID = CurrentUser.get.get.idField.is
@@ -87,17 +89,20 @@ class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extend
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
 
-    def onProjectRemove(buttonID: String, project: Project) = {
+    def onProjectRemove(buttonID: String, project: Project) = 
+    {
         currentProjects = currentProjects.filterNot(_ == project)
         FadeOutAndRemove(buttonID)
     }
 
-    def onTopicRemove(buttonID: String, topic: Topic) = {
+    def onTopicRemove(buttonID: String, topic: Topic) = 
+    {
         currentTopics = currentTopics.filterNot(_ == topic)
         FadeOutAndRemove(buttonID)
     }
 
-    def setTitle(title: String): JsCmd = {
+    def setTitle(title: String): JsCmd = 
+    {
         val errors = stuff.title(title).validate
         setError(errors, "editStuffTitle")._2
     }
@@ -108,13 +113,28 @@ class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extend
         Noop
     }
 
-    def save(): JsCmd = {
+    def setContact(contactName: String): JsCmd = 
+    {
+        def createNewContact() = Contact.createRecord.name(contactName).userID(user.idField.is)
+        
+        optFromStr(contactName) match {
+            case None => 
+                currentContact = None
+                ShowFieldError("editDelegatedContact", "此為必填欄位")
 
+            case Some(name) =>
+                currentContact = Some(Contact.findByName(user, name).openOr(createNewContact))
+                ClearFieldError("editDelegatedContact")
+        }
+    }
+
+    def save(): JsCmd = 
+    {
         val status = List(
             setError(stuff.title.validate, "editStuffTitle")
         )
 
-        val hasError = status.map(_._1).contains(true)
+        val hasError = status.map(_._1).contains(true) || currentContact.isEmpty
         val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
 
         hasError match {
@@ -123,13 +143,20 @@ class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extend
                 stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
+
+                currentContact.foreach { contact => 
+                    contact.saveTheRecord()
+                    delegated.contactID(contact.idField.is).saveTheRecord()
+                }
+
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
 
-    def cssBinder = {
-
+    def cssBinder = 
+    {
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
+        val contactName = delegated.contact.name.is
 
         "#editStuffTitle" #> ("input" #> titleInput) &
         "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
@@ -137,6 +164,7 @@ class EditDelegatedForm(delegated: Delegated, postAction: Stuff => JsCmd) extend
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
         "#inputProject" #> (SHtml.text("", project = _)) &
         "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#inputContact" #> SHtml.textAjaxTest(contactName, doNothing _, setContact _) &
         "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))

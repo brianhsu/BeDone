@@ -101,7 +101,7 @@ class DelegatedAction extends JSImplicit
 
     def showEditForm(delegated: Delegated) = 
     {
-        val editStuff = new EditDelegatedForm(delegated, editPostAction)
+        val editStuff = new EditDelegatedForm(currentUser, delegated, editPostAction)
 
         """$('#stuffEdit').remove()""" &
         AppendHtml("editForm", editStuff.toForm) &
