@@ -3,6 +3,8 @@ package org.bedone.view
 import net.liftweb.common._
 import net.liftweb.http._
 import net.liftweb.http.js.JE._
+import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 import org.bedone.model._
 
@@ -14,10 +16,10 @@ object AutoComplete {
 
             val topics = Topic.findByUser(user).openOr(Nil)
             val jsonTopics = topics.filter(_.title.is.contains(term)).map { topic => 
-                """{"id": "%s", "label": "%s"}""" format(topic.title, topic.title)
+                ("id" -> topic.title.is) ~ ("label" -> topic.title.is)
             }
 
-            JsonResponse(JsRaw("""[%s]""" format(jsonTopics.mkString(","))))
+            JsonResponse(jsonTopics)
         }
     }
 
@@ -27,10 +29,10 @@ object AutoComplete {
 
             val projects = Project.findByUser(user).openOr(Nil)
             val jsonProjects = projects.filter(_.title.is.contains(term)).map { project => 
-                """{"id": "%s", "label": "%s"}""" format(project.title, project.title)
+                ("id" -> project.title.is) ~ ("label" -> project.title.is)
             }
 
-            JsonResponse(JsRaw("""[%s]""" format(jsonProjects.mkString(","))))
+            JsonResponse(jsonProjects)
         }
     }
 
@@ -40,10 +42,10 @@ object AutoComplete {
 
             val contexts = Context.findByUser(user).openOr(Nil)
             val jsonContexts = contexts.filter(_.title.is.contains(term)).map { context => 
-                """{"id": "%s", "label": "%s"}""" format(context.title, context.title)
+                ("id" -> context.title.is) ~ ("label" -> context.title.is)
             }
 
-            JsonResponse(JsRaw("""[%s]""" format(jsonContexts.mkString(","))))
+            JsonResponse(jsonContexts)
         }
     }
 
@@ -53,10 +55,10 @@ object AutoComplete {
 
             val contacts = Contact.findByUser(user).openOr(Nil)
             val jsonContacts = contacts.filter(_.name.is.contains(term)).map { contact => 
-                """{"id": "%s", "label": "%s"}""" format(contact.name, contact.name)
+                ("id" -> contact.name.is) ~ ("label" -> contact.name.is)
             }
 
-            JsonResponse(JsRaw("""[%s]""" format(jsonContacts.mkString(","))))
+            JsonResponse(jsonContacts)
         }
     }
 
