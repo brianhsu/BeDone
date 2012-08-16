@@ -32,7 +32,7 @@ object Topic extends Topic with MetaRecord[Topic]
         BeDoneSchema.topics.where(_.idField === id).headOption
 
     def findByUser(user: User): Box[List[Topic]] = findByUser(user.idField.is)
-    def findByUser(userID: Int): Box[List[Topic]] = tryo{
+    def findByUser(userID: Int): Box[List[Topic]] = tryo {
         BeDoneSchema.topics.where(_.userID === userID).toList
     }
 

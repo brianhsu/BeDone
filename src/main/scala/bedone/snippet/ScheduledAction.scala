@@ -156,13 +156,10 @@ class ScheduledAction extends JSImplicit
 
     def shouldDisplay(scheduled: Scheduled) = 
     {
-        val hasCurrentTopic = 
-            currentTopic.map(scheduled.action.topics.contains).getOrElse(true)
-
-        val hasCurrentProject = 
-            currentProject.map(scheduled.action.projects.contains).getOrElse(true)
+        val hasTopic = currentTopic.map(scheduled.action.topics.contains).getOrElse(true)
+        val hasProject = currentProject.map(scheduled.action.projects.contains).getOrElse(true)
    
-        hasCurrentTopic && hasCurrentProject && !scheduled.action.stuff.isTrash.is
+        hasTopic && hasProject && !scheduled.action.stuff.isTrash.is
     }
 
     def createActionList(intervalAction: List[Scheduled]) = 

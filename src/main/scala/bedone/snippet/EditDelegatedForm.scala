@@ -25,24 +25,23 @@ import java.util.Calendar
 
 import TagButton.Implicit._
 
-class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extends JSImplicit
+class EditDelegatedForm(user: User, delegated: Delegated, 
+                        postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
-    private def template = Templates("templates-hidden" :: "scheduled" :: "edit" :: Nil)
+    private def template = Templates("templates-hidden" :: "delegated" :: "edit" :: Nil)
 
-    private lazy val action = scheduled.action
+    private lazy val action = delegated.action
     private lazy val stuff = action.stuff
-
-    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
-    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     private var topic: Option[String] = _
     private var project: Option[String] = _
 
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
- 
+    private var currentContact: Option[Contact] = Option(delegated.contact)
+
     def addTopic(title: String) = 
     {
         val userID = CurrentUser.get.get.idField.is
@@ -90,59 +89,22 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
 
-    def onProjectRemove(buttonID: String, project: Project) = {
+    def onProjectRemove(buttonID: String, project: Project) = 
+    {
         currentProjects = currentProjects.filterNot(_ == project)
         FadeOutAndRemove(buttonID)
     }
 
-    def onTopicRemove(buttonID: String, topic: Topic) = {
+    def onTopicRemove(buttonID: String, topic: Topic) = 
+    {
         currentTopics = currentTopics.filterNot(_ == topic)
         FadeOutAndRemove(buttonID)
     }
 
-    def setTitle(title: String): JsCmd = {
+    def setTitle(title: String): JsCmd = 
+    {
         val errors = stuff.title(title).validate
         setError(errors, "editStuffTitle")._2
-    }
-
-    def dateTimeFromStr(dateTimeStr: String, defaultValue: Box[Calendar]) = 
-    {
-        optFromStr(dateTimeStr) match {
-            case None    => defaultValue
-            case Some(x) => try {
-                dateTimeFormatter.setLenient(false)
-                val calendar = Calendar.getInstance
-                calendar.setTime(dateTimeFormatter.parse(x))
-                Full(calendar)
-            } catch {
-                case e: ParseException => Failure("日期格式錯誤")
-            }
-        }
-
-    }
-
-    def setEndTime(endTimeStr: String): JsCmd = 
-    {
-        val endTime = dateTimeFromStr(endTimeStr, Empty)
-        scheduled.endTime.setBox(endTime)
-        val errors = scheduled.endTime.validate
-        setError(errors, "editEndTime")._2
-    }
-
-    def setStartTime(startTimeStr: String): JsCmd = 
-    {
-        val startTime = dateTimeFromStr(startTimeStr, Failure("此為必填欄位"))
-
-        scheduled.startTime.setBox(startTime)
-
-        val errors = scheduled.startTime.validate
-        setError(errors, "editStartTime")._2
-    }
-
-    def setLocation(location: String): JsCmd = 
-    {
-        scheduled.location(location)
-        Noop
     }
 
     def setDescription(desc: String): JsCmd = 
@@ -151,15 +113,28 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         Noop
     }
 
-    def save(): JsCmd = {
+    def setContact(contactName: String): JsCmd = 
+    {
+        def createNewContact() = Contact.createRecord.name(contactName).userID(user.idField.is)
+        
+        optFromStr(contactName) match {
+            case None => 
+                currentContact = None
+                ShowFieldError("editDelegatedContact", "此為必填欄位")
 
+            case Some(name) =>
+                currentContact = Some(Contact.findByName(user, name).openOr(createNewContact))
+                ClearFieldError("editDelegatedContact")
+        }
+    }
+
+    def save(): JsCmd = 
+    {
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle"),
-            setError(scheduled.startTime.validate, "editStartTime"),
-            setError(scheduled.endTime.validate, "editEndTime")
+            setError(stuff.title.validate, "editStuffTitle")
         )
 
-        val hasError = status.map(_._1).contains(true)
+        val hasError = status.map(_._1).contains(true) || currentContact.isEmpty
         val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
 
         hasError match {
@@ -168,24 +143,20 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
                 stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
-                scheduled.saveTheRecord()
+
+                currentContact.foreach { contact => 
+                    contact.saveTheRecord()
+                    delegated.contactID(contact.idField.is).saveTheRecord()
+                }
+
                 FadeOutAndRemove("stuffEdit") & postAction(stuff)
         }
     }
 
-    def cssBinder = {
-
-        val startTime = dateTimeFormatter.format(scheduled.startTime.is.getTime)
-        val endTime = scheduled.endTime.is.map(x => dateTimeFormatter.format(x.getTime))
-                               .getOrElse("")
-
+    def cssBinder = 
+    {
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
-        val startTimeInput = SHtml.textAjaxTest(startTime, doNothing _, setStartTime _)
-        val endTimeInput = SHtml.textAjaxTest(endTime, doNothing _, setEndTime _)
-        val locationInput = SHtml.textAjaxTest(
-            scheduled.location.is.getOrElse(""), doNothing _,
-            setLocation _
-        )
+        val contactName = delegated.contact.name.is
 
         "#editStuffTitle" #> ("input" #> titleInput) &
         "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
@@ -193,13 +164,11 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
         "#inputProject" #> (SHtml.text("", project = _)) &
         "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#inputContact" #> SHtml.textAjaxTest(contactName, doNothing _, setContact _) &
         "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
         "#editStuffProjects *" #> (
             currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         ) &
-        "#editStartTime" #> ("input" #> startTimeInput) &
-        "#editEndTime" #> ("input" #> endTimeInput) &
-        "#editLocation" #> ("input" #> locationInput) &
         "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
         "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")

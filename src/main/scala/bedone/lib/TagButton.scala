@@ -16,7 +16,7 @@ object TagButton
     def topicView   = Templates("templates-hidden" :: "button" :: "topic" :: Nil)
     def projectView = Templates("templates-hidden" :: "button" :: "project" :: Nil)
     def contextView = Templates("templates-hidden" :: "button" :: "context" :: Nil)
-
+    def contactView = Templates("templates-hidden" :: "button" :: "contact" :: Nil)
 
     object Implicit {
         implicit def fromTopic(topic: Topic) = 
@@ -27,6 +27,9 @@ object TagButton
 
         implicit def fromContext(context: Context) = 
             new TagViewButton(contextView, context, context.title.is)
+
+        implicit def fromContact(contact: Contact) = 
+            new TagViewButton(contactView, contact, contact.name.is)
 
     }
 }
@@ -57,6 +60,7 @@ class TagViewButton[T](template: Box[NodeSeq], data: T, title: String)
 
         template.map(cssBinding).openOr(<span>Generate Button Error</span>)
     }
+
 
 }
 
