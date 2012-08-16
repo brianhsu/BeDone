@@ -17,8 +17,14 @@ import org.squeryl.annotations.Column
 
 object Contact extends Contact with MetaRecord[Contact]
 {
-    def findByID(id: Int): Box[Contact] = 
-        tryo(BeDoneSchema.contacts.where(_.idField === id).single)
+    def findByID(id: Int): Box[Contact] = tryo {
+        BeDoneSchema.contacts.where(_.idField === id).single
+    }
+
+    def findByUser(user: User): Box[List[Contact]] = tryo {
+        BeDoneSchema.contacts.where(_.userID === user.idField).toList
+    }
+
 }
 
 class Contact extends Record[Contact] with KeyedRecord[Int]

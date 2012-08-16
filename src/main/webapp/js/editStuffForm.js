@@ -16,6 +16,14 @@ function prepareStuffEditForm() {
         }
     });
 
+    $( "#inputContact" ).autocomplete({
+        source: "/autocomplete/contact",
+        select: function(event, ui) { 
+            $("#inputContact").val(ui.item.label)
+            $("#inputContact").blur()
+        }
+    });
+
     $( "#editStuffDeadline input" ).datepicker({
         dateFormat: "yy-mm-dd",
         onClose: function(dateText) {
