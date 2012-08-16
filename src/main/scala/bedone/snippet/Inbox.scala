@@ -108,11 +108,6 @@ class Inbox extends JSImplicit
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
-    def editPostAction(stuff: Stuff): JsCmd = {
-        val newRow = createStuffRow(stuff).flatMap(_.child)
-        JqSetHtml("row" + stuff.idField.is, newRow)
-    }
-
     def showInsertForm(): JsCmd = 
     {
         def userID = CurrentUser.is.map(_.idField.is).get
@@ -134,6 +129,12 @@ class Inbox extends JSImplicit
         """$('#stuffEdit').remove()""" &
         AppendHtml("editForm", editStuff.toForm) &
         """prepareStuffEditForm()"""
+    }
+
+    def editPostAction(stuff: Stuff): JsCmd = 
+    {
+        val newRow = createStuffRow(stuff).flatMap(_.child)
+        JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
     def stuffTable = 

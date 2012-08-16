@@ -90,7 +90,7 @@ div.action .showDesc {
   margin-left: 0.5em;
 }
 div.stuffs {
-  background: #d3d3d3;
+  background: rgba(211, 211, 211, 0.5);
   margin-bottom: 0.8em;
   padding-top: 0.6em;
   padding-bottom: 0.7em;

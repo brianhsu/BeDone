@@ -35,23 +35,31 @@ object StuffType extends Enumeration
     val Action   = Value(1, "Value")
     val Delegated = Value(2, "Delegated")
     val Scheduled = Value(3, "Scheduled")
-    val Refrence = Value(4, "Reference")
+    val Reference = Value(4, "Reference")
     val Maybe    = Value(5, "Maybe")
 }
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
-    def findByID(id: Int): Box[Stuff] = 
-        tryo { BeDoneSchema.stuffs.where(_.idField === id).single }
+    def findByID(id: Int): Box[Stuff] = tryo { 
+        BeDoneSchema.stuffs.where(_.idField === id).single 
+    }
 
-    def findByUser(user: User): Box[List[Stuff]] =
-        tryo {
-            from(BeDoneSchema.stuffs)(table =>
-                where(table.userID === user.idField and table.stuffType === StuffType.Stuff) 
-                select(table)
-                orderBy(table.createTime asc)
-            ).toList
-        }
+    def findByUser(user: User): Box[List[Stuff]] = tryo {
+        from(BeDoneSchema.stuffs)(table =>
+            where(table.userID === user.idField and table.stuffType === StuffType.Stuff) 
+            select(table)
+            orderBy(table.createTime asc)
+        ).toList
+    }
+
+    def findReferenceByUser(user: User): Box[List[Stuff]] = tryo {
+        from(BeDoneSchema.stuffs)(table =>
+            where(table.userID === user.idField and table.stuffType === StuffType.Reference)
+            select(table)
+            orderBy(table.createTime asc)
+        ).toList
+    }
 }
 
 class Stuff extends Record[Stuff] with KeyedRecord[Int] 
