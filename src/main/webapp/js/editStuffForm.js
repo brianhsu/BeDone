@@ -50,6 +50,14 @@ function prepareStuffEditForm() {
         }
     });
 
+    $( "#editTicklerDate input" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        onClose: function(dateText) {
+            $("#editTicklerDate input").val(dateText)
+            $("#editTicklerDate input").blur()
+        }
+    });
+
     $( "#inputContext" ).autocomplete({
         source: "/autocomplete/context",
         select: function(event, ui) { 

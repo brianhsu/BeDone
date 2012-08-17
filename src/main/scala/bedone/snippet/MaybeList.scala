@@ -83,22 +83,19 @@ class MaybeList extends JSImplicit
         updateList(currentTabID)
     }
 
-    /*
-    def showEditForm(stuff: Stuff): JsCmd = 
+    def editPostAction(stuff: Stuff): JsCmd = {
+        updateList(currentTabID)
+    }
+
+    def showEditForm(maybe: Maybe) = 
     {
-        val editStuff = new EditStuffForm(stuff, editPostAction _)
+        val editStuff = new EditMaybeForm(maybe, editPostAction)
 
         """$('#stuffEdit').remove()""" &
         AppendHtml("editForm", editStuff.toForm) &
         """prepareStuffEditForm()"""
     }
 
-    def editPostAction(stuff: Stuff): JsCmd = 
-    {
-        val newRow = createStuffRow(stuff).flatMap(_.child)
-        JqSetHtml("row" + stuff.idField.is, newRow)
-    }
-    */
 
     def actionBar(maybe: Maybe) = 
     {
@@ -132,10 +129,17 @@ class MaybeList extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        val descIconVisibility = stuff.description.is.isEmpty match {
+            case true  => "visibility:hidden"
+            case false => "visibility:visible"
+        }
+
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(maybe)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [style+]" #> descIconVisibility
     }
 
     def formatTickler(maybe: Maybe) = 

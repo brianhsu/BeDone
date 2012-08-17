@@ -51,11 +51,17 @@ class ReferenceList extends JSImplicit
             new FadeOut("row" + stuff.idField, 0, 500)
         }
 
+        val descIconVisibility = stuff.description.is.isEmpty match {
+            case true  => "visibility:hidden"
+            case false => "visibility:visible"
+        }
+
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField)
+        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [style+]" #> descIconVisibility
     }
 
     def shouldDisplay(stuff: Stuff) = 
@@ -134,6 +140,7 @@ class ReferenceList extends JSImplicit
         import TagButton.Implicit._
 
         def template = Templates("templates-hidden" :: "stuff" :: "item" :: Nil)
+
 
         val cssBinding = 
             actionBar(stuff) &

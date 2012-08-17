@@ -86,11 +86,17 @@ class DelegatedAction extends JSImplicit
             FadeOutAndRemove("row" + stuff.idField)
         }
 
+        val descIconVisibility = stuff.description.is.isEmpty match {
+            case true  => "visibility:hidden"
+            case false => "visibility:visible"
+        }
+
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(delegated)) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
         ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [style+]" #> descIconVisibility &
         ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag _)
     }
 
