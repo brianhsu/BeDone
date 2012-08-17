@@ -74,7 +74,7 @@ div.stuffs-edit .showDesc {
 }
 div.action {
   background: rgba(211, 211, 211, 0.5);
-  margin-bottom: 0.8em;
+  margin-bottom: 0.5em;
   padding-top: 0.6em;
   padding-bottom: 0.7em;
   padding-left: 0.5em;
@@ -91,7 +91,7 @@ div.action .showDesc {
 }
 div.stuffs {
   background: rgba(211, 211, 211, 0.5);
-  margin-bottom: 0.8em;
+  margin-bottom: 0.5em;
   padding-top: 0.6em;
   padding-bottom: 0.7em;
   padding-left: 0.5em;
