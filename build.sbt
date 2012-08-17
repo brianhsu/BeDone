@@ -32,7 +32,8 @@ libraryDependencies ++= Seq(
     "net.liftweb" % "lift-webkit_2.9.2" % "2.5-SNAPSHOT" % "compile->default",
     "net.liftweb" % "lift-squeryl-record_2.9.2" % "2.5-SNAPSHOT",
     "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7",
-    "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
+    "com.jolbox" % "bonecp" % "0.7.1.RELEASE",
+    "org.slf4j" % "slf4j-simple" % "1.6.6"
 )
 
 port in container.Configuration := 8081
