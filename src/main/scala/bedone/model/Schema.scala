@@ -50,16 +50,13 @@ object BeDoneSchema extends Schema
     on(contexts) { context => declare(columns(context.userID, context.title) are unique)}
     on(contacts) { contact => declare(columns(contact.userID, contact.name) are unique)}
 
-    on(actions) { action => declare(action.idField is primaryKey) }
-    on(maybes) { maybe => declare(maybe.stuffID is primaryKey) }
-
     // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
     oneToManyRelation(users, contexts).via { (u, c) => u.id === c.userID }
 
-    oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.stuffID }
+    oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.idField }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }
     oneToManyRelation(stuffs, scheduleds).via { (st, sc) => st.id === sc.idField }
     oneToManyRelation(stuffs, delegateds).via { (s, d) => s.id === d.idField }
