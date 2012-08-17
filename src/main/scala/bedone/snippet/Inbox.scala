@@ -16,7 +16,9 @@ import java.text.SimpleDateFormat
 
 class Inbox extends JSImplicit
 {
+    private var rapidTitle: String = _
 
+    lazy val currentUser = CurrentUser.get.get
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
@@ -137,12 +139,22 @@ class Inbox extends JSImplicit
         JqSetHtml("row" + stuff.idField.is, newRow)
     }
 
-    def stuffTable = 
+    def addRapidStuff(): JsCmd =
+    {
+        val stuff = Stuff.createRecord.userID(currentUser.idField.is).title(rapidTitle)
+
+        stuff.saveTheRecord()
+
+        """$('#rapidStuff').val("")""" &
+        AppendHtml("stuffTable", createStuffRow(stuff))
+    }
+
+    def render = 
     {
         "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#addStuffButton [onclick]" #> SHtml.onEvent(s => showInsertForm) &
-        "#stuffTable *" #> completeStuffTable
+        "#stuffTable *" #> completeStuffTable &
+        "#rapidStuff" #> SHtml.text("", rapidTitle = _) &
+        "#rapidTitle" #> SHtml.hidden(addRapidStuff _)
     }
-
-    def render = stuffTable
 }
