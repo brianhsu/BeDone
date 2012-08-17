@@ -21,9 +21,12 @@
               <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
             </div>
           </div>
-          <form class="form-inline pull-right" style="margin:0.2em 0.5em 0em 0em">
-            <input type="text" placeholder="快速新增" />
-          </form>
+
+          <div class="pull-right" id="rapidEntry">
+            <form data-lift="lift:Form.ajax">
+              <input id="rapidStuff" type="text" placeholder="快速新增"/>
+            </form>
+          </div>
 
           <ul class="nav nav-tabs">
             <li class="active">

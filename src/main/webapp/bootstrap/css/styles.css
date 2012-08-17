@@ -121,3 +121,9 @@ div.stuffs .showDesc {
 .deadline {
   margin-right: 0.5em;
 }
+div#rapidEntry form {
+  margin-top: 0.2em;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0.5em;
+}
