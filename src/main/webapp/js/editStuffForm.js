@@ -1,34 +1,40 @@
-function prepareStuffEditForm() {
-
-    $( "#inputTopic" ).autocomplete({
+function prepareInboxEditForm() 
+{
+    $( "#inboxTopic" ).autocomplete({
         source: "/autocomplete/topic",
         select: function(event, ui) { 
-            $("#inputTopic").val(ui.item.label)
+            $("#inboxTopic").val(ui.item.label)
             $(this).closest("form").submit()
         }
     });
 
-    $( "#inputProject" ).autocomplete({
+    $( "#inboxProject" ).autocomplete({
         source: "/autocomplete/project",
         select: function(event, ui) { 
-            $("#inputProject").val(ui.item.label)
+            $("#inboxProject").val(ui.item.label)
             $(this).closest("form").submit()
         }
     });
 
+    $( "#inboxDeadline input" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        onClose: function(dateText) {
+            $("#inboxDeadline input").val(dateText)
+            $("#inboxDeadline input").blur()
+        }
+    });
+
+    $('#inboxSave').click(function () {
+        $(this).button('loading')
+    })
+}
+
+function prepareStuffEditForm() {
     $( "#inputContact" ).autocomplete({
         source: "/autocomplete/contact",
         select: function(event, ui) { 
             $("#inputContact").val(ui.item.label)
             $("#inputContact").blur()
-        }
-    });
-
-    $( "#editStuffDeadline input" ).datepicker({
-        dateFormat: "yy-mm-dd",
-        onClose: function(dateText) {
-            $("#editStuffDeadline input").val(dateText)
-            $("#editStuffDeadline input").blur()
         }
     });
 
@@ -66,7 +72,4 @@ function prepareStuffEditForm() {
         }
     });
 
-    $('#editStuffSave').click(function () {
-        $(this).button('loading')
-    })
 }
