@@ -72,7 +72,7 @@ div.editForm div.desc {
 div.editForm .showDesc {
   margin-left: 0.5em;
 }
-div.action {
+div.listRow {
   background: rgba(211, 211, 211, 0.5);
   margin-bottom: 0.5em;
   padding-top: 0.6em;
@@ -83,27 +83,10 @@ div.action {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
 }
-div.action div.desc {
+div.listRow div.desc {
   margin: 1em;
 }
-div.action .showDesc {
-  margin-left: 0.5em;
-}
-div.stuffs {
-  background: rgba(211, 211, 211, 0.5);
-  margin-bottom: 0.5em;
-  padding-top: 0.6em;
-  padding-bottom: 0.7em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-}
-div.stuffs div.desc {
-  margin: 1em;
-}
-div.stuffs .showDesc {
+div.listRow .showDesc {
   margin-left: 0.5em;
 }
 .inline {

@@ -69,14 +69,47 @@ function prepareActionEditForm()
 
 }
 
-function prepareStuffEditForm() {
-    $( "#inputContact" ).autocomplete({
-        source: "/autocomplete/contact",
+function prepareDelegateEditForm()
+{
+    $( "#delegateTopic" ).autocomplete({
+        source: "/autocomplete/topic",
         select: function(event, ui) { 
-            $("#inputContact").val(ui.item.label)
-            $("#inputContact").blur()
+            $("#delegateTopic").val(ui.item.label)
+            $(this).closest("form").submit()
         }
     });
+
+    $( "#delegateProject" ).autocomplete({
+        source: "/autocomplete/project",
+        select: function(event, ui) { 
+            $("#delegateProject").val(ui.item.label)
+            $(this).closest("form").submit()
+        }
+    });
+
+    $( "#delegateContact input" ).autocomplete({
+        source: "/autocomplete/contact",
+        select: function(event, ui) { 
+            $("#delegateContact input").val(ui.item.label)
+            $("#delegateContact input").blur()
+        }
+    });
+
+    $( "#delegateDeadline input" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        onClose: function(dateText) {
+            $("#delegateDeadline input").val(dateText)
+            $("#delegateDeadline input").blur()
+        }
+    });
+
+    $('#delegateSave').click(function () {
+        $(this).button('loading')
+    })
+
+}
+
+function prepareStuffEditForm() {
 
     $( "#editStartTime input" ).datetimepicker({
         dateFormat: "yy-mm-dd",

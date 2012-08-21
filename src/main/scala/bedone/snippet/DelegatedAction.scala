@@ -24,7 +24,7 @@ class DelegatedAction extends JSImplicit
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
-    private var currentTabID: String = "notInformed"
+    private var currentTabID: String = "delegateInform"
 
     val currentUser = CurrentUser.get.get
 
@@ -59,7 +59,7 @@ class DelegatedAction extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
             
-            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#delegate%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = 
@@ -67,23 +67,23 @@ class DelegatedAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("row" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField)
         }
 
         def markDoneFlag(isDone: Boolean): JsCmd = 
         {
             currentTabID match {
-                case "notInformed" => 
+                case "delegateInform" => 
                     delegated.hasInformed(true).saveTheRecord()
-                case "notRespond" => 
+                case "delegateResponse" => 
                     delegated.hasInformed(true).saveTheRecord()
                     delegated.action.isDone(true).saveTheRecord()
-                case "isDone" => 
+                case "delegateDone" => 
                     delegated.hasInformed(false).saveTheRecord()
                     delegated.action.isDone(false).saveTheRecord()
             }
 
-            FadeOutAndRemove("row" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -95,7 +95,7 @@ class DelegatedAction extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#delegateDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility &
         ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag _)
     }
@@ -109,9 +109,9 @@ class DelegatedAction extends JSImplicit
     {
         val editStuff = new EditDelegatedForm(currentUser, delegated, editPostAction)
 
-        """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        """$('#delegateEdit').remove()""" &
+        AppendHtml("delegateEditHolder", editStuff.toForm) &
+        Run("prepareDelegateEditForm()")
     }
 
     def topicFilter(buttonID: String, topic: Topic) = 
@@ -119,9 +119,9 @@ class DelegatedAction extends JSImplicit
         this.currentProject = None
         this.currentTopic = Some(topic)
 
-        JqSetHtml("current", topic.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-info")""" &
+        JqSetHtml("delegateCurrent", topic.title.is) &
+        """$('#delegateShowAll').prop("disabled", false)""" &
+        """$('#delegateCurrent').attr("class", "btn btn-info")""" &
         updateList(currentTabID)
     }
 
@@ -130,9 +130,9 @@ class DelegatedAction extends JSImplicit
         this.currentProject = Some(project)
         this.currentTopic = None
 
-        JqSetHtml("current", project.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-success")""" &
+        JqSetHtml("delegateCurrent", project.title.is) &
+        """$('#delegateShowAll').prop("disabled", false)""" &
+        """$('#delegateCurrent').attr("class", "btn btn-success")""" &
         updateList(currentTabID)
     }
 
@@ -142,9 +142,9 @@ class DelegatedAction extends JSImplicit
         this.currentProject = None
 
         updateList(currentTabID) &
-        JqSetHtml("current", "全部") &
-        """$('#showAll').prop("disabled", true)""" &
-        """$('#current').attr("class", "btn btn-inverse")"""
+        JqSetHtml("delegateCurrent", "全部") &
+        """$('#delegateShowAll').prop("disabled", true)""" &
+        """$('#delegateCurrent').attr("class", "btn btn-inverse")"""
     }
 
     def contactFilter(buttonID: String, contact: Contact) =
@@ -165,14 +165,14 @@ class DelegatedAction extends JSImplicit
         this.currentTabID = tabID
 
         var events = tabID match {
-            case "notInformed" => notInformedAction
-            case "notRespond" => notRespondAction
-            case "isDone" => doneAction
+            case "delegateInform" => notInformedAction
+            case "delegateResponse" => notRespondAction
+            case "delegateDone" => doneAction
         }
 
         """$('.delegatedTab li').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("eventList", events.filter(shouldDisplay).flatMap(createActionRow))
+        JqSetHtml("delegateActions", events.filter(shouldDisplay).flatMap(createActionRow))
     }
 
     def createActionRow(delegated: Delegated) = 
@@ -186,8 +186,8 @@ class DelegatedAction extends JSImplicit
 
         val cssBinding = 
             actionBar(delegated) &
-            ".action [id]"    #> ("row" + action.idField) &
-            ".collapse [id]"  #> ("desc" + action.stuff.idField) &
+            ".delegate [id]"    #> ("delegate" + action.idField) &
+            ".collapse [id]"  #> ("delegateDesc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
@@ -201,10 +201,10 @@ class DelegatedAction extends JSImplicit
     def render = 
     {
         ClearClearable &
-        "#eventList *" #> notInformedAction.flatMap(createActionRow) &
-        "#notInformed [onclick]" #> SHtml.onEvent(s => updateList("notInformed")) &
-        "#notRespond [onclick]"  #> SHtml.onEvent(s => updateList("notRespond")) &
-        "#isDone [onclick]"      #> SHtml.onEvent(s => updateList("isDone")) &
-        "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff())
+        "#delegateActions *" #> notInformedAction.flatMap(createActionRow) &
+        "#delegateInform [onclick]" #> SHtml.onEvent(s => updateList("delegateInform")) &
+        "#delegateResponse [onclick]"  #> SHtml.onEvent(s => updateList("delegateResponse")) &
+        "#delegateDone [onclick]"      #> SHtml.onEvent(s => updateList("delegateDone")) &
+        "#delegateShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff())
     }
 }

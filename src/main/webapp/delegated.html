@@ -9,21 +9,7 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div data-lift="DelegatedAction">
-        <div class="btn-group" style="float:right">
-          <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
-          <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
-        </div>
-        <ul class="nav nav-tabs delegatedTab">
-          <li id="notInformed" class="active"><a href="#">需要通知</a></li>
-          <li id="notRespond"><a href="#">等待回應</a></li>
-          <li id="isDone"><a href="#">已完成</a></li>
-        </ul>
-        <div>
-          <div id="editForm"></div>
-          <div id="eventList"></div>
-        </div>
-      </div>
+      <div data-lift="lift:embed?what=delegated/list"></div>
     </div>
   </body>
 </html>
