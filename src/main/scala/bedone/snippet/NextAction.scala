@@ -64,19 +64,19 @@ class NextAction extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
             
-            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#action%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("row" + stuff.idField, 0, 500)
+            new FadeOut("action" + stuff.idField, 0, 500)
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
         {
-            val rowID = "row" + action.idField.is
+            val rowID = "action" + action.idField.is
             val doneTime = isDone match {
                 case false => None
                 case true  =>
@@ -103,7 +103,7 @@ class NextAction extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#actionDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility &
         ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag(action, _))
     }
@@ -114,9 +114,9 @@ class NextAction extends JSImplicit
         this.currentProject = None
 
         updateList() &
-        JqSetHtml("current", "全部") &
-        """$('#showAll').prop("disabled", true)""" &
-        """$('#current').attr("class", "btn btn-inverse")"""
+        JqSetHtml("actionCurrent", "全部") &
+        """$('#actionShowAll').prop("disabled", true)""" &
+        """$('#actionCurrent').attr("class", "btn btn-inverse")"""
     }
 
     def topicFilter(buttonID: String, topic: Topic) = 
@@ -125,9 +125,9 @@ class NextAction extends JSImplicit
         this.currentTopic = Some(topic)
 
         updateList() &
-        JqSetHtml("current", topic.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-info")"""
+        JqSetHtml("actionCurrent", topic.title.is) &
+        """$('#actionShowAll').prop("disabled", false)""" &
+        """$('#actionCurrent').attr("class", "btn btn-info")"""
     }
 
     def projectFilter(buttonID: String, project: Project) =
@@ -136,9 +136,9 @@ class NextAction extends JSImplicit
         this.currentTopic = None
 
         updateList() &
-        JqSetHtml("current", project.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-success")"""
+        JqSetHtml("actionCurrent", project.title.is) &
+        """$('#actionShowAll').prop("disabled", false)""" &
+        """$('#actionCurrent').attr("class", "btn btn-success")"""
     }
 
     def editPostAction(stuff: Stuff): JsCmd = {
@@ -149,9 +149,9 @@ class NextAction extends JSImplicit
     {
         val editStuff = new EditActionForm(action, editPostAction)
 
-        """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        """$('#actionEdit').remove()""" &
+        AppendHtml("actionEditHolder", editStuff.toForm) &
+        Run("prepareActionEditForm()")
     }
 
 
@@ -169,6 +169,7 @@ class NextAction extends JSImplicit
     def actions: (List[Action], List[Action]) = {
         Action.findByUser(currentUser).openOr(Nil)
               .filterNot(_.stuff.isTrash.is)
+              .filter(shouldDisplay)
               .partition(_.isDone.is)
     }
 
@@ -182,17 +183,17 @@ class NextAction extends JSImplicit
 
         val (doneList, notDoneList) = actions
         val doneHTML = 
-            doneList.filter(shouldDisplay).sortWith(byDoneTime)
+            doneList.sortWith(byDoneTime)
                     .map(createActionRow).flatten
 
-        val notDoneHTML = notDoneList.filter(shouldDisplay).map(createActionRow).flatten
+        val notDoneHTML = notDoneList.map(createActionRow).flatten
         val contextTab = contexts.map(createContextTab)
 
-        JqEmpty("isDone") &
-        JqEmpty("notDone") &
-        JqSetHtml("isDone", doneHTML) &
-        JqSetHtml("notDone", notDoneHTML) &
-        JqSetHtml("contextTabFolder", contextTab.flatten)
+        JqEmpty("actionIsDone") &
+        JqEmpty("actionNotDone") &
+        JqSetHtml("actionIsDone", doneHTML) &
+        JqSetHtml("actionNotDone", notDoneHTML) &
+        JqSetHtml("actionTabFolder", contextTab.flatten)
     }
 
     def createActionRow(action: Action) = 
@@ -205,8 +206,8 @@ class NextAction extends JSImplicit
 
         val cssBinding = 
             actionBar(action) &
-            ".action [id]"    #> ("row" + action.idField) &
-            ".collapse [id]"  #> ("desc" + action.stuff.idField) &
+            ".action [id]"    #> ("action" + action.idField) &
+            ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
@@ -219,17 +220,17 @@ class NextAction extends JSImplicit
 
     def switchContext(context: Context, str: String) = {
 
-        val contextTabID = ("contextTab" + context.idField.is)
+        val contextTabID = ("actionTab" + context.idField.is)
         this.currentContext = Some(context)
 
-        """$('.contextTab').removeClass('active')""" &
+        """$('.actionTab').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(contextTabID) &
         updateList()
     }
 
     def createContextTab(context: Context) = 
     {
-        val contextTabID = ("contextTab" + context.idField.is)
+        val contextTabID = ("actionTab" + context.idField.is)
         val activtedStyle = if (currentContext == Some(context)) "active" else ""
         val cssBinding = 
             "li [class]"  #> activtedStyle &
@@ -237,7 +238,7 @@ class NextAction extends JSImplicit
             "a *"         #> context.title &
             "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
 
-        cssBinding(<li class="contextTab"><a href="#">@ Home</a></li>)
+        cssBinding(<li class="actionTab"><a href="#">@ Home</a></li>)
     }
 
     def render = 
@@ -245,9 +246,9 @@ class NextAction extends JSImplicit
         val (doneActions, notDoneActions) = actions
 
         ClearClearable &
-        "#showAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#isDone *"  #> doneActions.filter(shouldDisplay).map(createActionRow).flatten &
-        "#notDone *" #> notDoneActions.filter(shouldDisplay).map(createActionRow).flatten &
-        "#contextTabFolder *" #> contexts.map(createContextTab).flatten
+        "#actionShowAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#actionIsDone *"  #> doneActions.flatMap(createActionRow) &
+        "#actionNotDone *" #> notDoneActions.flatMap(createActionRow) &
+        "#actionTabFolder *" #> contexts.map(createContextTab).flatten
     }
 }
