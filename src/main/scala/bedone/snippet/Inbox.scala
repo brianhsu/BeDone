@@ -18,12 +18,12 @@ class Inbox extends JSImplicit
 {
     private var rapidTitle: String = _
 
-    lazy val currentUser = CurrentUser.get.get
-    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-    lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+    private lazy val currentUser = CurrentUser.get.get
+    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
+    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    def stuffs = CurrentUser.get.flatMap(Stuff.findByUser).openOr(Nil)
-    def completeStuffTable = createStuffTable(stuffs)
+    private def stuffs = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
+    private def completeStuffTable = createStuffTable(stuffs)
 
     def formatDeadline(stuff: Stuff) = 
     {
@@ -44,14 +44,14 @@ class Inbox extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
             
-            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#inboxRow%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("row" + stuff.idField, 0, 500)
+            new FadeOut("inboxRow" + stuff.idField, 0, 500)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -63,7 +63,7 @@ class Inbox extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#inboxDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility
     }
 
@@ -71,28 +71,28 @@ class Inbox extends JSImplicit
     {
         val newTable = createStuffTable(topic.stuffs)
 
-        JqSetHtml("stuffTable", newTable) &
-        JqSetHtml("current", topic.title.is) &
-        JsRaw("""$('#showAll').prop("disabled", false)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-info")""")
+        JqSetHtml("inboxList", newTable) &
+        JqSetHtml("inboxCurrent", topic.title.is) &
+        JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-info")""")
     }
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
     {
         val newTable = createStuffTable(project.stuffs)
 
-        JqSetHtml("stuffTable", newTable) &
-        JqSetHtml("current", project.title.is) &
-        JsRaw("""$('#showAll').prop("disabled", false)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-success")""")
+        JqSetHtml("inboxList", newTable) &
+        JqSetHtml("inboxCurrent", project.title.is) &
+        JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-success")""")
     }
 
     def showAllStuff() = 
     {
-        JqSetHtml("stuffTable", completeStuffTable) & 
-        JqSetHtml("current", "全部") &
-        JsRaw("""$('#showAll').prop("disabled", true)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-inverse")""")
+        JqSetHtml("inboxList", completeStuffTable) & 
+        JqSetHtml("inboxCurrent", "全部") &
+        JsRaw("""$('#inboxShowAll').prop("disabled", true)""") &
+        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-inverse")""")
     }
 
     def createStuffTable(stuffs: List[Stuff]) = stuffs.map(createStuffRow).flatten
@@ -105,8 +105,8 @@ class Inbox extends JSImplicit
 
         val cssBinding = 
             actionBar(stuff) &
-            ".stuffs [id]"   #> ("row" + stuff.idField) &
-            ".collapse [id]" #> ("desc" + stuff.idField) &
+            ".stuffs [id]"   #> ("inboxRow" + stuff.idField) &
+            ".collapse [id]" #> ("inboxDesc" + stuff.idField) &
             ".title *"       #> stuff.title &
             ".desc *"        #> stuff.descriptionHTML &
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
@@ -122,12 +122,12 @@ class Inbox extends JSImplicit
         def createNewStuff: Stuff = Stuff.createRecord.userID(userID)
 
         val editStuff = new EditStuffForm(createNewStuff, {stuff =>
-            AppendHtml("stuffTable", createStuffRow(stuff))
+            AppendHtml("inboxList", createStuffRow(stuff))
         })
 
         """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        AppendHtml("inboxEditHolder", editStuff.toForm) &
+        Run("prepareInboxEditForm()")
     }
 
     def showEditForm(stuff: Stuff): JsCmd = 
@@ -135,14 +135,14 @@ class Inbox extends JSImplicit
         val editStuff = new EditStuffForm(stuff, editPostAction _)
 
         """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        AppendHtml("inboxEditHolder", editStuff.toForm) &
+        Run("prepareInboxEditForm()")
     }
 
     def editPostAction(stuff: Stuff): JsCmd = 
     {
         val newRow = createStuffRow(stuff).flatMap(_.child)
-        JqSetHtml("row" + stuff.idField.is, newRow)
+        JqSetHtml("inboxRow" + stuff.idField.is, newRow)
     }
 
     def addRapidStuff(): JsCmd =
@@ -151,16 +151,16 @@ class Inbox extends JSImplicit
 
         stuff.saveTheRecord()
 
-        """$('#rapidStuff').val("")""" &
-        AppendHtml("stuffTable", createStuffRow(stuff))
+        """$('#inboxRapidStuff').val("")""" &
+        AppendHtml("inboxList", createStuffRow(stuff))
     }
 
     def render = 
     {
-        "#showAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#addStuffButton [onclick]" #> SHtml.onEvent(s => showInsertForm) &
-        "#stuffTable *" #> completeStuffTable &
-        "#rapidStuff" #> SHtml.text("", rapidTitle = _) &
-        "#rapidTitle" #> SHtml.hidden(addRapidStuff _)
+        "#inboxShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#inboxAdd [onclick]" #> SHtml.onEvent(s => showInsertForm) &
+        "#inboxList *" #> completeStuffTable &
+        "#inboxRapidStuff" #> SHtml.text("", rapidTitle = _) &
+        "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _)
     }
 }

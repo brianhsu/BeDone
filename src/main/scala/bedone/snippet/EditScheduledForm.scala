@@ -50,11 +50,11 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         currentTopics.contains(topic) match {
-            case true => ClearValue("inputTopic")
+            case true => ClearValue("scheduledTopic")
             case false =>
                 currentTopics ::= topic
-                ClearValue("inputTopic") &
-                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+                ClearValue("scheduledTopic") &
+                AppendHtml("scheduledTopicTags", topic.editButton(onTopicClick, onTopicRemove))
         }
     }
 
@@ -65,12 +65,12 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
         currentProjects.contains(project) match {
-            case true  => ClearValue("inputProject")
+            case true  => ClearValue("scheduledProject")
             case false =>
                 currentProjects ::= project
-                ClearValue("inputProject") &
+                ClearValue("scheduledProject") &
                 AppendHtml(
-                    "editStuffProjects", 
+                    "scheduledProjectTags", 
                     project.editButton(onProjectClick, onProjectRemove)
                 )
         }
@@ -101,8 +101,8 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
     }
 
     def setTitle(title: String): JsCmd = {
-        val errors = stuff.title(title).validate
-        setError(errors, "editStuffTitle")._2
+        val errors = stuff.title(title).title.validate
+        setError(errors, "scheduledTitle")._2
     }
 
     def dateTimeFromStr(dateTimeStr: String, defaultValue: Box[Calendar]) = 
@@ -126,7 +126,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         val endTime = dateTimeFromStr(endTimeStr, Empty)
         scheduled.endTime.setBox(endTime)
         val errors = scheduled.endTime.validate
-        setError(errors, "editEndTime")._2
+        setError(errors, "scheduledEndTime")._2
     }
 
     def setStartTime(startTimeStr: String): JsCmd = 
@@ -136,7 +136,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         scheduled.startTime.setBox(startTime)
 
         val errors = scheduled.startTime.validate
-        setError(errors, "editStartTime")._2
+        setError(errors, "scheduledStartTime")._2
     }
 
     def setLocation(location: String): JsCmd = 
@@ -154,13 +154,13 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
     def save(): JsCmd = {
 
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle"),
-            setError(scheduled.startTime.validate, "editStartTime"),
-            setError(scheduled.endTime.validate, "editEndTime")
+            setError(stuff.title.validate, "scheduledTitle"),
+            setError(scheduled.startTime.validate, "scheduledStartTime"),
+            setError(scheduled.endTime.validate, "scheduledEndTime")
         )
 
         val hasError = status.map(_._1).contains(true)
-        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
+        val jsCmds = "$('#scheduledSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -169,7 +169,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 scheduled.saveTheRecord()
-                FadeOutAndRemove("stuffEdit") & postAction(stuff)
+                FadeOutAndRemove("scheduledEdit") & postAction(stuff)
         }
     }
 
@@ -187,22 +187,23 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
             setLocation _
         )
 
-        "#editStuffTitle" #> ("input" #> titleInput) &
-        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#inputTopic" #> (SHtml.text("", topic = _)) &
-        "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", project = _)) &
-        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> (
-            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        ) &
-        "#editStartTime" #> ("input" #> startTimeInput) &
-        "#editEndTime" #> ("input" #> endTimeInput) &
-        "#editLocation" #> ("input" #> locationInput) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
+        val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+
+        "#scheduledTitle" #> ("input" #> titleInput) &
+        "#scheduledEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#scheduledTopic" #> (SHtml.text("", topic = _)) &
+        "#scheduledTopicHidden" #> (SHtml.hidden(addTopic)) &
+        "#scheduledProject" #> (SHtml.text("", project = _)) &
+        "#scheduledProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#scheduledTopicTags *" #> topicTags &
+        "#scheduledProjectTags *" #> projectTags &
+        "#scheduledStartTime" #> ("input" #> startTimeInput) &
+        "#scheduledEndTime" #> ("input" #> endTimeInput) &
+        "#scheduleLocation" #> ("input" #> locationInput) &
+        "#scheduledCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("scheduledEdit")) &
+        "#scheduledSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#scheduledSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {

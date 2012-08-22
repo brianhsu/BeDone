@@ -49,11 +49,11 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         currentTopics.contains(topic) match {
-            case true => ClearValue("inputTopic")
+            case true => ClearValue("delegateTopic")
             case false =>
                 currentTopics ::= topic
-                ClearValue("inputTopic") &
-                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+                ClearValue("delegateTopic") &
+                AppendHtml("delegateTopicTags", topic.editButton(onTopicClick, onTopicRemove))
         }
     }
 
@@ -64,12 +64,12 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
         currentProjects.contains(project) match {
-            case true  => ClearValue("inputProject")
+            case true  => ClearValue("delegateProject")
             case false =>
                 currentProjects ::= project
-                ClearValue("inputProject") &
+                ClearValue("delegateProject") &
                 AppendHtml(
-                    "editStuffProjects", 
+                    "delegateProjectTags", 
                     project.editButton(onProjectClick, onProjectRemove)
                 )
         }
@@ -103,8 +103,8 @@ class EditDelegatedForm(user: User, delegated: Delegated,
 
     def setTitle(title: String): JsCmd = 
     {
-        val errors = stuff.title(title).validate
-        setError(errors, "editStuffTitle")._2
+        val errors = stuff.title(title).title.validate
+        setError(errors, "delegateTitle")._2
     }
 
     def setDescription(desc: String): JsCmd = 
@@ -131,11 +131,11 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     def save(): JsCmd = 
     {
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle")
+            setError(stuff.title.validate, "delegateTitle")
         )
 
         val hasError = status.map(_._1).contains(true) || currentContact.isEmpty
-        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
+        val jsCmds = "$('#delegateSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -149,7 +149,7 @@ class EditDelegatedForm(user: User, delegated: Delegated,
                     delegated.contactID(contact.idField.is).saveTheRecord()
                 }
 
-                FadeOutAndRemove("stuffEdit") & postAction(stuff)
+                FadeOutAndRemove("delegateEdit") & postAction(stuff)
         }
     }
 
@@ -157,21 +157,22 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     {
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val contactName = delegated.contact.name.is
+        val contactInput = SHtml.textAjaxTest(contactName, doNothing _, setContact _)
+        val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+        val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
 
-        "#editStuffTitle" #> ("input" #> titleInput) &
-        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#inputTopic" #> (SHtml.text("", topic = _)) &
-        "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", project = _)) &
-        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#inputContact" #> SHtml.textAjaxTest(contactName, doNothing _, setContact _) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> (
-            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        ) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#delegateTitle" #> ("input" #> titleInput) &
+        "#delegateEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#delegateTopic" #> (SHtml.text("", topic = _)) &
+        "#delegateTopicHidden" #> (SHtml.hidden(addTopic)) &
+        "#delegateProject" #> (SHtml.text("", project = _)) &
+        "#delegateProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#delegateContact" #>  ("input" #> contactInput) &
+        "#delegateTopicTags *" #> topicTags &
+        "#delegateProjectTags *" #> projectTags &
+        "#delegateCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("delegateEdit")) &
+        "#delegateSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#delegateSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {

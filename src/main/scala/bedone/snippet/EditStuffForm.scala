@@ -44,11 +44,11 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         currentTopics.contains(topic) match {
-            case true => ClearValue("inputTopic")
+            case true => ClearValue("inboxTopic")
             case false =>
                 currentTopics ::= topic
-                ClearValue("inputTopic") &
-                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+                ClearValue("inboxTopic") &
+                AppendHtml("inboxTopicTags", topic.editButton(onTopicClick, onTopicRemove))
         }
     }
 
@@ -58,12 +58,12 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
         currentProjects.contains(project) match {
-            case true  => ClearValue("inputProject")
+            case true  => ClearValue("inboxProject")
             case false =>
                 currentProjects ::= project
-                ClearValue("inputProject") &
+                ClearValue("inboxProject") &
                 AppendHtml(
-                    "editStuffProjects", 
+                    "inboxProjectTags", 
                     project.editButton(onProjectClick, onProjectRemove)
                 )
         }
@@ -94,12 +94,11 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
     }
 
     def setTitle(title: String): JsCmd = {
-        val errors = stuff.title(title).validate
-        setError(errors, "editStuffTitle")._2
+        stuff.title(title)
+        setError(stuff.title.validate, "inboxTitle")._2
     }
 
     def setDeadline(deadline: String): JsCmd = {
-        println("deadline:" + deadline)
         val newDeadline = optFromStr(deadline) match {
             case None    => Empty
             case Some(x) => try {
@@ -112,11 +111,10 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
             }
         }
 
-        println("deadline:" + newDeadline)
         stuff.deadline.setBox(newDeadline)
 
         val errors = stuff.deadline.validate
-        setError(errors, "editStuffDeadline")._2
+        setError(errors, "inboxDeadline")._2
     }
 
     def setDescription(desc: String): JsCmd = {
@@ -127,12 +125,12 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
     def save(): JsCmd = {
 
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle"),
-            setError(stuff.deadline.validate, "editStuffDeadline")
+            setError(stuff.title.validate, "inboxTitle"),
+            setError(stuff.deadline.validate, "inboxDeadline")
         )
 
         val hasError = status.map(_._1).contains(true)
-        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
+        val jsCmds = "$('#inboxSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -140,7 +138,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
                 stuff.saveTheRecord()
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
-                FadeOutAndRemove("stuffEdit") & postAction(stuff)
+                FadeOutAndRemove("inboxEdit") & postAction(stuff)
         }
     }
 
@@ -150,21 +148,21 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
 
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val deadlineInput = SHtml.textAjaxTest(deadline, doNothing _, setDeadline _)
+        val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+        val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
 
-        "#editStuffTitle" #> ("input" #> titleInput) &
-        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#editStuffDeadline" #> ("input" #> deadlineInput) &
-        "#inputTopic" #> (SHtml.text("", topic = _)) &
-        "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", project = _)) &
-        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> (
-            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        ) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#inboxTitle" #> ("input" #> titleInput) &
+        "#inboxEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#inboxDeadline" #> ("input" #> deadlineInput) &
+        "#inboxTopic" #> (SHtml.text("", topic = _)) &
+        "#inboxTopicHidden" #> (SHtml.hidden(addTopic)) &
+        "#inboxProject" #> (SHtml.text("", project = _)) &
+        "#inboxProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#inboxTopicTags *" #>  topicTags &
+        "#inboxProjectTags *" #> projectTags &
+        "#inboxCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("inboxEdit")) &
+        "#inboxSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#inboxSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {

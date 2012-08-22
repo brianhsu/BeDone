@@ -77,7 +77,7 @@ i.myicon-starOff {
     vertical-align: text-middle;
 }
 
-div.stuffs-edit {
+div.editForm {
 
     margin-bottom: 0.8em;
     padding-top: 0.6em;
@@ -109,20 +109,7 @@ div.stuffs-edit {
     .rounded-corners(5px);
 }
 
-div.action {
-
-    .post-it(fade(@stuffBackground, 50%));
-
-    div.desc {
-        margin: 1em;
-    }
-
-    .showDesc {
-        margin-left: 0.5em;
-    }
-}
-
-div.stuffs {
+div.listRow {
 
     .post-it(fade(@stuffBackground, 50%));
 
@@ -155,7 +142,8 @@ div.stuffs {
     margin-right: 0.5em;
 }
 
-div#rapidEntry form {
+div.rapidEntry form {
+    float: right;
     margin-top: 0.2em;
     margin-bottom: 0px;
     margin-left: 0px;

@@ -52,7 +52,7 @@ i.myicon-starOff {
   line-height: 14px;
   vertical-align: text-middle;
 }
-div.stuffs-edit {
+div.editForm {
   margin-bottom: 0.8em;
   padding-top: 0.6em;
   padding-bottom: 0.6em;
@@ -66,13 +66,13 @@ div.stuffs-edit {
   -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
-div.stuffs-edit div.desc {
+div.editForm div.desc {
   margin: 1em;
 }
-div.stuffs-edit .showDesc {
+div.editForm .showDesc {
   margin-left: 0.5em;
 }
-div.action {
+div.listRow {
   background: rgba(211, 211, 211, 0.5);
   margin-bottom: 0.5em;
   padding-top: 0.6em;
@@ -83,27 +83,10 @@ div.action {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
 }
-div.action div.desc {
+div.listRow div.desc {
   margin: 1em;
 }
-div.action .showDesc {
-  margin-left: 0.5em;
-}
-div.stuffs {
-  background: rgba(211, 211, 211, 0.5);
-  margin-bottom: 0.5em;
-  padding-top: 0.6em;
-  padding-bottom: 0.7em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-}
-div.stuffs div.desc {
-  margin: 1em;
-}
-div.stuffs .showDesc {
+div.listRow .showDesc {
   margin-left: 0.5em;
 }
 .inline {
@@ -121,7 +104,8 @@ div.stuffs .showDesc {
 .deadline {
   margin-right: 0.5em;
 }
-div#rapidEntry form {
+div.rapidEntry form {
+  float: right;
   margin-top: 0.2em;
   margin-bottom: 0px;
   margin-left: 0px;

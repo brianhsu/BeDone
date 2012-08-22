@@ -48,11 +48,11 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         val context = Context.findByTitle(userID, title).getOrElse(createContext)
 
         currentContexts.contains(context) match {
-            case true => ClearValue("inputContext")
+            case true => ClearValue("actionContext")
             case false =>
                 currentContexts ::= context
-                ClearValue("inputContext") &
-                AppendHtml("editActionContexts", context.editButton(onContextClick, onContextRemove))
+                ClearValue("actionContext") &
+                AppendHtml("actionContextTags", context.editButton(onContextClick, onContextRemove))
         }
     }
 
@@ -63,11 +63,11 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         currentTopics.contains(topic) match {
-            case true => ClearValue("inputTopic")
+            case true => ClearValue("actionTopic")
             case false =>
                 currentTopics ::= topic
-                ClearValue("inputTopic") &
-                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+                ClearValue("actionTopic") &
+                AppendHtml("actionTopicTags", topic.editButton(onTopicClick, onTopicRemove))
         }
     }
 
@@ -78,12 +78,12 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
         currentProjects.contains(project) match {
-            case true  => ClearValue("inputProject")
+            case true  => ClearValue("actionProject")
             case false =>
                 currentProjects ::= project
-                ClearValue("inputProject") &
+                ClearValue("actionProject") &
                 AppendHtml(
-                    "editStuffProjects", 
+                    "actionProjectTags", 
                     project.editButton(onProjectClick, onProjectRemove)
                 )
         }
@@ -129,12 +129,11 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
     }
 
     def setTitle(title: String): JsCmd = {
-        val errors = stuff.title(title).validate
-        setError(errors, "editStuffTitle")._2
+        val errors = stuff.title(title).title.validate
+        setError(errors, "actionTitle")._2
     }
 
     def setDeadline(deadline: String): JsCmd = {
-        println("deadline:" + deadline)
         val newDeadline = optFromStr(deadline) match {
             case None    => Empty
             case Some(x) => try {
@@ -147,11 +146,9 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
             }
         }
 
-        println("deadline:" + newDeadline)
         stuff.deadline.setBox(newDeadline)
-
         val errors = stuff.deadline.validate
-        setError(errors, "editStuffDeadline")._2
+        setError(errors, "actionDeadline")._2
     }
 
     def setDescription(desc: String): JsCmd = {
@@ -162,12 +159,12 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
     def save(): JsCmd = {
 
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle"),
-            setError(stuff.deadline.validate, "editStuffDeadline")
+            setError(stuff.title.validate, "actionTitle"),
+            setError(stuff.deadline.validate, "actionDeadline")
         )
 
         val hasError = status.map(_._1).contains(true)
-        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
+        val jsCmds = "$('#actionSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -176,7 +173,7 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 action.setContexts(currentContexts)
-                FadeOutAndRemove("stuffEdit") & postAction(stuff)
+                FadeOutAndRemove("actionEdit") & postAction(stuff)
         }
     }
 
@@ -187,25 +184,24 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val deadlineInput = SHtml.textAjaxTest(deadline, doNothing _, setDeadline _)
 
-        "#editStuffTitle" #> ("input" #> titleInput) &
-        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#editStuffDeadline" #> ("input" #> deadlineInput) &
-        "#inputContext" #> (SHtml.text("", context = _)) &
-        "#inputContextHidden" #> (SHtml.hidden(addContext)) &
-        "#inputTopic" #> (SHtml.text("", topic = _)) &
-        "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", project = _)) &
-        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#editActionContexts *" #> (
-            currentContexts.map(_.editButton(onContextClick, onContextRemove))
-        ) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> (
-            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        ) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        val contextTags = currentContexts.map(_.editButton(onContextClick, onContextRemove))
+        val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+
+        "#actionTitle" #> ("input" #> titleInput) &
+        "#actionEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#actionDeadline" #> ("input" #> deadlineInput) &
+        "#actionContext" #> (SHtml.text("", context = _)) &
+        "#actionContextHidden" #> (SHtml.hidden(addContext)) &
+        "#actionTopic" #> (SHtml.text("", topic = _)) &
+        "#actionTopicHidden" #> (SHtml.hidden(addTopic)) &
+        "#actionProject" #> (SHtml.text("", project = _)) &
+        "#actionProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#actionContextTags *" #> contextTags &
+        "#actionTopicTags *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
+        "#actionProjectTags *" #> projectTags &
+        "#actionCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("actionEdit")) &
+        "#actionSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#actionSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {

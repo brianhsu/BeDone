@@ -9,26 +9,7 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div data-lift="NextAction">
-        <div class="btn-group" style="float:right">
-          <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
-          <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
-        </div>
-        <ul class="nav nav-tabs" id="contextTabFolder">
-          <li class="contextTab"><a href="#">@ Home</a></li>
-        </ul>
-        <div>
-          <div id="editForm"></div>
-          <div>
-            <h3 style="margin-bottom:0.5em">儘快去做</h3>
-            <div id="notDone"></div>
-          </div>
-          <div>
-            <h3 style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
-            <div id="isDone"></div>
-          </div>
-        </div>
-      </div>
+      <div data-lift="lift:embed?what=action/list"/>
     </div>
   </body>
 </html>

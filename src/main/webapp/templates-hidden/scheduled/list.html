@@ -1,0 +1,30 @@
+<div data-lift="ScheduledAction">
+  <div style="float: right">
+    <div class="btn-group inline">
+      <button class="btn btn-inverse" id="scheduledCurrent" disabled="disabled">全部</button>
+      <button class="btn btn-inverse" id="scheduledShowAll" disabled="disabled">顯示全部</button>
+    </div>
+  </div>
+  <ul class="nav nav-tabs">
+    <li class="intervalTab active" id="scheduledWeekTab"><a href="#">本週</a></li>
+    <li class="intervalTab" id="scheduledMonthTab"><a href="#">本月</a></li>
+    <li class="intervalTab" id="scheduledAllTab"><a href="#">全部</a></li>
+  </ul>
+  <div id="scheduledEditHolder"></div>
+  <div id="scheduledOutdatedBlock">
+    <h3 style="margin-bottom:0.5em">已過期</h3>
+    <div id="scheduledOutdatedList" class="outdatedList"></div>
+  </div>
+  <div id="scheduledTodayBlock">
+    <h3 style="margin-bottom:0.5em">本日</h3>
+    <div id="scheduledTodayList" class="actionList"></div>
+  </div>
+  <div id="scheduledIntervalBlock">
+    <h3 id="scheduledIntervalLabel" style="margin-top:1em; margin-bottom:0.5em">本週</h3>
+    <div id="scheduledIntervalList" class="actionList"></div>
+  </div>
+  <div id="scheduledDoneBlock">
+    <h3 style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
+    <div id="scheduledDoneList" class="actionList"></div>
+  </div>
+</div>

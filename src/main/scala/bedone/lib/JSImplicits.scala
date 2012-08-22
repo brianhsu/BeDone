@@ -1,6 +1,7 @@
 package org.bedone.lib
 
 import net.liftweb.util.FieldError
+import net.liftweb.util.FieldIdentifier
 
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
@@ -58,6 +59,7 @@ trait JSImplicit
     }
 
     def setError(fieldErrors: List[FieldError], fieldID: String): (Boolean, JsCmd) = {
+
         fieldErrors match {
             case Nil    => (false, ClearFieldError(fieldID))
             case errors => 

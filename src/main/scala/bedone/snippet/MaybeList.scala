@@ -24,7 +24,7 @@ class MaybeList extends JSImplicit
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
-    private var currentTabID: String = "allMaybe"
+    private var currentTabID: String = "maybeAllTab"
 
     def shouldDisplay(maybe: Maybe) = 
     {
@@ -39,9 +39,9 @@ class MaybeList extends JSImplicit
         this.currentTabID = tabID
 
         val maybes = tabID match {
-            case "allMaybe"     => this.maybes
-            case "hasTickler"   => this.maybes.filter(_.tickler.is.isDefined)
-            case "isStared"     => this.maybes.filter(_.stuff.isStared.is)
+            case "maybeAllTab"     => this.maybes
+            case "maybeTicklerTab" => this.maybes.filter(_.tickler.is.isDefined)
+            case "maybeStaredTab"  => this.maybes.filter(_.stuff.isStared.is)
         }
 
         """$('.maybeTab li').removeClass('active')""" &
@@ -54,9 +54,9 @@ class MaybeList extends JSImplicit
         this.currentTopic = Some(topic)
         this.currentProject = None
         
-        JqSetHtml("current", topic.title.is) &
-        JsRaw("""$('#showAll').prop("disabled", false)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-info")""") &
+        JqSetHtml("maybeCurrent", topic.title.is) &
+        JsRaw("""$('#maybeShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-info")""") &
         updateList(currentTabID)
     }
 
@@ -65,9 +65,9 @@ class MaybeList extends JSImplicit
         this.currentTopic = None
         this.currentProject = Some(project)
 
-        JqSetHtml("current", project.title.is) &
-        JsRaw("""$('#showAll').prop("disabled", false)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-success")""") &
+        JqSetHtml("maybeCurrent", project.title.is) &
+        JsRaw("""$('#maybeShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-success")""") &
         updateList(currentTabID)
     }
 
@@ -76,10 +76,10 @@ class MaybeList extends JSImplicit
         this.currentTopic = None
         this.currentProject = None
 
-        JqSetHtml("current", "全部") &
+        JqSetHtml("maybeCurrent", "全部") &
         JqSetHtml("maybeList", maybes.flatMap(createMaybeRow)) &
-        JsRaw("""$('#showAll').prop("disabled", true)""") &
-        JsRaw("""$('#current').attr("class", "btn btn-inverse")""") &
+        JsRaw("""$('#maybeShowAll').prop("disabled", true)""") &
+        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-inverse")""") &
         updateList(currentTabID)
     }
 
@@ -91,9 +91,9 @@ class MaybeList extends JSImplicit
     {
         val editStuff = new EditMaybeForm(maybe, editPostAction)
 
-        """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        """$('#maybeEdit').remove()""" &
+        AppendHtml("maybeEditHolder", editStuff.toForm) &
+        """prepareMaybeEditForm()"""
     }
 
 
@@ -111,14 +111,13 @@ class MaybeList extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
 
-            val fadeOutEffect = currentTabID == "isStared" match {
-                case true  => FadeOutAndRemove("row" + stuff.idField) 
-                case false => Noop
+            val fadeOutEffect = if (currentTabID == "maybeStaredTab") {
+                FadeOutAndRemove("maybe" + stuff.idField) 
+            } else {
+                Noop
             }
 
-            println("fadeOutEffect:" + fadeOutEffect)
-
-            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
+            """$('#maybe%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
             fadeOutEffect
         }
 
@@ -126,7 +125,7 @@ class MaybeList extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("row" + stuff.idField, 0, 500)
+            new FadeOut("maybe" + stuff.idField, 0, 500)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -138,7 +137,7 @@ class MaybeList extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#maybeDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility
     }
 
@@ -160,8 +159,8 @@ class MaybeList extends JSImplicit
 
         val cssBinding = 
             actionBar(maybe) &
-            ".action [id]"   #> ("row" + stuff.idField) &
-            ".collapse [id]" #> ("desc" + stuff.idField) &
+            ".maybe [id]"   #> ("maybe" + stuff.idField) &
+            ".collapse [id]" #> ("maybeDesc" + stuff.idField) &
             ".title *"       #> stuff.title &
             ".desc *"        #> stuff.descriptionHTML &
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
@@ -174,10 +173,10 @@ class MaybeList extends JSImplicit
 
     def render = 
     {
-        "#allMaybe [onclick]" #> SHtml.onEvent(s => updateList("allMaybe")) &
-        "#hasTickler [onclick]" #> SHtml.onEvent(s => updateList("hasTickler")) &
-        "#isStared [onclick]" #> SHtml.onEvent(s => updateList("isStared")) &
-        "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
+        "#maybeAllTab [onclick]" #> SHtml.onEvent(s => updateList("maybeAllTab")) &
+        "#maybeTicklerTab [onclick]" #> SHtml.onEvent(s => updateList("maybeTicklerTab")) &
+        "#maybeStaredTab [onclick]" #> SHtml.onEvent(s => updateList("maybeStaredTab")) &
+        "#maybeShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
         "#maybeList *" #> maybes.flatMap(createMaybeRow)
     }
 }
