@@ -26,7 +26,7 @@ class ScheduledAction extends JSImplicit
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
-    private var currentTabID: String = "thisWeekTab"
+    private var currentTabID: String = "scheduledWeekTab"
 
     val currentUser = CurrentUser.get.get
 
@@ -91,9 +91,9 @@ class ScheduledAction extends JSImplicit
         this.currentProject = None
 
         updateList() &
-        JqSetHtml("current", "全部") &
-        """$('#showAll').prop("disabled", true)""" &
-        """$('#current').attr("class", "btn btn-inverse")"""
+        JqSetHtml("scheduledCurrent", "全部") &
+        """$('#scheduledShowAll').prop("disabled", true)""" &
+        """$('#scheduledCurrent').attr("class", "btn btn-inverse")"""
     }
 
     def topicFilter(buttonID: String, topic: Topic) = 
@@ -102,9 +102,9 @@ class ScheduledAction extends JSImplicit
         this.currentTopic = Some(topic)
 
         updateList() &
-        JqSetHtml("current", topic.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-info")"""
+        JqSetHtml("scheduledCurrent", topic.title.is) &
+        """$('#scheduledShowAll').prop("disabled", false)""" &
+        """$('#scheduledCurrent').attr("class", "btn btn-info")"""
     }
 
     def projectFilter(buttonID: String, project: Project) =
@@ -113,9 +113,9 @@ class ScheduledAction extends JSImplicit
         this.currentTopic = None
 
         updateList() &
-        JqSetHtml("current", project.title.is) &
-        """$('#showAll').prop("disabled", false)""" &
-        """$('#current').attr("class", "btn btn-success")"""
+        JqSetHtml("scheduledCurrent", project.title.is) &
+        """$('#scheduledShowAll').prop("disabled", false)""" &
+        """$('#scheduledCurrent').attr("class", "btn btn-success")"""
     }
 
     def updateList(): JsCmd = updateList(this.currentTabID)
@@ -141,8 +141,8 @@ class ScheduledAction extends JSImplicit
 
         val cssBinding = 
             actionBar(scheduled) &
-            ".action [id]"    #> ("row" + action.idField) &
-            ".collapse [id]"  #> ("desc" + action.stuff.idField) &
+            ".scheduled [id]"    #> ("scheduled" + action.idField) &
+            ".collapse [id]"  #> ("scheduledDesc" + action.stuff.idField) &
             ".title *"        #> stuff.title &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
@@ -179,15 +179,15 @@ class ScheduledAction extends JSImplicit
         this.currentTabID = tabID
 
         val title = tabID match {
-            case "thisWeekTab"  => "本週"
-            case "thisMonthTab" => "本月"
-            case "allTab" => "全部"
+            case "scheduledWeekTab"  => "本週"
+            case "scheduledMonthTab" => "本月"
+            case "scheduledAllTab" => "全部"
         }
 
         val intervalAction = tabID match {
-            case "thisWeekTab"  => weekAction
-            case "thisMonthTab" => monthAction
-            case "allTab" => allAction
+            case "scheduledWeekTab"  => weekAction
+            case "scheduledMonthTab" => monthAction
+            case "scheduledAllTab" => allAction
         }
 
         updateList(tabID, title, intervalAction)
@@ -199,15 +199,15 @@ class ScheduledAction extends JSImplicit
 
         """$('.intervalTab').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("intervalLabel", title)  &
-        JqSetHtml("intervalList", intervalList.flatMap(createActionRow)) &
-        JqSetHtml("todayList", todayList.flatMap(createActionRow)) &
-        JqSetHtml("doneList", doneList.flatMap(createActionRow)) &
-        JqSetHtml("outdatedList", outdatedList.flatMap(createActionRow)) &
-        JqSetVisible("outdatedBlock", !outdatedList.isEmpty) &
-        JqSetVisible("intervalBlock", !intervalList.isEmpty) &
-        JqSetVisible("todayBlock", !todayList.isEmpty) &
-        JqSetVisible("doneBlock", !doneList.isEmpty)
+        JqSetHtml("scheduledIntervalLabel", title)  &
+        JqSetHtml("scheduledIntervalList", intervalList.flatMap(createActionRow)) &
+        JqSetHtml("scheduledTodayList", todayList.flatMap(createActionRow)) &
+        JqSetHtml("scheduledDoneList", doneList.flatMap(createActionRow)) &
+        JqSetHtml("scheduledOutdatedList", outdatedList.flatMap(createActionRow)) &
+        JqSetVisible("scheduledOutdatedBlock", !outdatedList.isEmpty) &
+        JqSetVisible("scheduledIntervalBlock", !intervalList.isEmpty) &
+        JqSetVisible("scheduledTodayBlock", !todayList.isEmpty) &
+        JqSetVisible("scheduledDoneBlock", !doneList.isEmpty)
     }
 
     def editPostAction(stuff: Stuff): JsCmd = {
@@ -218,9 +218,9 @@ class ScheduledAction extends JSImplicit
     {
         val editStuff = new EditScheduledForm(scheduled, editPostAction)
 
-        """$('#stuffEdit').remove()""" &
-        AppendHtml("editForm", editStuff.toForm) &
-        """prepareStuffEditForm()"""
+        """$('#scheduledEdit').remove()""" &
+        AppendHtml("scheduledEditHolder", editStuff.toForm) &
+        """prepareScheduledEditForm()"""
     }
 
     def actionBar(scheduled: Scheduled) = 
@@ -237,19 +237,19 @@ class ScheduledAction extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
             
-            """$('#row%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#scheduled%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("row" + stuff.idField, 0, 500)
+            new FadeOut("scheduled" + stuff.idField, 0, 500)
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
         {
-            val rowID = "row" + action.idField.is
+            val rowID = "scheduled" + action.idField.is
             val doneTime = isDone match {
                 case false => None
                 case true  =>
@@ -276,7 +276,7 @@ class ScheduledAction extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#scheduledDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility &
         ".isDone" #> SHtml.ajaxCheckbox(action.isDone.is, markDoneFlag(action, _))
     }
@@ -286,17 +286,17 @@ class ScheduledAction extends JSImplicit
         val (todayList, intervalList, doneList, outdatedList) = createActionList(weekAction)
         val hidden = "display: none;";
 
-        "#showAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#thisWeekTab [onclick]" #> SHtml.onEvent(s => updateList("thisWeekTab")) &
-        "#thisMonthTab [onclick]" #> SHtml.onEvent(s => updateList("thisMonthTab")) &
-        "#allTab [onclick]" #> SHtml.onEvent(s => updateList("allTab")) &
-        "#todayList *"    #> todayList.flatMap(createActionRow) &
-        "#intervalList *" #> intervalList.flatMap(createActionRow) &
-        "#doneList *"     #> doneList.flatMap(createActionRow) &
-        "#outdatedList *" #> outdatedList.flatMap(createActionRow) &
-        "#outdatedBlock [style+]" #> (if (outdatedList.isEmpty) hidden else "") &
-        "#intervalBlock [style+]" #> (if (intervalList.isEmpty) hidden else "") &
-        "#todayBlock [style+]" #> (if (todayList.isEmpty) hidden else "") &
-        "#doneBlock [style+]" #> (if (doneList.isEmpty) hidden else "")
+        "#scheduledShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
+        "#scheduledWeekTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledWeekTab")) &
+        "#scheduledMonthTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledMonthTab")) &
+        "#scheduledAllTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledAllTab")) &
+        "#scheduledTodayList *"    #> todayList.flatMap(createActionRow) &
+        "#scheduledIntervalList *" #> intervalList.flatMap(createActionRow) &
+        "#scheduledDoneList *" #> doneList.flatMap(createActionRow) &
+        "#scheduledOutdatedList *" #> outdatedList.flatMap(createActionRow) &
+        "#scheduledOutdatedBlock [style+]" #> (if (outdatedList.isEmpty) hidden else "") &
+        "#scheduledIntervalBlock [style+]" #> (if (intervalList.isEmpty) hidden else "") &
+        "#scheduledTodayBlock [style+]" #> (if (todayList.isEmpty) hidden else "") &
+        "#scheduledDoneBlock [style+]" #> (if (doneList.isEmpty) hidden else "")
     }
 }

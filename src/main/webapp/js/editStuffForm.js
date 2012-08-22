@@ -109,26 +109,45 @@ function prepareDelegateEditForm()
 
 }
 
-function prepareStuffEditForm() {
-
-    $( "#editStartTime input" ).datetimepicker({
-        dateFormat: "yy-mm-dd",
-        timeFormat: 'hh:mm',
-        onClose: function(dateText) {
-            $("#editStartTime input").val(dateText)
-            $("#editStartTime input").blur()
+function prepareScheduledEditForm() 
+{
+    $( "#scheduledTopic" ).autocomplete({
+        source: "/autocomplete/topic",
+        select: function(event, ui) { 
+            $("#scheduledTopic").val(ui.item.label)
+            $(this).closest("form").submit()
         }
     });
 
-    $( "#editEndTime input" ).datetimepicker({
-        dateFormat: "yy-mm-dd",
-        timeFormat: 'hh:mm',
-        onClose: function(dateText) {
-            $("#editEndTime input").val(dateText)
-            $("#editEndTime input").blur()
+    $( "#scheduledProject" ).autocomplete({
+        source: "/autocomplete/project",
+        select: function(event, ui) { 
+            $("#scheduledProject").val(ui.item.label)
+            $(this).closest("form").submit()
         }
     });
 
+    $( "#scheduledStartTime input" ).datetimepicker({
+        dateFormat: "yy-mm-dd",
+        timeFormat: 'hh:mm',
+        onClose: function(dateText) {
+            $("#scheduledStartTime input").val(dateText)
+            $("#scheduledStartTime input").blur()
+        }
+    });
+
+    $( "#scheduledEndTime input" ).datetimepicker({
+        dateFormat: "yy-mm-dd",
+        timeFormat: 'hh:mm',
+        onClose: function(dateText) {
+            $("#scheduledEndTime input").val(dateText)
+            $("#scheduledEndTime input").blur()
+        }
+    });
+}
+
+function prepareMaybeEditForm()
+{
     $( "#editTicklerDate input" ).datepicker({
         dateFormat: "yy-mm-dd",
         onClose: function(dateText) {
@@ -137,5 +156,5 @@ function prepareStuffEditForm() {
         }
     });
 
-
 }
+
