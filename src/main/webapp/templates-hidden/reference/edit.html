@@ -1,0 +1,52 @@
+<div id="referenceEdit" class="editForm">
+  <div>
+    <span class="actionBar">
+      <i class="icon-white icon-ok"></i>
+      <i class="icon-white icon-remove"></i>
+      <i class="icon-white icon-star"></i>
+    </span>
+
+    <fieldset id="referenceTitle" class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題" />
+        <span id="referenceTitle_msg" class="help-inline"></span>
+      </div>
+    </fieldset>
+
+    <div class="pull-right form-inline">
+      <div class="input-prepend" style="margin-right:0.5em;">
+        <form action="." data-lift="lift:Form.ajax">
+          <span title="主題" class="add-on">
+            <i class="icon-tags"></i>
+          </span><input id="referenceTopic" class="input-medium" type="text" placeholder="主題" />
+          <input type="hidden" id="referenceTopicHidden" />
+        </form>
+      </div>
+      <div class="input-prepend" style="margin-right: 0.5em">
+        <form action="." data-lift="lift:Form.ajax">
+          <span title="專案" class="add-on">
+            <i class="icon-folder-open"></i>
+          </span><input id="referenceProject" class="input-medium" type="text" placeholder="專案" />
+          <input type="hidden" id="referenceProjectHidden" />
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 0.5em; display: table; width: 98%">
+    <div id="referenceProjectTags" class="inline" style="float:right"></div>
+    <div id="referenceTopicTags" class="inline" style="float:right"></div>
+  </div>
+
+  <div style="width: 100%">
+    <textarea rows="5" id="referenceEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+  </div>
+
+  <div style="text-align: right; margin-right: 0.5em">
+      <button id="referenceCancel" class="btn" style="margin-right:0.5em">取消</button>
+      <button id="referenceSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
+  </div>
+
+</div>

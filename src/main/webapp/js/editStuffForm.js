@@ -29,6 +29,30 @@ function prepareInboxEditForm()
     })
 }
 
+function prepareReferenceEditForm() 
+{
+    $( "#referenceTopic" ).autocomplete({
+        source: "/autocomplete/topic",
+        select: function(event, ui) { 
+            $("#referenceTopic").val(ui.item.label)
+            $(this).closest("form").submit()
+        }
+    });
+
+    $( "#referenceProject" ).autocomplete({
+        source: "/autocomplete/project",
+        select: function(event, ui) { 
+            $("#referenceProject").val(ui.item.label)
+            $(this).closest("form").submit()
+        }
+    });
+
+    $('#referenceSave').click(function () {
+        $(this).button('loading')
+    })
+}
+
+
 function prepareActionEditForm()
 {
     $( "#actionContext" ).autocomplete({
