@@ -63,7 +63,7 @@ class Inbox extends JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#desc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#inboxDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility
     }
 
@@ -106,7 +106,7 @@ class Inbox extends JSImplicit
         val cssBinding = 
             actionBar(stuff) &
             ".stuffs [id]"   #> ("inboxRow" + stuff.idField) &
-            ".collapse [id]" #> ("desc" + stuff.idField) &
+            ".collapse [id]" #> ("inboxDesc" + stuff.idField) &
             ".title *"       #> stuff.title &
             ".desc *"        #> stuff.descriptionHTML &
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &

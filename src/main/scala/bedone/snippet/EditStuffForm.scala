@@ -152,7 +152,7 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
 
         "#inboxTitle" #> ("input" #> titleInput) &
-        "#inboxDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#inboxEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
         "#inboxDeadline" #> ("input" #> deadlineInput) &
         "#inboxTopic" #> (SHtml.text("", topic = _)) &
         "#inboxTopicHidden" #> (SHtml.hidden(addTopic)) &
