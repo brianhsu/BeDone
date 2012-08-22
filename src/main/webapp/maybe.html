@@ -9,21 +9,7 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div data-lift="MaybeList">
-        <div class="btn-group" style="float:right">
-          <button class="btn btn-inverse" id="current" disabled="disabled">全部</button>
-          <button class="btn btn-inverse" id="showAll" disabled="disabled">顯示全部</button>
-        </div>
-        <ul class="nav nav-tabs maybeTab">
-          <li id="allMaybe" class="active"><a href="#">全部</a></li>
-          <li id="hasTickler"><a href="#">提醒我</a></li>
-          <li id="isStared"><a href="#">已標記星號</a></li>
-        </ul>
-        <div>
-          <div id="editForm"></div>
-          <div id="maybeList"></div>
-        </div>
-      </div>
+      <div data-lift="lift:embed?what=maybe/list"></div>
     </div>
   </body>
 </html>

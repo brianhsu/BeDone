@@ -48,11 +48,11 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
         val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
         currentTopics.contains(topic) match {
-            case true => ClearValue("inputTopic")
+            case true => ClearValue("maybeTopic")
             case false =>
                 currentTopics ::= topic
-                ClearValue("inputTopic") &
-                AppendHtml("editStuffTopics", topic.editButton(onTopicClick, onTopicRemove))
+                ClearValue("maybeTopic") &
+                AppendHtml("maybeTopicTags", topic.editButton(onTopicClick, onTopicRemove))
         }
     }
 
@@ -63,12 +63,12 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
         val project = Project.findByTitle(userID, title).getOrElse(createProject)
 
         currentProjects.contains(project) match {
-            case true  => ClearValue("inputProject")
+            case true  => ClearValue("maybeProject")
             case false =>
                 currentProjects ::= project
-                ClearValue("inputProject") &
+                ClearValue("maybeProject") &
                 AppendHtml(
-                    "editStuffProjects", 
+                    "maybeProjectTags", 
                     project.editButton(onProjectClick, onProjectRemove)
                 )
         }
@@ -99,8 +99,8 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
     }
 
     def setTitle(title: String): JsCmd = {
-        val errors = stuff.title(title).validate
-        setError(errors, "editStuffTitle")._2
+        val errors = stuff.title(title).title.validate
+        setError(errors, "maybeTitle")._2
     }
 
     def dateFromStr(dateStr: String, defaultValue: Box[Calendar]) = 
@@ -126,7 +126,7 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
         maybe.tickler.setBox(ticklerDate)
 
         val errors = maybe.tickler.validate
-        setError(errors, "editTicklerDate")._2
+        setError(errors, "maybeTicklerDate")._2
     }
 
     def setDescription(desc: String): JsCmd = 
@@ -138,12 +138,12 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
     def save(): JsCmd = {
 
         val status = List(
-            setError(stuff.title.validate, "editStuffTitle"),
-            setError(maybe.tickler.validate, "editTicklerDate")
+            setError(stuff.title.validate, "maybeTitle"),
+            setError(maybe.tickler.validate, "maybeTicklerDate")
         )
 
         val hasError = status.map(_._1).contains(true)
-        val jsCmds = "$('#editStuffSave').button('reset')" & status.map(_._2)
+        val jsCmds = "$('#maybeSave').button('reset')" & status.map(_._2)
 
         hasError match {
             case true  => jsCmds
@@ -152,7 +152,7 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 maybe.saveTheRecord()
-                FadeOutAndRemove("stuffEdit") & postAction(stuff)
+                FadeOutAndRemove("maybeEdit") & postAction(stuff)
         }
     }
 
@@ -165,20 +165,21 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val ticklerInput = SHtml.textAjaxTest(tickler, doNothing _, setTickler _)
 
-        "#editStuffTitle" #> ("input" #> titleInput) &
-        "#editStuffDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#inputTopic" #> (SHtml.text("", topic = _)) &
-        "#inputTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inputProject" #> (SHtml.text("", project = _)) &
-        "#inputProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#editStuffTopics *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
-        "#editStuffProjects *" #> (
-            currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
-        ) &
-        "#editTicklerDate" #> ("input" #> ticklerInput) &
-        "#editStuffCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("stuffEdit")) &
-        "#editStuffSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#editStuffSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
+        val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
+
+        "#maybeTitle" #> ("input" #> titleInput) &
+        "#maybeEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#maybeTopic" #> (SHtml.text("", topic = _)) &
+        "#maybeTopicHidden" #> (SHtml.hidden(addTopic)) &
+        "#maybeProject" #> (SHtml.text("", project = _)) &
+        "#maybeProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#maybeTopicTags *" #> topicTags &
+        "#maybeProjectTags *" #> projectTags &
+        "#maybeTicklerDate" #> ("input" #> ticklerInput) &
+        "#maybeCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("maybeEdit")) &
+        "#maybeSave [onclick]" #> SHtml.onEvent(x => save()) &
+        "#maybeSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
     }
 
     def toForm = {
