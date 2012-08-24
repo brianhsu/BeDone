@@ -15,6 +15,7 @@ import net.liftweb.record.field.StringField
 import net.liftweb.record.field.TextareaField
 import net.liftweb.record.field.DateTimeField
 import net.liftweb.record.field.OptionalDateTimeField
+import net.liftweb.record.field.OptionalLongField
 import net.liftweb.record.field.BooleanField
 import net.liftweb.record.field.EnumField
 
@@ -71,6 +72,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val userID = new IntField(this)
     val createTime = new DateTimeField(this)
     val stuffType = new EnumField(this, StuffType, StuffType.Stuff)
+    val gmailID = new OptionalLongField(this)
 
     val isTrash = new BooleanField(this, false)
     val isStared = new BooleanField(this, false)
@@ -79,7 +81,7 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
         override def displayName = "標題"
         override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
     }
-    val description = new TextareaField(this, 1000) {
+    val description = new TextareaField(this, 10000) {
         override def displayName = "描述"
     }
 
@@ -100,13 +102,20 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
 
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
-        val reader = new StringReader(description.is)
-        val writer = new StringWriter
-        val markdown = new Markdown
-        markdown.transform(reader, writer)
+        import scala.xml.XML
 
-        val rawHTML = "<div>" + writer.toString + "</div>"
-        scala.xml.XML.loadString(rawHTML)
+        if (gmailID.is == None) {
+            val reader = new StringReader(description.is)
+            val writer = new StringWriter
+            val markdown = new Markdown
+            markdown.transform(reader, writer)
+
+            val rawHTML = "<div>" + writer.toString + "</div>"
+            XML.loadString(rawHTML)
+
+        } else {
+            <pre>{description.is}</pre>
+        }
     }
 
     override def saveTheRecord() = tryo{
