@@ -41,7 +41,7 @@ class Preference extends JSImplicit
 
         def updateStatusOK: JsCmd =
         {
-            val encryptedPassword = PasswordHelper.encrypt(gmailPassword)
+            val encryptedPassword = PasswordHelper.encrypt(getGMailPassword)
             val preference = GMailPreference.findByUser(currentUser)
                                             .openOr(GMailPreference.createRecord)
 
