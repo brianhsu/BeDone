@@ -2,6 +2,7 @@ package org.bedone.lib
 
 import org.bedone.model.Stuff
 import org.bedone.model.User
+import org.bedone.model.GMailPreference
 
 import net.liftweb.squerylrecord.RecordTypeMode._
 
@@ -18,8 +19,13 @@ import com.google.code.javax.mail.Multipart
 
 object GMailFetcher
 {
-    def apply(user: User): Option[GMailFetcher] = {
-        None
+    def apply(user: User): Option[GMailFetcher] = inTransaction {
+
+        GMailPreference.findByUser(user).filter(_.usingGMail.is).map { setting =>
+            val plainPassword = PasswordHelper.decrypt(setting.password.is).get
+            new GMailFetcher(user.idField.is, setting.username.is, plainPassword)
+        }.toOption
+
     }
 }
 
@@ -44,6 +50,30 @@ class GMailFetcher(userID: Int, username: String, password: String)
         }
 
         folder
+    }
+
+    def validate: Option[Throwable] = {
+
+        def convertException(error: Throwable) = {
+            val errorMessage = error.getMessage
+            val reason = if (errorMessage.contains("Invalid credentials")) {
+                "帳號密碼有誤，請檢查帳號密碼後重新設定"
+            } else if (errorMessage.contains("Your account is not enabled for IMAP use.")) {
+                "尚未在 GMail 中開啟 IMAP 選項"
+            } else {
+                errorMessage
+            }
+
+            new Exception(reason)
+        }
+
+        try {
+            store.connect("imap.gmail.com", username, password)
+            store.close()
+            None
+        } catch {
+            case e => Some(convertException(e))
+        }
     }
 
     def getUntouchedMail() =

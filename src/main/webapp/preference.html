@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div data-lift="Preference">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#basic" data-toggle="tab">基本設定</a></li>
+          <li><a href="#gmail" data-toggle="tab">GMail 收件匣</a></li>
+        </ul>
+        <div class="tab-content" style="margin-left: 0.5em; margin-right: 0.5em">
+          <div class="tab-pane active" id="basic">
+            <div class="pull-right" style="text-align: center">
+              <img id="avatar" src="http://www.gravatar.com/avatar/0?d=mm" />
+              <div style="margin-top:0.5em">
+                <a href="https://en.gravatar.com/emails/">更換大頭貼</a>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="gmail">
+            <form data-lift="lift:Form.ajax?class=form-horizontal">
+
+              <div class="btn-group pull-right">
+                <input type="reset" class="btn btn-inverse">重設</input>
+                <input id="saveGMail" class="btn btn-primary">儲存設定</input>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="gmailAccount">GMail 狀態：</label>
+                <div data-lift="lift:LazyLoad?template=gmailLoad">
+                  <div class="controls" data-lift="GMailStatus">
+                    <span class="label" id="gmailStatus">尚未驗證</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="gmailAccount">GMail 信箱：</label>
+                <div class="controls">
+                  <input type="text" id="gmailAccount"/>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="gmailPassword">GMail 密碼：</label>
+                <div class="controls">
+                  <input type="password" id="gmailPassword"/>
+                </div>
+              </div>
+              <div style="margin-left:3em">
+                <label class="checkbox">
+                  <input type="checkbox" style="margin-right: 0.5em" id="usingGMail"/> 
+                  將 GMail 收到的信件放入 BeDone 中處理
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
