@@ -37,9 +37,9 @@ class Login
         }
     }
 
-    def logoutButton = CurrentUser.isDefined match {
+    def logoutLink = CurrentUser.isDefined match {
         case false => "*" #> ""
-        case true  => "button" #> SHtml.button("登出", logout _)
+        case true  => "#logout [onclick]" #> SHtml.onEvent(logout _)
     }
 
     def loginForm = CurrentUser.isDefined match {
@@ -50,7 +50,8 @@ class Login
             "type=submit" #> SHtml.submit("Sign in", login _)
     }
 
-    def logout() = {
+    def logout(eventData: String) = {
+        println("Hello World")
         CurrentUser.foreach { _.logout(S.redirectTo("/")) }
     }
 

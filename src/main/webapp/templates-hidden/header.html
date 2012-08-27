@@ -61,21 +61,13 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="/">BeDone</a>
+        <div class="container" style="width: 98%">
+          <a class="brand" href="/" style="margin-left:0.5em">BeDone</a>
           <img src="/img/ajax-loader.gif"  id="ajax-loader" class="ajax-loader" alt="" />
           <div class="nav-collapse pull-right">
             <ul class="nav">
-              <li class="active"><a href="/">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
               <li><span data-lift="lift:embed?what=login"></span></li>
-              <li><span data-lift="lift:embed?what=logout"></span></li>
+              <span data-lift="lift:embed?what=logout"></span>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
