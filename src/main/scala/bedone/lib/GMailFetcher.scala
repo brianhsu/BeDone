@@ -46,6 +46,16 @@ class GMailFetcher(userID: Int, username: String, password: String)
         folder
     }
 
+    def validate: Option[Throwable] = {
+        try {
+            store.connect("imap.gmail.com", username, password)
+            store.close()
+            None
+        } catch {
+            case e => Some(e)
+        }
+    }
+
     def getUntouchedMail() =
     {
         def inBeDone(message: IMAPMessage) = {

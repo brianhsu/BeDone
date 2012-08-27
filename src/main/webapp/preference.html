@@ -22,13 +22,22 @@
             </div>
           </div>
           <div class="tab-pane" id="gmail">
-            <form class="form-horizontal" style="margin-left:-2em">
+            <form data-lift="lift:Form.ajax?class=form-horizontal">
+
               <div class="btn-group pull-right">
-                <button type="reset" class="btn">重設</button>
-                <button id="saveGMail" type="submit" class="btn btn-primary">儲存設定</button>
+                <input type="reset" class="btn btn-inverse">重設</input>
+                <input id="saveGMail" class="btn btn-primary">儲存設定</input>
               </div>
+
               <div class="control-group">
-                <label class="control-label" for="gmailAccount">GMail 帳號：</label>
+                <label class="control-label" for="gmailAccount">GMail 狀態：</label>
+                <div class="controls">
+                  <span class="label" id="gmailStatus">尚未驗證</span>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="gmailAccount">GMail 信箱：</label>
                 <div class="controls">
                   <input type="text" id="gmailAccount"/>
                 </div>
@@ -41,7 +50,7 @@
               </div>
               <div style="margin-left:3em">
                 <label class="checkbox">
-                  <input type="checkbox" style="margin-right: 0.5em"/> 
+                  <input type="checkbox" style="margin-right: 0.5em" id="usingGMail"/> 
                   將 GMail 收到的信件放入 BeDone 中處理
                 </label>
               </div>
