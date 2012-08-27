@@ -35,17 +35,8 @@ class Preference extends JSImplicit
 
         def updateStatusFailed(error: Throwable): JsCmd = 
         {
-            val errorMessage = error.getMessage
-            val reason = if (errorMessage.contains("Invalid credentials")) {
-                "帳號密碼有誤，請檢查帳號密碼後重新設定"
-            } else if (errorMessage.contains("Your account is not enabled for IMAP use.")) {
-                "尚未在 GMail 中開啟 IMAP 選項"
-            } else {
-                errorMessage
-            }
-
             """$('#gmailStatus').attr('class', 'label label-important')""" &
-            """$('#gmailStatus').text('連線失敗，%s')""".format(reason)
+            """$('#gmailStatus').text('連線失敗，%s')""".format(error.getMessage)
         }
 
         def updateStatusOK: JsCmd =

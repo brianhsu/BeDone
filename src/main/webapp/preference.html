@@ -18,7 +18,9 @@
           <div class="tab-pane active" id="basic">
             <div class="pull-right" style="text-align: center">
               <img id="avatar" src="http://www.gravatar.com/avatar/0?d=mm" />
-              <div style="margin-top:0.5em"><a href="https://en.gravatar.com/emails/">更換大頭貼</a></div>
+              <div style="margin-top:0.5em">
+                <a href="https://en.gravatar.com/emails/">更換大頭貼</a>
+              </div>
             </div>
           </div>
           <div class="tab-pane" id="gmail">
@@ -31,8 +33,10 @@
 
               <div class="control-group">
                 <label class="control-label" for="gmailAccount">GMail 狀態：</label>
-                <div class="controls">
-                  <span class="label" id="gmailStatus">尚未驗證</span>
+                <div data-lift="lift:LazyLoad?template=gmailLoad">
+                  <div class="controls" data-lift="GMailStatus">
+                    <span class="label" id="gmailStatus">尚未驗證</span>
+                  </div>
                 </div>
               </div>
 

@@ -53,12 +53,26 @@ class GMailFetcher(userID: Int, username: String, password: String)
     }
 
     def validate: Option[Throwable] = {
+
+        def convertException(error: Throwable) = {
+            val errorMessage = error.getMessage
+            val reason = if (errorMessage.contains("Invalid credentials")) {
+                "帳號密碼有誤，請檢查帳號密碼後重新設定"
+            } else if (errorMessage.contains("Your account is not enabled for IMAP use.")) {
+                "尚未在 GMail 中開啟 IMAP 選項"
+            } else {
+                errorMessage
+            }
+
+            new Exception(reason)
+        }
+
         try {
             store.connect("imap.gmail.com", username, password)
             store.close()
             None
         } catch {
-            case e => Some(e)
+            case e => Some(convertException(e))
         }
     }
 
