@@ -51,7 +51,8 @@ class Boot
             (Menu.i("Delegated") / "delegated") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Scheduled") / "scheduled") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Maybe") / "maybe") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Reference") / "reference") >> If(User.isLoggedIn _, "請先登入")
+            (Menu.i("Reference") / "reference") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Preference") / "preference") >> If(User.isLoggedIn _, "請先登入")
         )
 
         LiftRules.setSiteMap(siteMap)
