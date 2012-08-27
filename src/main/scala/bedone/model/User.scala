@@ -3,6 +3,7 @@ package org.bedone.model
 import net.liftweb.common.{Box, Full, Empty, Failure}
 
 import net.liftweb.util.FieldError
+import net.liftweb.util.Helpers._
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
@@ -99,5 +100,10 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
     def login(postAction: => Any = ()) {
         CurrentUser.set(Full(this))
         postAction
+    }
+
+    def avatarURL = {
+        val avatarHash = hexEncode(md5(email.is.trim.toLowerCase.getBytes))
+        "http://www.gravatar.com/avatar/%s?d=mm" format(avatarHash)
     }
 }

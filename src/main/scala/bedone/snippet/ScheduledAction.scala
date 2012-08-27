@@ -21,15 +21,13 @@ import org.joda.time._
 
 class ScheduledAction extends JSImplicit
 {
-    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-    lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+    private lazy val currentUser = CurrentUser.get.get
+    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "scheduledWeekTab"
-
-    val currentUser = CurrentUser.get.get
-
 
     def scheduledAction = Scheduled.findByUser(currentUser).openOr(Nil)
     def todayAction = scheduledAction.filter(isToday)
