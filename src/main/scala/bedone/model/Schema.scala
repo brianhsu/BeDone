@@ -13,7 +13,6 @@ object BeDoneSchema extends Schema
     val users = table[User]("Users")
     val stuffs = table[Stuff]("Stuffs")
 
-
     val maybes = table[Maybe]("Maybes")
     val actions = table[Action]("Actions")
     val scheduleds = table[Scheduled]("Scheduled")
@@ -23,6 +22,8 @@ object BeDoneSchema extends Schema
     val topics = table[Topic]("Topics")
     val contacts = table[Contact]("Contacts")
     val contexts = table[Context]("Contexts")
+
+    val gmailPreference = table[GMailPreference]("GMailPreference")
 
     // Many to Many Relations
     val stuffTopics = manyToManyRelation(stuffs, topics).via[StuffTopic](
@@ -55,6 +56,7 @@ object BeDoneSchema extends Schema
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
     oneToManyRelation(users, contexts).via { (u, c) => u.id === c.userID }
+    oneToManyRelation(users, gmailPreference).via { (u, g) => u.id === g.idField }
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.idField }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }

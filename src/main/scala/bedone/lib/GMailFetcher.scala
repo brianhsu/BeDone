@@ -2,6 +2,7 @@ package org.bedone.lib
 
 import org.bedone.model.Stuff
 import org.bedone.model.User
+import org.bedone.model.GMailPreference
 
 import net.liftweb.squerylrecord.RecordTypeMode._
 
@@ -18,8 +19,13 @@ import com.google.code.javax.mail.Multipart
 
 object GMailFetcher
 {
-    def apply(user: User): Option[GMailFetcher] = {
-        None
+    def apply(user: User): Option[GMailFetcher] = inTransaction {
+
+        GMailPreference.findByUser(user).filter(_.usingGMail.is).map { setting =>
+            val plainPassword = PasswordHelper.decrypt(setting.password.is).get
+            new GMailFetcher(user.idField.is, setting.username.is, plainPassword)
+        }.toOption
+
     }
 }
 

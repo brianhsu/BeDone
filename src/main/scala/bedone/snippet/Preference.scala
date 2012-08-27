@@ -17,19 +17,23 @@ import java.text.SimpleDateFormat
 class Preference extends JSImplicit
 {
     private lazy val currentUser = CurrentUser.get.get
+    private lazy val oldSetting = GMailPreference.findByUser(currentUser).toOption
 
-    private var gmailAccount: String = _
+    private var gmailAccount: String = oldSetting.map(_.username.is).getOrElse("")
     private var gmailPassword: String = _
-    private var usingGMail: Boolean = false
-
+    private var usingGMail: Boolean = oldSetting.map(_.usingGMail.is).getOrElse(false)
 
     def saveGMail() =
     {
-        println("GMailAccount:" + gmailAccount)
-        println("GMailPassword:" + gmailPassword)
-        println("gmailCheckbox:" + usingGMail)
+        def getGMailPassword = {
+            if (gmailPassword.length == 0) {
+                oldSetting.flatMap(x => PasswordHelper.decrypt(x.password.is)).getOrElse("")
+            } else {
+                gmailPassword
+            }
+        }
 
-        def updateStatusFailedJS(error: Throwable): JsCmd = 
+        def updateStatusFailed(error: Throwable): JsCmd = 
         {
             val errorMessage = error.getMessage
             val reason = if (errorMessage.contains("Invalid credentials")) {
@@ -44,18 +48,27 @@ class Preference extends JSImplicit
             """$('#gmailStatus').text('連線失敗，%s')""".format(reason)
         }
 
-        def updateStatusOKJS: JsCmd =
+        def updateStatusOK: JsCmd =
         {
-            println("OK")
+            val encryptedPassword = PasswordHelper.encrypt(gmailPassword)
+            val preference = GMailPreference.findByUser(currentUser)
+                                            .openOr(GMailPreference.createRecord)
+
+            preference.idField(currentUser.idField.is)
+                      .username(gmailAccount)
+                      .password(encryptedPassword)
+                      .usingGMail(usingGMail)
+                      .saveTheRecord()
+
             """$('#gmailStatus').attr('class', 'label label-success')""" &
             """$('#gmailStatus').text('連線成功，已儲存設定')"""
         }
 
-        val fetcher = new GMailFetcher(currentUser.idField.is, gmailAccount, gmailPassword)
+        val fetcher = new GMailFetcher(currentUser.idField.is, gmailAccount, getGMailPassword)
 
         fetcher.validate match {
-            case Some(error) => updateStatusFailedJS(error)
-            case None        => updateStatusOKJS
+            case Some(error) => updateStatusFailed(error)
+            case None        => updateStatusOK
         }
 
     }
