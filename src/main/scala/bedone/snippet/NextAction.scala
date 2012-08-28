@@ -208,7 +208,7 @@ class NextAction extends JSImplicit
             actionBar(action) &
             ".action [id]"    #> ("action" + action.idField) &
             ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
-            ".title *"        #> stuff.title &
+            ".title *"        #> stuff.title.is &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
@@ -235,7 +235,7 @@ class NextAction extends JSImplicit
         val cssBinding = 
             "li [class]"  #> activtedStyle &
             "li [id]"     #> contextTabID &
-            "a *"         #> context.title &
+            "a *"         #> context.title.is &
             "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
 
         cssBinding(<li class="actionTab"><a href="#">@ Home</a></li>)

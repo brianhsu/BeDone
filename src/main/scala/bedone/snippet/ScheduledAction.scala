@@ -141,7 +141,7 @@ class ScheduledAction extends JSImplicit
             actionBar(scheduled) &
             ".scheduled [id]"    #> ("scheduled" + action.idField) &
             ".collapse [id]"  #> ("scheduledDesc" + action.stuff.idField) &
-            ".title *"        #> stuff.title &
+            ".title *"        #> stuff.title.is &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &

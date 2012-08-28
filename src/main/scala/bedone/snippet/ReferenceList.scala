@@ -145,7 +145,7 @@ class ReferenceList extends JSImplicit
             actionBar(stuff) &
             ".reference [id]" #> ("reference" + stuff.idField) &
             ".collapse [id]"  #> ("referenceDesc" + stuff.idField) &
-            ".title *"        #> stuff.title &
+            ".title *"        #> stuff.title.is &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
