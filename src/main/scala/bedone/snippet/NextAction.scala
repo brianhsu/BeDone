@@ -187,13 +187,11 @@ class NextAction extends JSImplicit
                     .map(createActionRow).flatten
 
         val notDoneHTML = notDoneList.map(createActionRow).flatten
-        val contextTab = contexts.map(createContextTab)
 
         JqEmpty("actionIsDone") &
         JqEmpty("actionNotDone") &
         JqSetHtml("actionIsDone", doneHTML) &
-        JqSetHtml("actionNotDone", notDoneHTML) &
-        JqSetHtml("actionTabFolder", contextTab.flatten)
+        JqSetHtml("actionNotDone", notDoneHTML)
     }
 
     def createActionRow(action: Action) = 
@@ -232,13 +230,11 @@ class NextAction extends JSImplicit
     {
         val contextTabID = ("actionTab" + context.idField.is)
         val activtedStyle = if (currentContext == Some(context)) "active" else ""
-        val cssBinding = 
-            "li [class]"  #> activtedStyle &
-            "li [id]"     #> contextTabID &
-            "a *"         #> context.title.is &
-            "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
 
-        cssBinding(<li class="actionTab"><a href="#">@ Home</a></li>)
+        "li [class]"  #> activtedStyle &
+        "li [id]"     #> contextTabID &
+        "a *"         #> context.title.is &
+        "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
     }
 
     def render = 
@@ -249,6 +245,6 @@ class NextAction extends JSImplicit
         "#actionShowAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#actionIsDone *"  #> doneActions.flatMap(createActionRow) &
         "#actionNotDone *" #> notDoneActions.flatMap(createActionRow) &
-        "#actionTabFolder *" #> contexts.map(createContextTab).flatten
+        ".actionTab" #> contexts.map(createContextTab)
     }
 }
