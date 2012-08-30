@@ -22,6 +22,15 @@ trait JSImplicit
 
     object FadeOutAndRemove
     {
+        def byClassName(className: String, timespan: Int = 500): JsCmd = 
+        {
+            """
+                $('.%s').fadeOut(%d, function() {
+                    $('.%s').remove()
+                })
+            """.format(className, timespan, className)
+        }
+
         def apply(id: String, timespan: Int = 500): JsCmd = 
             """
                 $('#%s').fadeOut(%d, function() { 

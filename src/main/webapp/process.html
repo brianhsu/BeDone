@@ -10,196 +10,198 @@
         <div data-lift="lift:embed?what=menu"></div>
       </div>
 
-      <div class="dialog" id="isThisActionable">
-        <div class="messageBox">
-          <div class="message">請問是否可以針對這件事採取具體的行動？</div>
-          <div>
-            <button class="btn btn-info pull-left" disabled="disabled">上一步</button>
-            <div class="answers">
-              <button class="btn btn-inverse" id="isActionable">沒辦法</button>
-              <button class="btn btn-primary" id="notActionable">可以</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="itIsNotActionable">
-        <div class="messageBox">
-          <div class="message">那你覺得這件事情是……？</div>
-          <div>
-            <button id="back-itIsNotActionable" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-danger" id="isTrash">垃圾</button>
-              <button class="btn btn-inverse" id="isReference">參考資料</button>
-              <button class="btn btn-primary" id="isMaybe">也許有一天……</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="itIsReference">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:1em">這份參考資料屬於哪個專案或主題嗎？</div>
-            <div data-lift="lift:embed?what=process/projectInput"></div>
-            <div data-lift="lift:embed?what=process/topicInput"></div>
-          </div>
-          <div>
-            <button id="back-itIsReference" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="saveReference">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="itIsMaybe">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:1em">這件事是屬於某個專案或主題嗎？</div>
-            <div data-lift="lift:embed?what=process/projectInput"></div>
-            <div data-lift="lift:embed?what=process/topicInput"></div>
-          </div>
-          <div>
-            <button id="back-itIsMaybe" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-primary" id="addTickler">記得提醒我……</button>
-              <button class="btn btn-success" id="saveMaybe">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="itIsMaybeTickler">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:1em">請問要在什麼時候把這件事放回收件匣呢？</div>
-            <div>在這個一天提醒我：<input type="text" name="ticklerDate" /></div>
-          </div>
-          <div>
-            <button id="back-itIsMaybeTickler" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="saveMaybeTickler">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="whatIsNextAction">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" type="text" /></div>
-            <div style="margin-bottom:0.5em">另外，這件事是屬於某個專案或主題嗎？</div>
-            <div data-lift="lift:embed?what=process/projectInput"></div>
-            <div data-lift="lift:embed?what=process/topicInput"></div>
-          </div>
-          <div>
-            <button id="back-whatIsNextAction" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-primary" id="">下一步</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="isThisTwoMiniuteWork">
-        <div class="messageBox">
-          <div class="message">
-            <div>這件事可以在兩分鐘之內完成嗎？</div>
-          </div>
-          <div>
-            <button id="back-isThisTwoMiniuteWork" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-inverse" id="notTwoMinitueWork">不行</button>
-              <button class="btn btn-primary" id="isTwoMinitueWork">可以</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="itIsTwoMiniuteWork">
-        <div class="messageBox">
-          <div class="message">
-            <div>那還等什麼，現在就去把它解決掉唄！</div>
-          </div>
-          <div>
-            <button id="back-itIsTwoMiniuteWork" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="markAsDone">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="whatActionType">
-        <div class="messageBox">
-          <div class="message">
-            <div>我覺得這件事情應該……</div>
-          </div>
-          <div>
-            <button id="back-whatActionType" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-primary" id="isDelegated">交給別人做</button>
-              <button class="btn btn-primary" id="isScheduled">放到行事曆上</button>
-              <button class="btn btn-primary" id="isNextAction">盡快自己完成</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="isDelegated">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
-            <div>這件事交給：
-              <div class="inline">
-                <div class="input-prepend">
-                  <span class="add-on"><i class="icon-user"></i></span><input name="contactInput" type="text" />
-                </div>
+      <div data-lift="Process?eager_eval=true">
+        <div id="noStuffAlert" class="alert alert-success"><h3>耶！沒有雜事需要整理耶！</h3></div>
+        <div class="dialog" id="isThisActionable">
+          <div class="messageBox">
+            <div class="message">請問是否可以針對這件事採取具體的行動？</div>
+            <div>
+              <button class="btn btn-info pull-left" disabled="disabled">上一步</button>
+              <div class="answers">
+                <button class="btn btn-inverse" id="isActionable">沒辦法</button>
+                <button class="btn btn-primary" id="notActionable">可以</button>
               </div>
             </div>
           </div>
-          <div>
-            <button id="back-isDelegated" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="saveDelegated">搞定！</button>
+        </div>
+
+        <div class="dialog" id="itIsNotActionable">
+          <div class="messageBox">
+            <div class="message">那你覺得這件事情是……？</div>
+            <div>
+              <button id="back-itIsNotActionable" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-danger" id="isTrash">垃圾</button>
+                <button class="btn btn-inverse" id="isReference">參考資料</button>
+                <button class="btn btn-primary" id="isMaybe">也許有一天……</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="itIsReference">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">這份參考資料屬於哪個專案或主題嗎？</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button id="back-itIsReference" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveReference">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="itIsMaybe">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">這件事是屬於某個專案或主題嗎？</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button id="back-itIsMaybe" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" id="addTickler">記得提醒我……</button>
+                <button class="btn btn-success" id="saveMaybe">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="itIsMaybeTickler">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">請問要在什麼時候把這件事放回收件匣呢？</div>
+              <div>在這個一天提醒我：<input type="text" name="ticklerDate" /></div>
+            </div>
+            <div>
+              <button id="back-itIsMaybeTickler" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveMaybeTickler">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="whatIsNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" type="text" /></div>
+              <div style="margin-bottom:0.5em">另外，這件事是屬於某個專案或主題嗎？</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button id="back-whatIsNextAction" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" id="">下一步</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="isThisTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>這件事可以在兩分鐘之內完成嗎？</div>
+            </div>
+            <div>
+              <button id="back-isThisTwoMiniuteWork" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-inverse" id="notTwoMinitueWork">不行</button>
+                <button class="btn btn-primary" id="isTwoMinitueWork">可以</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="itIsTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>那還等什麼，現在就去把它解決掉唄！</div>
+            </div>
+            <div>
+              <button id="back-itIsTwoMiniuteWork" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="markAsDone">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="whatActionType">
+          <div class="messageBox">
+            <div class="message">
+              <div>我覺得這件事情應該……</div>
+            </div>
+            <div>
+              <button id="back-whatActionType" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" id="isDelegated">交給別人做</button>
+                <button class="btn btn-primary" id="isScheduled">放到行事曆上</button>
+                <button class="btn btn-primary" id="isNextAction">盡快自己完成</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="isDelegated">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
+              <div>這件事交給：
+                <div class="inline">
+                  <div class="input-prepend">
+                    <span class="add-on"><i class="icon-user"></i></span><input name="contactInput" type="text" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button id="back-isDelegated" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveDelegated">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="isScheduled">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事情在行事曆上要如何記載？</div>
+              <div class="inline" style="margin-right:1em">開始時間：<input name="startDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">結束時間：<input name="endDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">地點：<input name="location" type="text"/></div>
+            </div>
+            <div>
+              <button id="back-isScheduled" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveDelegated">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog" id="isNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事情適合在哪種情境下執行呢？</div>
+              <div data-lift="lift:embed?what=process/contextInput"></div>
+            </div>
+            <div>
+              <button id="back-isNextAction" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveNextAction">搞定！</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="dialog" id="isScheduled">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:0.5em">請問這件事情在行事曆上要如何記載？</div>
-            <div class="inline" style="margin-right:1em">開始時間：<input name="startDateTime" type="text"/></div>
-            <div class="inline" style="margin-right:1em">結束時間：<input name="endDateTime" type="text"/></div>
-            <div class="inline" style="margin-right:1em">地點：<input name="location" type="text"/></div>
-          </div>
-          <div>
-            <button id="back-isScheduled" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="saveDelegated">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dialog" id="isNextAction">
-        <div class="messageBox">
-          <div class="message">
-            <div style="margin-bottom:0.5em">請問這件事情適合在哪種情境下執行呢？</div>
-            <div data-lift="lift:embed?what=process/contextInput"></div>
-          </div>
-          <div>
-            <button id="back-isNextAction" class="btn btn-info pull-left">上一步</button>
-            <div class="answers">
-              <button class="btn btn-success" id="saveNextAction">搞定！</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
 
     </div>
   </body>

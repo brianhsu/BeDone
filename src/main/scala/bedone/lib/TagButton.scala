@@ -20,21 +20,21 @@ object TagButton
 
     object Implicit {
         implicit def fromTopic(topic: Topic) = 
-            new TagViewButton(topicView, topic, topic.title.is)
+            new TagViewButton(topicView, topic, topic.title.is, "topic" + topic.idField.is)
 
         implicit def fromProject(project: Project) = 
-            new TagViewButton(projectView, project, project.title.is)
+            new TagViewButton(projectView, project, project.title.is, "project" + project.idField.is)
 
         implicit def fromContext(context: Context) = 
-            new TagViewButton(contextView, context, context.title.is)
+            new TagViewButton(contextView, context, context.title.is, "context" + context.idField.is)
 
         implicit def fromContact(contact: Contact) = 
-            new TagViewButton(contactView, contact, contact.name.is)
+            new TagViewButton(contactView, contact, contact.name.is, "contact" + contact.idField.is)
 
     }
 }
 
-class TagViewButton[T](template: Box[NodeSeq], data: T, title: String)
+class TagViewButton[T](template: Box[NodeSeq], data: T, title: String, className: String)
 {
     type OnClick = (String, T) => JsCmd
     type OnRemove = (String, T) => JsCmd
@@ -43,6 +43,7 @@ class TagViewButton[T](template: Box[NodeSeq], data: T, title: String)
         val buttonID = randomString(20)
         val cssBinding =
             "div [id]" #> buttonID &
+            "div [class+]" #> className &
             "div [onclick]" #> SHtml.onEvent(s => onClick(buttonID, data)) &
             ".title *" #> title &
             ".icon-remove" #> ""
@@ -54,6 +55,7 @@ class TagViewButton[T](template: Box[NodeSeq], data: T, title: String)
         val buttonID = randomString(20)
         val cssBinding =
             "div [id]" #> buttonID &
+            "div [class+]" #> className &
             "div [onclick]" #> SHtml.onEvent(s => onClick(buttonID, data)) &
             ".title *" #> title &
             ".icon-remove [onclick]" #> SHtml.onEvent(s => onRemove(buttonID, data))
