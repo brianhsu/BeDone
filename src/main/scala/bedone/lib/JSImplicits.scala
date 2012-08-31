@@ -17,6 +17,10 @@ trait JSImplicit
 
     object ClearValue
     {
+        def byClassName(className: String): JsCmd = {
+            """$('.%s').each(function() {$(this).val('')})""".format(className)
+        }
+
         def apply(id: String): JsCmd = """$('#%s').val('')""".format(id)
     }
 

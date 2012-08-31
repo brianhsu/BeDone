@@ -138,6 +138,9 @@ div.rapidEntry form {
 .dialog .message {
   margin-bottom: 1em;
 }
+.dialog .message form {
+  margin: 0em;
+}
 .dialog .messageBox {
   margin: 0.5em;
 }

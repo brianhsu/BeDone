@@ -203,6 +203,26 @@
         </div>
       </div>
 
+      <script type="text/javascript">
+        
+          $(".projectInput").autocomplete({
+              source: "/autocomplete/project",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
+              }
+          });
+
+          $(".topicInput").autocomplete({
+              source: "/autocomplete/topic",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
+              }
+          });
+
+      </script>
+
     </div>
   </body>
 </html>

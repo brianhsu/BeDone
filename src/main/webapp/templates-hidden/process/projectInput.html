@@ -1,9 +1,12 @@
-<div>
+<form action="." data-lift="lift:Form.ajax" class="projectForm">
   專案：
   <div class="inline">
     <div class="input-prepend">
-      <span class="add-on"><i class="icon-folder-open"></i></span><input name="projectInput" type="text" />
+      <span class="add-on"><i class="icon-folder-open"></i></span><input name="projectInput" type="text" class="projectInput"/>
     </div>
   </div>
-  <div class="projectTags inline"></div>
-</div>
+  <input type="hidden" class="projectInputHidden" />
+  <div class="projectTags inline">
+    <span class="inline">Tag1</span>
+  </div>
+</form>
