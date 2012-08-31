@@ -25,6 +25,7 @@ class Process extends JSImplicit
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)
 
     private var projectTitle: Option[String] = None
+    private var topicTitle: Option[String] = None
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -41,8 +42,8 @@ class Process extends JSImplicit
         FadeOutAndRemove.byClassName("topic" + topic.idField.is)
     }
 
-    def saveReference(stuff: Stuff, valueAttr: String) = 
-    {
+    def saveReference(stuff: Stuff, valueAttr: String) = {
+
         stuff.setTopics(currentTopics)
         stuff.setProjects(currentProjects)
         stuff.stuffType(StuffType.Reference)
@@ -51,8 +52,8 @@ class Process extends JSImplicit
         S.redirectTo("/process", () => S.notice("已將「%s」加入參考資料" format(stuff.title.is)))
     }
 
-    def markAsTrash(stuff: Stuff, valueAttr: String) = 
-    {
+    def markAsTrash(stuff: Stuff, valueAttr: String) = {
+
         stuff.isTrash(true).saveTheRecord()
         S.redirectTo("/process", () => S.notice("已刪除「%s」" format(stuff.title.is)))
     }
@@ -78,16 +79,44 @@ class Process extends JSImplicit
     }
 
     def addProject(): JsCmd = {
-        
+
         projectTitle match {
             case None        => Noop
             case Some(title) => addProject(title)
         }
     }
     
+    def addTopic(title: String): JsCmd = {
+        val containers = List("referenceTopic", "maybeTopic", "nextActionTopic")
+        val userID = CurrentUser.get.get.idField.is
+
+        def createTopic = Topic.createRecord.userID(userID).title(title)
+        def topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
+
+        currentTopics.contains(topic) match {
+            case true  => ClearValue.byClassName("topicInput")
+            case false =>
+                currentTopics ::= topic
+
+                ClearValue.byClassName("topicInput") &
+                containers.map { htmlID => 
+                    AppendHtml(htmlID, topic.editButton(onTopicClick, onTopicRemove))
+                }
+        }
+    }
+
+    def addTopic(): JsCmd = {
+        topicTitle match {
+            case None        => Noop
+            case Some(title) => addTopic(title)
+        }
+    }
+
     def createTopicTags(containerID: String) =
     {
-        ".topicTags [id]" #> containerID &
+        "name=topicInput"   #> SHtml.text("", topicTitle = _) &
+        ".topicInputHidden" #> SHtml.hidden(addTopic) &
+        ".topicTags [id]"   #> containerID &
         ".topicTags" #> (
             "span" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
         )
@@ -95,9 +124,9 @@ class Process extends JSImplicit
 
     def createProjectTags(containerID: String) =
     {
-        "name=projectInput" #> SHtml.text("", projectTitle = _) &
+        "name=projectInput"   #> SHtml.text("", projectTitle = _) &
         ".projectInputHidden" #> SHtml.hidden(addProject) &
-        ".projectTags [id]" #> containerID &
+        ".projectTags [id]"   #> containerID &
         ".projectTags" #> (
             "span" #> currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         )
