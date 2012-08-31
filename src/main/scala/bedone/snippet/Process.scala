@@ -26,6 +26,7 @@ class Process extends JSImplicit
     private var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)
 
+    private var contactName: Option[String] = None
     private var projectTitle: Option[String] = None
     private var topicTitle: Option[String] = None
     private var actionTitle: Option[String] = stuff.map(_.title.is)
@@ -34,18 +35,50 @@ class Process extends JSImplicit
     def onProjectClick(buttonID: String, project: Project) = Noop
 
     def onProjectRemove(buttonID: String, project: Project): JsCmd = {
-        currentProjects = currentProjects.filterNot(_ == project)
 
+        currentProjects = currentProjects.filterNot(_ == project)
         FadeOutAndRemove.byClassName("project" + project.idField.is)
     }
 
     def onTopicRemove(buttonID: String, topic: Topic): JsCmd = {
-        currentTopics = currentTopics.filterNot(_ == topic)
 
+        currentTopics = currentTopics.filterNot(_ == topic)
         FadeOutAndRemove.byClassName("topic" + topic.idField.is)
     }
 
-    def saveReference(stuff: Stuff, valueAttr: String) = {
+    def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
+
+        def createContact = 
+            Contact.createRecord.userID(currentUser.idField.is).name(contactName.get)
+
+        contactName match {
+            case None => Alert("負責人為必填欄位")
+            case Some(name) =>
+                stuff.setTopics(currentTopics)
+                stuff.setProjects(currentProjects)
+                stuff.stuffType(StuffType.Delegated)
+                stuff.saveTheRecord()
+
+                val contact = Contact.findByName(currentUser, name)
+                                     .openOr(createContact)
+                                     .saveTheRecord().get
+
+                val action = Action.createRecord.idField(stuff.idField.is)
+                                   .doneTime(Calendar.getInstance)
+                                   .saveTheRecord().get
+
+                val delegated = Delegated.createRecord.idField(stuff.idField.is)
+                                         .contactID(contact.idField.is)
+                                         .saveTheRecord()
+                
+                S.redirectTo(
+                    "/process", () => S.notice("已將「%s」加入指派清單" format(stuff.title.is))
+                )
+               
+        }
+    }
+
+    def saveReference(stuff: Stuff)(valueAttr: String) = {
 
         stuff.setTopics(currentTopics)
         stuff.setProjects(currentProjects)
@@ -65,9 +98,7 @@ class Process extends JSImplicit
 
     def markAsDone(stuff: Stuff)(valueAttr: String) = {
 
-        println("Title: " + actionTitle)
-        
-        stuff.title.setBox(actionTitle)
+        stuff.title(actionTitle.getOrElse(stuff.title.is))
         stuff.stuffType(StuffType.Action)
         stuff.setProjects(currentProjects)
         stuff.setTopics(currentTopics)
@@ -156,11 +187,23 @@ class Process extends JSImplicit
 
     def doNothing(s: String) {}
 
-    def setTitle(title: String) = {
-        println("Set Title: " + title)
+    def setContact(name: String): JsCmd = {
+        this.contactName = name
+        this.contactName match {
+            case None    => "$('#saveDelegated').attr('disabled', true)"
+            case Some(t) => "$('#saveDelegated').attr('disabled', false)"
+        }
+    }
+
+    def setTitle(title: String): JsCmd = {
+
+        val stuffTitle = stuff.map(_.title.is).getOrElse("")
+
         this.actionTitle = title
-        println("ActionTitle:" + actionTitle)
-        Noop
+        this.actionTitle match {
+            case None       => "$('#nextActionTitle').val('%s');".format(stuffTitle)
+            case Some(text) => Noop
+        }
     }
 
     def hasStuffBinding(stuff: Stuff) = 
@@ -168,10 +211,14 @@ class Process extends JSImplicit
         "#noStuffAlert" #> "" &
         "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
         "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
+        "#isDelegated" #> (
+            ".contactInput" #> SHtml.textAjaxTest("", doNothing _, setContact _) &
+            "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
+        ) &
         "#itIsReference" #> (
             createTopicTags("referenceTopic") &
             createProjectTags("referenceProject") &
-            "#saveReference [onclick]" #> SHtml.onEvent(saveReference(stuff, _))
+            "#saveReference [onclick]" #> SHtml.onEvent(saveReference(stuff))
         ) &
         "#itIsMaybe" #> (
             createTopicTags("maybeTopic") &

@@ -90,7 +90,7 @@
         <div class="dialog" id="whatIsNextAction">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" type="text" /></div>
+              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" id="nextActionTitle" type="text" /></div>
               <div style="margin-bottom:0.5em">另外，這件事是屬於某個專案或主題嗎？</div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
@@ -155,16 +155,19 @@
               <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
               <div>這件事交給：
                 <div class="inline">
-                  <div class="input-prepend">
-                    <span class="add-on"><i class="icon-user"></i></span><input name="contactInput" type="text" />
-                  </div>
+                  <form data-lift="lift:Form.ajax">
+                    <div class="input-prepend">
+                      <span class="add-on"><i class="icon-user"></i></span><input class="contactInput" type="text" />
+                    </div>
+                    <input class="contactInputHidden" type="hidden" />
+                  </form>
                 </div>
               </div>
             </div>
             <div>
               <button id="back-isDelegated" class="btn btn-info pull-left">上一步</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveDelegated">搞定！</button>
+                <button class="btn btn-success" id="saveDelegated" disabled="disabled">搞定！</button>
               </div>
             </div>
           </div>
@@ -218,6 +221,14 @@
               select: function(event, ui) { 
                   $(this).val(ui.item.label)
                   $(this).closest("form").submit()
+              }
+          });
+
+          $(".contactInput").autocomplete({
+              source: "/autocomplete/contact",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).blur()
               }
           });
 
