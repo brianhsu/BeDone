@@ -3,6 +3,8 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import TagButton.Implicit._
+
 import net.liftweb.util.Helpers._
 
 import net.liftweb.http.S
@@ -11,7 +13,7 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
 
-import TagButton.Implicit._
+import java.util.Calendar
 
 class Process extends JSImplicit
 {
@@ -19,13 +21,14 @@ class Process extends JSImplicit
 
     private lazy val currentUser = CurrentUser.is.get
     private lazy val stuff = Stuff.findByUser(currentUser).openOr(Nil)
-                                  .filterNot(_.isTrash.is)headOption
+                                  .filterNot(_.isTrash.is).headOption
 
     private var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)
 
     private var projectTitle: Option[String] = None
     private var topicTitle: Option[String] = None
+    private var actionTitle: Option[String] = stuff.map(_.title.is)
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -49,13 +52,32 @@ class Process extends JSImplicit
         stuff.stuffType(StuffType.Reference)
         stuff.saveTheRecord()
 
-        S.redirectTo("/process", () => S.notice("已將「%s」加入參考資料" format(stuff.title.is)))
+        S.redirectTo(
+            "/process", () => S.notice("已將「%s」加入參考資料" format(stuff.title.is))
+        )
     }
 
-    def markAsTrash(stuff: Stuff, valueAttr: String) = {
+    def markAsTrash(stuff: Stuff)(valueAttr: String) = {
 
         stuff.isTrash(true).saveTheRecord()
         S.redirectTo("/process", () => S.notice("已刪除「%s」" format(stuff.title.is)))
+    }
+
+    def markAsDone(stuff: Stuff)(valueAttr: String) = {
+
+        println("Title: " + actionTitle)
+        
+        stuff.title.setBox(actionTitle)
+        stuff.stuffType(StuffType.Action)
+        stuff.setProjects(currentProjects)
+        stuff.setTopics(currentTopics)
+        stuff.saveTheRecord()
+
+        Action.createRecord.idField(stuff.idField.is)
+              .isDone(true).doneTime(Calendar.getInstance)
+              .saveTheRecord()
+
+        S.redirectTo("/process", () => S.notice("已將「%s」標記為完成" format(stuff.title.is)))
     }
 
     def addProject(title: String): JsCmd = {
@@ -132,15 +154,24 @@ class Process extends JSImplicit
         )
     }
 
+    def doNothing(s: String) {}
+
+    def setTitle(title: String) = {
+        println("Set Title: " + title)
+        this.actionTitle = title
+        println("ActionTitle:" + actionTitle)
+        Noop
+    }
+
     def hasStuffBinding(stuff: Stuff) = 
     {
         "#noStuffAlert" #> "" &
-        "name=nextActionTitle [value]" #> stuff.title.is &
-        "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff, _)) &
-        "#saveReference [onclick]" #> SHtml.onEvent(saveReference(stuff, _)) &
+        "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
+        "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
         "#itIsReference" #> (
             createTopicTags("referenceTopic") &
-            createProjectTags("referenceProject")
+            createProjectTags("referenceProject") &
+            "#saveReference [onclick]" #> SHtml.onEvent(saveReference(stuff, _))
         ) &
         "#itIsMaybe" #> (
             createTopicTags("maybeTopic") &
@@ -148,10 +179,10 @@ class Process extends JSImplicit
         ) &
         "#whatIsNextAction" #> (
             createTopicTags("nextActionTopic") &
-            createProjectTags("nextActionProject")
+            createProjectTags("nextActionProject") &
+            "name=nextActionTitle" #> 
+                SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         )
-
-
     }
 
     def noStuffBinding = 
