@@ -30,7 +30,7 @@ object GMailPreference extends GMailPreference with MetaRecord[GMailPreference]
 
     def findByUser(user: User): Box[GMailPreference] = findByUser(user.idField.is)
     def findByUser(userID: Int): Box[GMailPreference] = tryo {
-        BeDoneSchema.gmailPreference.where(_.idField === userID).single
+        BeDoneSchema.gmailPreferences.where(_.idField === userID).single
     }
 }
 
@@ -47,8 +47,8 @@ class GMailPreference extends Record[GMailPreference] with KeyedRecord[Int]
 
     override def saveTheRecord() = tryo {
         this.isPersisted match {
-            case true  => BeDoneSchema.gmailPreference.update(this)
-            case false => BeDoneSchema.gmailPreference.insert(this)
+            case true  => BeDoneSchema.gmailPreferences.update(this)
+            case false => BeDoneSchema.gmailPreferences.insert(this)
         }
 
         this

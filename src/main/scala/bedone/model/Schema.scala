@@ -23,7 +23,7 @@ object BeDoneSchema extends Schema
     val contacts = table[Contact]("Contacts")
     val contexts = table[Context]("Contexts")
 
-    val gmailPreference = table[GMailPreference]("GMailPreference")
+    val gmailPreferences = table[GMailPreference]("GMailPreference")
 
     // Many to Many Relations
     val stuffTopics = manyToManyRelation(stuffs, topics).via[StuffTopic](
@@ -51,12 +51,19 @@ object BeDoneSchema extends Schema
     on(contexts) { context => declare(columns(context.userID, context.title) are unique)}
     on(contacts) { contact => declare(columns(contact.userID, contact.name) are unique)}
 
+    on(maybes)     { maybe => declare(maybe.idField is primaryKey) }
+    on(actions)    { action => declare(action.idField is primaryKey) }
+    on(scheduleds) { scheduled => declare(scheduled.idField is primaryKey) }
+    on(delegateds) { delegated => declare(delegated.idField is primaryKey) }
+    on(gmailPreferences) { preference => declare(preference.idField is primaryKey) }
+
+
     // One-to-Many Foreign Keys
     oneToManyRelation(users, stuffs).via { (u, s) => u.id === s.userID }
     oneToManyRelation(users, topics).via { (u, t) => u.id === t.userID }
     oneToManyRelation(users, projects).via { (u, p) => u.id === p.userID }
     oneToManyRelation(users, contexts).via { (u, c) => u.id === c.userID }
-    oneToManyRelation(users, gmailPreference).via { (u, g) => u.id === g.idField }
+    oneToManyRelation(users, gmailPreferences).via { (u, g) => u.id === g.idField }
 
     oneToManyRelation(stuffs, maybes).via { (s, m) => s.id === m.idField }
     oneToManyRelation(stuffs, actions).via { (s, a) => s.id === a.idField }
