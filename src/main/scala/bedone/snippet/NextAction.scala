@@ -243,8 +243,8 @@ class NextAction extends JSImplicit
 
         ClearClearable &
         "#actionShowAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#actionIsDone *"  #> doneActions.flatMap(createActionRow) &
-        "#actionNotDone *" #> notDoneActions.flatMap(createActionRow) &
+        "#actionIsDone"  #> (".row" #> doneActions.map(createActionRow)) &
+        "#actionNotDone" #> (".row" #> notDoneActions.map(createActionRow)) &
         ".actionTab" #> contexts.map(createContextTab)
     }
 }
