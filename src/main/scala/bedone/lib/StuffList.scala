@@ -78,7 +78,10 @@ trait StuffList extends JSImplicit
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
     {
-        val newTable = createStuffTable(topic.stuffs)
+        val stuffs = topic.stuffs
+        val newTable = createStuffTable(stuffs)
+
+        println("stuffs of Topic(%d): %s" format(topic.idField.is, stuffs))
 
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", topic.title.is) &
@@ -88,7 +91,10 @@ trait StuffList extends JSImplicit
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
     {
-        val newTable = createStuffTable(project.stuffs)
+        val stuffs = project.stuffs
+        val newTable = createStuffTable(stuffs)
+
+        println("stuffs of Project(%d): %s" format(project.idField.is, stuffs))
 
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", project.title.is) &
@@ -166,9 +172,9 @@ trait StuffList extends JSImplicit
     {
         "#inboxShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#inboxAdd [onclick]" #> SHtml.onEvent(s => showInsertForm) &
-        "#inboxList *" #> completeStuffTable &
         "#inboxRapidStuff" #> SHtml.text("", rapidTitle = _) &
-        "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _)
+        "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _) &
+        ".inboxRow" #> completeStuffTable
     }
 }
 

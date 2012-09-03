@@ -2,6 +2,7 @@ package org.bedone.model
 
 import net.liftweb.common.Box
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.hashHex
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
@@ -46,6 +47,8 @@ class Contact extends Record[Contact] with KeyedRecord[Int]
     val email = new OptionalEmailField(this, 100)
     val address = new OptionalStringField(this, 255)
     val phone = new OptionalStringField(this, 20)
+
+    def className = "topic%d%s" format (userID.is, hashHex(name.is))
 
     def isDirty = allFields.exists(_.dirty_?)
 

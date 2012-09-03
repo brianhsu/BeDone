@@ -4,6 +4,7 @@ import net.liftweb.common.Box
 import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.hashHex
 
 import net.liftweb.util.FieldError
 
@@ -53,6 +54,8 @@ class Project extends Record[Project] with KeyedRecord[Int]
     def stuffs = 
         BeDoneSchema.stuffProjects.right(this)
                     .filter(_.stuffType.is == StuffType.Stuff).toList
+
+    def className = "project%d%s" format (userID.is, hashHex(title.is))
 
     override def saveTheRecord() = tryo(BeDoneSchema.projects.insert(this))
 }

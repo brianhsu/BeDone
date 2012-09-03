@@ -114,3 +114,33 @@ div.rapidEntry form {
 #gmail form {
   margin-left: -2em;
 }
+.dialog {
+  background: rgba(204, 204, 255, 0.5);
+  margin-bottom: 0.5em;
+  padding-top: 0.6em;
+  padding-bottom: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+}
+.dialog .answers {
+  text-align: right;
+  width: 100%;
+}
+.dialog .message {
+  margin-bottom: 1em;
+}
+.dialog .message form {
+  margin: 0em;
+}
+.dialog .messageBox {
+  margin: 0.5em;
+}

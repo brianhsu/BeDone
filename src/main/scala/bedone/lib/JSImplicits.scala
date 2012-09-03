@@ -17,11 +17,24 @@ trait JSImplicit
 
     object ClearValue
     {
+        def byClassName(className: String): JsCmd = {
+            """$('.%s').each(function() {$(this).val('')})""".format(className)
+        }
+
         def apply(id: String): JsCmd = """$('#%s').val('')""".format(id)
     }
 
     object FadeOutAndRemove
     {
+        def byClassName(className: String, timespan: Int = 500): JsCmd = 
+        {
+            """
+                $('.%s').fadeOut(%d, function() {
+                    $('.%s').remove()
+                })
+            """.format(className, timespan, className)
+        }
+
         def apply(id: String, timespan: Int = 500): JsCmd = 
             """
                 $('#%s').fadeOut(%d, function() { 

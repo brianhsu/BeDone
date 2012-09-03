@@ -11,7 +11,7 @@ seq(webSettings :_*)        // 使用 xsbt-web-plugin 的預設設定
 seq(lessSettings:_*)
 
 (LessKeys.filter in (Compile, LessKeys.less)) := 
-    ("bootstrap.less" || "styles.less" || "responsive.less")
+    ("bootstrap.less" || "responsive.less" || "custom.less")
 
 (resourceManaged in (Compile, LessKeys.less)) <<= 
     (sourceDirectory in Compile)(_ / "webapp" / "bootstrap" / "css")

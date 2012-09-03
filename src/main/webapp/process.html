@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+
+      <div data-lift="Process?eager_eval=true">
+        <div id="noStuffAlert" class="alert alert-success"><h3>耶！沒有雜事需要整理耶！</h3></div>
+        <div id="processEdit" class="editForm">
+          <div>
+            <fieldset id="processTitle" class="inline control-group">
+              <div class="input-prepend" style="margin-left: 0.5em">
+                <span title="標題" class="add-on">
+                  <i class="icon-th-list"></i>
+                </span><input class="input-xxlarge" type="text" placeholder="標題" />
+                <span id="processTitle_msg" class="help-inline"></span>
+              </div>
+            </fieldset>
+        
+            <div class="pull-right form-inline">
+              <div class="input-prepend" style="margin-right:0.5em;">
+                <form action="." data-lift="lift:Form.ajax">
+                  <span title="主題" class="add-on">
+                    <i class="icon-tags"></i>
+                  </span><input name="topicInput" class="input-medium topicInput" type="text" placeholder="主題" />
+                  <input type="hidden" class="topicInputHidden" />
+                </form>
+              </div>
+              <div class="input-prepend" style="margin-right: 0.5em">
+                <form action="." data-lift="lift:Form.ajax">
+                  <span title="專案" class="add-on">
+                    <i class="icon-folder-open"></i>
+                  </span><input name="projectInput" class="input-medium projectInput" type="text" placeholder="專案" />
+                  <input type="hidden" class="projectInputHidden" />
+                </form>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin: 0.5em; display: table; width: 98%">
+            <div class="projectTags" class="inline" style="float:right"><span>Tags</span></div>
+            <div class="topicTags" class="inline" style="float:right"><span>Tags</span></div>
+          </div>
+        
+          <div style="width: 100%">
+            <textarea rows="5" id="processEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+          </div>
+        </div>
+        <div class="dialog" id="isThisActionable">
+          <div class="messageBox">
+            <div class="message">請問是否可以針對這件事採取具體的行動？</div>
+            <div>
+              <button class="btn btn-info pull-left" disabled="disabled">上一步</button>
+              <div class="answers">
+                <button class="btn btn-inverse" onclick="showDialog('itIsNotActionable')">沒辦法</button>
+                <button class="btn btn-primary" onclick="showDialog('whatIsNextAction')">可以</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsNotActionable">
+          <div class="messageBox">
+            <div class="message">那你覺得這件事情是……？</div>
+            <div>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-danger" id="isTrash">垃圾</button>
+                <button class="btn btn-inverse" onclick="showDialog('itIsReference')">參考資料</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybe')">也許有一天……</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsReference">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">這份參考資料屬於哪個專案或主題嗎？</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveReference">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsMaybe">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">這件事是屬於某個專案或主題嗎？</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybeTickler')">記得提醒我……</button>
+                <button class="btn btn-success" id="saveMaybe">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsMaybeTickler">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">請問要在什麼時候把這件事放回收件匣呢？</div>
+              <div>在這個一天提醒我：<input type="text" id="ticklerDate" />
+                <span class="control-group error hide" id="tickler_error">
+                  <span class="help-inline" id="tickler_error_msg">提醒時間要比今天晚</span>
+                </span>
+              </div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsMaybe')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveMaybeTickler">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="whatIsNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" class="input-xxlarge" id="nextActionTitle" type="text" />
+              </div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+              <div class="input-prepend input-append">
+                <span class="add-on">完成期限：</span><input class="input-large" id="deadline" type="text" />
+                <span class="control-group error hide" id="deadline_error">
+                  <span class="help-inline" id="deadline_error_msg">完成期限要比今天晚</span>
+                </span>
+
+              </div>
+            </div>
+            <div>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" id="goToActionType" onclick="showDialog('isThisTwoMiniuteWork')">下一步</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isThisTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>這件事可以在兩分鐘之內完成嗎？</div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatIsNextAction')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-inverse" onclick="showDialog('whatActionType')">不行</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsTwoMiniuteWork')">可以</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>那還等什麼，現在就去把它解決掉唄！</div>
+            </div>
+            <div>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="markAsDone">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="whatActionType">
+          <div class="messageBox">
+            <div class="message">
+              <div>我覺得這件事情應該……</div>
+            </div>
+            <div>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-primary" onclick="showDialog('isDelegated')">交給別人做</button>
+                <button class="btn btn-primary" onclick="showDialog('isScheduled')">放到行事曆上</button>
+                <button class="btn btn-primary" onclick="showDialog('isNextAction')">盡快自己完成</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isDelegated">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
+              <div>
+                <div class="inline">
+                  <form data-lift="lift:Form.ajax">
+                    <div class="input-prepend">
+                      <span class="add-on"><i class="icon-user"></i> 負責人：</span><input class="contactInput" type="text" />
+                    </div>
+                    <input class="contactInputHidden" type="hidden" />
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveDelegated" disabled="disabled">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isScheduled">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事情在行事曆上要如何記載？</div>
+              <div class="inline" style="margin-right:1em">開始時間：<input id="startDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">結束時間：<input id="endDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">地點：<input id="location" type="text"/></div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveScheduled" disabled="disabled">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">請問這件事情適合在哪種情境下執行呢？</div>
+              <div data-lift="lift:embed?what=process/contextInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveNextAction">搞定！</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        
+          $(".projectInput").autocomplete({
+              source: "/autocomplete/project",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
+              }
+          });
+
+          $(".topicInput").autocomplete({
+              source: "/autocomplete/topic",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
+              }
+          });
+
+          $(".contactInput").autocomplete({
+              source: "/autocomplete/contact",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).blur()
+              }
+          });
+
+          $(".contextInput").autocomplete({
+              source: "/autocomplete/context",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
+              }
+          });
+
+          $( "#startDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#startDateTime").val(dateText)
+                  $("#startDateTime").blur()
+              }
+          });
+
+          $( "#endDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#endDateTime").val(dateText)
+                  $("#endDateTime").blur()
+              }
+          });
+
+          $( "#deadline" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#deadline").val(dateText)
+                  $("#deadline").blur()
+              }
+          });
+
+          $( "#ticklerDate" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#ticklerDate").val(dateText)
+                  $("#ticklerDate").blur()
+              }
+          });
+
+          function showDialog(id) {
+              $('.dialog').hide()
+              $('#' + id).show()
+          }
+
+      </script>
+
+    </div>
+  </body>
+</html>
+

@@ -4,6 +4,7 @@ import net.liftweb.common.Box
 import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.hashHex
 
 import net.liftweb.util.FieldError
 
@@ -56,6 +57,8 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
         BeDoneSchema.stuffTopics.right(this)
                     .filter(_.stuffType.is == StuffType.Stuff)toList
     }
+
+    def className = "topic%d%s" format (userID.is, hashHex(title.is))
 
     def addStuff(stuff: Stuff) = BeDoneSchema.stuffTopics.right(this).associate(stuff)
 }
