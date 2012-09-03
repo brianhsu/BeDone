@@ -160,12 +160,16 @@ trait StuffList extends JSImplicit
 
     def addRapidStuff(): JsCmd =
     {
-        val stuff = Stuff.createRecord.userID(currentUser.idField.is).title(rapidTitle)
+        if (rapidTitle.length > 0) {
+            val stuff = Stuff.createRecord.userID(currentUser.idField.is).title(rapidTitle)
 
-        stuff.saveTheRecord()
+            stuff.saveTheRecord()
 
-        """$('#inboxRapidStuff').val("")""" &
-        AppendHtml("inboxList", createStuffRow(stuff))
+            """$('#inboxRapidStuff').val("")""" &
+            AppendHtml("inboxList", createStuffRow(stuff))
+        } else {
+            Noop
+        }
     }
 
     def cssBinding = 

@@ -27,7 +27,7 @@ class NextAction extends JSImplicit
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
-    private var currentContext: Option[Context] = contexts.headOption
+    private var currentContext: Option[Context] = None
 
     def formatDoneTime(action: Action) = 
     {
@@ -233,8 +233,16 @@ class NextAction extends JSImplicit
 
         "li [class]"  #> activtedStyle &
         "li [id]"     #> contextTabID &
-        "a *"         #> context.title.is &
+        "a *"         #> ("@ " + context.title.is) &
         "a [onclick]" #> SHtml.onEvent(switchContext(context, _))
+    }
+
+    def showAllAction(attrValue: String) = {
+        this.currentContext = None
+
+        """$('.actionTab').removeClass('active')""" &
+        """$('#allActionTab').addClass('active')""" &
+        updateList()
     }
 
     def render = 
@@ -243,8 +251,9 @@ class NextAction extends JSImplicit
 
         ClearClearable &
         "#actionShowAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#actionIsDone *"  #> doneActions.flatMap(createActionRow) &
-        "#actionNotDone *" #> notDoneActions.flatMap(createActionRow) &
-        ".actionTab" #> contexts.map(createContextTab)
+        "#actionIsDone"  #> (".row" #> doneActions.map(createActionRow)) &
+        "#actionNotDone" #> (".row" #> notDoneActions.map(createActionRow)) &
+        "#allActionTab [onclick]" #> SHtml.onEvent(showAllAction _) &
+        ".contextTab" #> contexts.map(createContextTab)
     }
 }

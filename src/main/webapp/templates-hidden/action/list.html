@@ -4,17 +4,22 @@
     <button class="btn btn-inverse" id="actionShowAll" disabled="disabled">顯示全部</button>
   </div>
   <ul class="nav nav-tabs" id="actionTabFolder">
-    <li class="actionTab"><a href="#">@ Home</a></li>
+    <li class="actionTab active" id="allActionTab"><a href="#">全部</a></li>
+    <li class="actionTab contextTab"><a href="#">@ Home</a></li>
   </ul>
   <div>
     <div id="actionEditHolder"></div>
     <div>
       <h3 style="margin-bottom:0.5em">儘快去做</h3>
-      <div id="actionNotDone"></div>
+      <div id="actionNotDone">
+        <div class="row"></div>
+      </div>
     </div>
     <div>
       <h3 style="margin-top:1em; margin-bottom:0.5em">已完成</h3>
-      <div id="actionIsDone"></div>
+      <div id="actionIsDone">
+        <div class="row"></div>
+      </div>
     </div>
   </div>
 </div>

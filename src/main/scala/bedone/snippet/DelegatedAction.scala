@@ -201,7 +201,7 @@ class DelegatedAction extends JSImplicit
     def render = 
     {
         ClearClearable &
-        "#delegateActions *" #> notInformedAction.flatMap(createActionRow) &
+        "#delegateActions" #> (".row" #> notInformedAction.map(createActionRow)) &
         "#delegateInform [onclick]" #> SHtml.onEvent(s => updateList("delegateInform")) &
         "#delegateResponse [onclick]"  #> SHtml.onEvent(s => updateList("delegateResponse")) &
         "#delegateDone [onclick]"      #> SHtml.onEvent(s => updateList("delegateDone")) &

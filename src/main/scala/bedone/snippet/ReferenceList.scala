@@ -159,6 +159,6 @@ class ReferenceList extends JSImplicit
         "#referenceAllTab [onclick]" #> SHtml.onEvent(s => updateList("referenceAllTab")) &
         "#referenceStaredTab [onclick]" #> SHtml.onEvent(s => updateList("referenceStaredTab")) &
         "#referenceShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#referenceList *" #> references.flatMap(createStuffRow)
+        "#referenceList" #> (".row" #> references.map(createStuffRow))
     }
 }
