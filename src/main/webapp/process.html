@@ -177,14 +177,14 @@
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:0.5em">請問這件事情在行事曆上要如何記載？</div>
-              <div class="inline" style="margin-right:1em">開始時間：<input name="startDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">結束時間：<input name="endDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">地點：<input name="location" type="text"/></div>
+              <div class="inline" style="margin-right:1em">開始時間：<input id="startDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">結束時間：<input id="endDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">地點：<input id="location" type="text"/></div>
             </div>
             <div>
               <button id="back-isScheduled" class="btn btn-info pull-left">上一步</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveDelegated">搞定！</button>
+                <button class="btn btn-success" id="saveScheduled" disabled="disabled">搞定！</button>
               </div>
             </div>
           </div>
@@ -231,6 +231,25 @@
                   $(this).blur()
               }
           });
+
+          $( "#startDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#startDateTime").val(dateText)
+                  $("#startDateTime").blur()
+              }
+          });
+
+          $( "#endDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#endDateTime").val(dateText)
+                  $("#endDateTime").blur()
+              }
+          });
+
 
       </script>
 

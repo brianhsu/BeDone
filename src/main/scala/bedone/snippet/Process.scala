@@ -3,7 +3,13 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import org.bedone.model.StuffType.StuffType
 import TagButton.Implicit._
+
+import net.liftweb.common.Box
+import net.liftweb.common.Empty
+import net.liftweb.common.Full
+import net.liftweb.common.Failure
 
 import net.liftweb.util.Helpers._
 
@@ -14,6 +20,7 @@ import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
 
 import java.util.Calendar
+import java.text.SimpleDateFormat
 
 class Process extends JSImplicit
 {
@@ -26,10 +33,22 @@ class Process extends JSImplicit
     private var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)
 
-    private var contactName: Option[String] = None
+    // Stuff attirbute
     private var projectTitle: Option[String] = None
     private var topicTitle: Option[String] = None
+
+    // Action attribute
     private var actionTitle: Option[String] = stuff.map(_.title.is)
+
+    // Delegated attribute
+    private var contactName: Option[String] = None
+
+    // Scheduled attribute
+    private var startDateTime: Option[Calendar] = None
+    private var endDateTime: Option[Calendar] = None
+    private var location: Option[String] = None
+
+    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -80,10 +99,7 @@ class Process extends JSImplicit
 
     def saveReference(stuff: Stuff)(valueAttr: String) = {
 
-        stuff.setTopics(currentTopics)
-        stuff.setProjects(currentProjects)
-        stuff.stuffType(StuffType.Reference)
-        stuff.saveTheRecord()
+        updateStuff(stuff, StuffType.Reference)
 
         S.redirectTo(
             "/process", () => S.notice("已將「%s」加入參考資料" format(stuff.title.is))
@@ -98,13 +114,9 @@ class Process extends JSImplicit
 
     def markAsDone(stuff: Stuff)(valueAttr: String) = {
 
-        stuff.title(actionTitle.getOrElse(stuff.title.is))
-        stuff.stuffType(StuffType.Action)
-        stuff.setProjects(currentProjects)
-        stuff.setTopics(currentTopics)
-        stuff.saveTheRecord()
+        val updatedStuff = updateStuff(stuff, StuffType.Action)
 
-        Action.createRecord.idField(stuff.idField.is)
+        Action.createRecord.idField(updatedStuff.idField.is)
               .isDone(true).doneTime(Calendar.getInstance)
               .saveTheRecord()
 
@@ -206,11 +218,92 @@ class Process extends JSImplicit
         }
     }
 
+    def updateStuff(stuff: Stuff, stuffType: StuffType) =
+    {
+        stuff.title(actionTitle.getOrElse(stuff.title.is))
+        stuff.stuffType(stuffType)
+        stuff.setProjects(currentProjects)
+        stuff.setTopics(currentTopics)
+        stuff
+    }
+
+    def saveScheduled(stuff: Stuff)(valueAttr: String): JsCmd = {
+
+        val updatedStuff = updateStuff(stuff, StuffType.Scheduled)
+        val action = Action.createRecord.idField(updatedStuff.idField.is)
+        val scheduled = Scheduled.createRecord.idField(updatedStuff.idField.is)
+
+        scheduled.startTime.setBox(startDateTime)
+        scheduled.endTime.setBox(endDateTime)
+        scheduled.location.setBox(location)
+        scheduled.validate match {
+            case Nil => 
+                stuff.saveTheRecord()
+                action.saveTheRecord()
+                scheduled.saveTheRecord()
+                S.redirectTo(
+                    "/process", 
+                    () => S.notice("已將「%s」放入行事曆" format(stuff.title.is))
+                )
+
+                Noop
+            case xs  => Alert(xs.map(_.msg).mkString("、"))
+        }
+    }
+
+    def setEndDateTime(dateTimeString: String): JsCmd = {
+
+        endDateTime = optFromStr(dateTimeString) match {
+            case None => None
+            case Some(dateTimeString) =>
+                try {
+                    dateTimeFormatter.setLenient(false)
+                    val dateTime = dateTimeFormatter.parse(dateTimeString)
+                    val calendar = Calendar.getInstance
+                    calendar.setTime(dateTime)
+                    Some(calendar)
+                } catch {
+                    case e => println("error:" + e)
+                        None
+                }
+        }
+
+        Noop
+
+    }
+
+    def setStartDateTime(dateTimeString: String): JsCmd = {
+        
+
+        val dateTime = tryo {
+            require(optFromStr(dateTimeString).isDefined, "此為必填欄位")
+
+            dateTimeFormatter.setLenient(false)
+
+            val dateTime = dateTimeFormatter.parse(dateTimeString)
+            val calendar = Calendar.getInstance
+            calendar.setTime(dateTime)
+            calendar
+        }
+
+        this.startDateTime = dateTime.toOption
+
+        dateTime match {
+            case Full(date) => "$('#saveScheduled').attr('disabled', false)"
+            case Empty => "$('#saveScheduled').attr('disabled', true)"
+            case Failure(msg, _, _) => "$('#saveScheduled').attr('disabled', true)"
+        }
+    }
+
     def hasStuffBinding(stuff: Stuff) = 
     {
         "#noStuffAlert" #> "" &
         "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
         "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
+        "#location" #> SHtml.textAjaxTest("", doNothing _, location = _) &
+        "#startDateTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
+        "#endDateTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
+        "#saveScheduled [onclick]" #> SHtml.onEvent(saveScheduled(stuff)) &
         "#isDelegated" #> (
             ".contactInput" #> SHtml.textAjaxTest("", doNothing _, setContact _) &
             "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
