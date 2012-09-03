@@ -32,6 +32,7 @@ class Process extends JSImplicit
 
     private var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)
+    private var currentContexts: List[Context] = Nil
 
     // Stuff attirbute
     private var projectTitle: Option[String] = None
@@ -39,6 +40,7 @@ class Process extends JSImplicit
 
     // Action attribute
     private var actionTitle: Option[String] = stuff.map(_.title.is)
+    private var contextTitle: Option[String] = None
 
     // Delegated attribute
     private var contactName: Option[String] = None
@@ -52,17 +54,24 @@ class Process extends JSImplicit
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
+    def onContextClick(buttonID: String, context: Context) = Noop
+
+    def onContextRemove(buttonID: String, context: Context): JsCmd = {
+
+        currentContexts = currentContexts.filterNot(_ == context)
+        FadeOutAndRemove.byClassName(context.className)
+    }
 
     def onProjectRemove(buttonID: String, project: Project): JsCmd = {
 
         currentProjects = currentProjects.filterNot(_ == project)
-        FadeOutAndRemove.byClassName("project" + project.idField.is)
+        FadeOutAndRemove.byClassName(project.className)
     }
 
     def onTopicRemove(buttonID: String, topic: Topic): JsCmd = {
 
         currentTopics = currentTopics.filterNot(_ == topic)
-        FadeOutAndRemove.byClassName("topic" + topic.idField.is)
+        FadeOutAndRemove.byClassName(topic.className)
     }
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
@@ -177,6 +186,32 @@ class Process extends JSImplicit
         }
     }
 
+    def addContext(title: String): JsCmd = {
+        val containers = List("nextActionContext")
+        val userID = CurrentUser.get.get.idField.is
+
+        def createContext = Context.createRecord.userID(userID).title(title)
+        def context = Context.findByTitle(userID, title).getOrElse(createContext)
+
+        currentContexts.contains(context) match {
+            case true  => ClearValue.byClassName("contextInput")
+            case false =>
+                currentContexts ::= context
+
+                ClearValue.byClassName("contextInput") &
+                containers.map { htmlID => 
+                    AppendHtml(htmlID, context.editButton(onContextClick, onContextRemove))
+                }
+        }
+    }
+
+    def addContext(): JsCmd = {
+        contextTitle match {
+            case None        => Noop
+            case Some(title) => addContext(title)
+        }
+    }
+
     def createTopicTags(containerID: String) =
     {
         "name=topicInput"   #> SHtml.text("", topicTitle = _) &
@@ -224,7 +259,21 @@ class Process extends JSImplicit
         stuff.stuffType(stuffType)
         stuff.setProjects(currentProjects)
         stuff.setTopics(currentTopics)
+        stuff.saveTheRecord()
         stuff
+    }
+
+    def saveNextAction(stuff: Stuff)(valueAttr: String): JsCmd = {
+        val updatedStuff = updateStuff(stuff, StuffType.Action)
+        val action = Action.createRecord.idField(updatedStuff.idField.is)
+
+        action.saveTheRecord()
+        action.setContexts(currentContexts)
+
+        S.redirectTo(
+            "/process", 
+             () => S.notice("已將「%s」放入下一步行動清單" format(stuff.title.is))
+        )
     }
 
     def saveScheduled(stuff: Stuff)(valueAttr: String): JsCmd = {
@@ -295,6 +344,16 @@ class Process extends JSImplicit
         }
     }
 
+    def createContextTags(containerID: String) =
+    {
+        "name=contextInput"   #> SHtml.text("", contextTitle = _) &
+        ".contextInputHidden" #> SHtml.hidden(addContext) &
+        ".contextTags [id]"   #> containerID &
+        ".contextTags" #> (
+            "span" #> currentContexts.map(_.editButton(onContextClick, onContextRemove))
+        )
+    }
+
     def hasStuffBinding(stuff: Stuff) = 
     {
         "#noStuffAlert" #> "" &
@@ -304,6 +363,10 @@ class Process extends JSImplicit
         "#startDateTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
         "#endDateTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
         "#saveScheduled [onclick]" #> SHtml.onEvent(saveScheduled(stuff)) &
+        "#itIsNextAction" #> (
+            createContextTags("nextActionContext") &
+            "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
+        ) &
         "#isDelegated" #> (
             ".contactInput" #> SHtml.textAjaxTest("", doNothing _, setContact _) &
             "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
@@ -323,6 +386,7 @@ class Process extends JSImplicit
             "name=nextActionTitle" #> 
                 SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         )
+
     }
 
     def noStuffBinding = 

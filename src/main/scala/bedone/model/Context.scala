@@ -4,6 +4,7 @@ import net.liftweb.common.Box
 import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Helpers.hashHex
 
 import net.liftweb.util.FieldError
 
@@ -51,6 +52,8 @@ class Context extends Record[Context] with KeyedRecord[Int]
     val userID = new IntField(this)
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
+
+    def className = "context%d%s" format (userID.is, hashHex(title.is))
 
     override def saveTheRecord() = tryo(BeDoneSchema.contexts.insert(this))
 }

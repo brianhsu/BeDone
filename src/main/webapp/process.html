@@ -190,7 +190,7 @@
           </div>
         </div>
 
-        <div class="dialog" id="isNextAction">
+        <div class="dialog" id="itIsNextAction">
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:0.5em">請問這件事情適合在哪種情境下執行呢？</div>
@@ -229,6 +229,14 @@
               select: function(event, ui) { 
                   $(this).val(ui.item.label)
                   $(this).blur()
+              }
+          });
+
+          $(".contextInput").autocomplete({
+              source: "/autocomplete/context",
+              select: function(event, ui) { 
+                  $(this).val(ui.item.label)
+                  $(this).closest("form").submit()
               }
           });
 

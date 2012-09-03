@@ -20,16 +20,16 @@ object TagButton
 
     object Implicit {
         implicit def fromTopic(topic: Topic) = 
-            new TagViewButton(topicView, topic, topic.title.is, "topic" + topic.idField.is)
+            new TagViewButton(topicView, topic, topic.title.is, topic.className)
 
         implicit def fromProject(project: Project) = 
-            new TagViewButton(projectView, project, project.title.is, "project" + project.idField.is)
+            new TagViewButton(projectView, project, project.title.is, project.className)
 
         implicit def fromContext(context: Context) = 
-            new TagViewButton(contextView, context, context.title.is, "context" + context.idField.is)
+            new TagViewButton(contextView, context, context.title.is, context.className)
 
         implicit def fromContact(contact: Contact) = 
-            new TagViewButton(contactView, contact, contact.name.is, "contact" + contact.idField.is)
+            new TagViewButton(contactView, contact, contact.name.is, contact.className)
 
     }
 }

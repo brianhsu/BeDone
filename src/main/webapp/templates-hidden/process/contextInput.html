@@ -1,9 +1,12 @@
-<div>
-  情境：
+<form action="." data-lift="lift:Form.ajax">
+  專案：
   <div class="inline">
     <div class="input-prepend">
-      <span class="add-on"><i class="icon-briefcase"></i></span><input name="contextInput" type="text" />
+      <span class="add-on"><i class="icon-briefcase"></i></span><input name="contextInput" type="text" class="contextInput"/>
     </div>
   </div>
-  <div class="contextTags inline"></div>
-</div>
+  <input type="hidden" class="contextInputHidden" />
+  <div class="contextTags inline">
+    <span class="inline">Tag1</span>
+  </div>
+</form>
