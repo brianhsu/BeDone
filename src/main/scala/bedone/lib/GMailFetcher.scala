@@ -16,6 +16,7 @@ import com.google.code.javax.mail.Folder
 import com.google.code.javax.mail.Message
 import com.google.code.javax.mail.Part
 import com.google.code.javax.mail.Multipart
+import javax.mail.internet.MimeUtility
 
 object GMailFetcher
 {
@@ -103,9 +104,17 @@ class GMailFetcher(userID: Int, username: String, password: String)
         beDoneFolder.appendMessages(messages.toArray)
     }
 
+    def decodeSubject(subject: String) = {
+        subject.contains("=?") match {
+            case true  => MimeUtility.decodeText(subject)
+            case false => new String(subject.getBytes("iso8859-1"), "utf-8")
+        }
+    }
     def createStuff(message: IMAPMessage) = 
     {
-        val title = message.getSubject
+        val title = message.getHeader("subject").map(decodeSubject)
+                           .headOption.getOrElse("無標題")
+
         val gmailID = message.getGoogleMessageId
         val desc = getBodyText(message).map(_.take(10000))
 
