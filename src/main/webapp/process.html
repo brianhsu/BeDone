@@ -12,6 +12,52 @@
 
       <div data-lift="Process?eager_eval=true">
         <div id="noStuffAlert" class="alert alert-success"><h3>耶！沒有雜事需要整理耶！</h3></div>
+        <div id="processEdit" class="editForm">
+          <div>
+            <span class="actionBar">
+              <i class="icon-white icon-ok"></i>
+              <i class="icon-white icon-remove"></i>
+              <i class="icon-white icon-star"></i>
+            </span>
+        
+            <fieldset id="processTitle" class="inline control-group">
+              <div class="input-prepend" style="margin-left: 0.5em">
+                <span title="標題" class="add-on">
+                  <i class="icon-th-list"></i>
+                </span><input class="input-xxlarge" type="text" placeholder="標題" />
+                <span id="processTitle_msg" class="help-inline"></span>
+              </div>
+            </fieldset>
+        
+            <div class="pull-right form-inline">
+              <div class="input-prepend" style="margin-right:0.5em;">
+                <form action="." data-lift="lift:Form.ajax">
+                  <span title="主題" class="add-on">
+                    <i class="icon-tags"></i>
+                  </span><input name="topicInput" class="input-medium topicInput" type="text" placeholder="主題" />
+                  <input type="hidden" class="topicInputHidden" />
+                </form>
+              </div>
+              <div class="input-prepend" style="margin-right: 0.5em">
+                <form action="." data-lift="lift:Form.ajax">
+                  <span title="專案" class="add-on">
+                    <i class="icon-folder-open"></i>
+                  </span><input name="projectInput" class="input-medium projectInput" type="text" placeholder="專案" />
+                  <input type="hidden" class="projectInputHidden" />
+                </form>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin: 0.5em; display: table; width: 98%">
+            <div class="projectTags" class="inline" style="float:right"><span>Tags</span></div>
+            <div class="topicTags" class="inline" style="float:right"><span>Tags</span></div>
+          </div>
+        
+          <div style="width: 100%">
+            <textarea rows="5" id="processEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+          </div>
+        </div>
         <div class="dialog" id="isThisActionable">
           <div class="messageBox">
             <div class="message">請問是否可以針對這件事採取具體的行動？</div>
@@ -90,15 +136,22 @@
         <div class="dialog" id="whatIsNextAction">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" id="nextActionTitle" type="text" /></div>
-              <div style="margin-bottom:0.5em">另外，這件事是屬於某個專案或主題嗎？</div>
+              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" class="input-xxlarge" id="nextActionTitle" type="text" />
+              </div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
+              <div class="input-prepend input-append">
+                <span class="add-on">完成期限：</span><input class="input-large" id="deadline" type="text" />
+                <span class="control-group error hide" id="deadline_error">
+                  <span class="help-inline" id="deadline_error_msg">完成期限要比今天晚</span>
+                </span>
+
+              </div>
             </div>
             <div>
               <button id="back-whatIsNextAction" class="btn btn-info pull-left">上一步</button>
               <div class="answers">
-                <button class="btn btn-primary" id="">下一步</button>
+                <button class="btn btn-primary" id="goToActionType">下一步</button>
               </div>
             </div>
           </div>
@@ -153,11 +206,11 @@
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
-              <div>這件事交給：
+              <div>
                 <div class="inline">
                   <form data-lift="lift:Form.ajax">
                     <div class="input-prepend">
-                      <span class="add-on"><i class="icon-user"></i></span><input class="contactInput" type="text" />
+                      <span class="add-on"><i class="icon-user"></i> 負責人：</span><input class="contactInput" type="text" />
                     </div>
                     <input class="contactInputHidden" type="hidden" />
                   </form>
@@ -258,6 +311,13 @@
               }
           });
 
+          $( "#deadline" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#deadline").val(dateText)
+                  $("#deadline").blur()
+              }
+          });
 
       </script>
 

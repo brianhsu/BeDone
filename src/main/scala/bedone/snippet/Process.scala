@@ -37,6 +37,7 @@ class Process extends JSImplicit
     // Stuff attirbute
     private var projectTitle: Option[String] = None
     private var topicTitle: Option[String] = None
+    private var description: Option[String] = stuff.map(_.description.is)
 
     // Action attribute
     private var actionTitle: Option[String] = stuff.map(_.title.is)
@@ -51,6 +52,7 @@ class Process extends JSImplicit
     private var location: Option[String] = None
 
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -134,8 +136,11 @@ class Process extends JSImplicit
 
     def addProject(title: String): JsCmd = {
 
-        val containers = List("referenceProject", "maybeProject", "nextActionProject")
         val userID = CurrentUser.get.get.idField.is
+        val containers = List(
+            "editFormProject", "referenceProject", 
+            "maybeProject", "nextActionProject"
+        )
 
         def createProject = Project.createRecord.userID(userID).title(title)
         def project = Project.findByTitle(userID, title).getOrElse(createProject)
@@ -161,8 +166,12 @@ class Process extends JSImplicit
     }
     
     def addTopic(title: String): JsCmd = {
-        val containers = List("referenceTopic", "maybeTopic", "nextActionTopic")
+
         val userID = CurrentUser.get.get.idField.is
+        val containers = List(
+            "editFormTopic", "referenceTopic", 
+            "maybeTopic", "nextActionTopic"
+        )
 
         def createTopic = Topic.createRecord.userID(userID).title(title)
         def topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
@@ -248,8 +257,12 @@ class Process extends JSImplicit
 
         this.actionTitle = title
         this.actionTitle match {
-            case None       => "$('#nextActionTitle').val('%s');".format(stuffTitle)
+            case None       => 
+                "$('#nextActionTitle').val('%s');".format(stuffTitle) &
+                "$('#processTitle input').val('%s');".format(stuffTitle)
             case Some(text) => Noop
+                "$('#nextActionTitle').val('%s');".format(text) &
+                "$('#processTitle input').val('%s');".format(text)
         }
     }
 
@@ -259,6 +272,7 @@ class Process extends JSImplicit
         stuff.stuffType(stuffType)
         stuff.setProjects(currentProjects)
         stuff.setTopics(currentTopics)
+        stuff.description(description.getOrElse(""))
         stuff.saveTheRecord()
         stuff
     }
@@ -300,9 +314,21 @@ class Process extends JSImplicit
         }
     }
 
-    def setEndDateTime(dateTimeString: String): JsCmd = {
+    def getCalendarDate(dateString: String): Box[Calendar] = {
+         optFromStr(dateString) match {
+            case None => Empty
+            case Some(date) => tryo {
+                dateFormatter.setLenient(false)
+                val date = dateFormatter.parse(dateString)
+                val calendar = Calendar.getInstance
+                calendar.setTime(date)
+                calendar
+            }
+         }
+    }
 
-        endDateTime = optFromStr(dateTimeString) match {
+    def getCalendar(dateTimeString: String): Option[Calendar] = {
+        optFromStr(dateTimeString) match {
             case None => None
             case Some(dateTimeString) =>
                 try {
@@ -312,13 +338,34 @@ class Process extends JSImplicit
                     calendar.setTime(dateTime)
                     Some(calendar)
                 } catch {
-                    case e => println("error:" + e)
-                        None
+                    case e => None
                 }
         }
+    }
 
+    def setDeadline(dateString: String): JsCmd = {
+
+        val deadline = getCalendarDate(dateString)
+        val errors = stuff.toList.flatMap { s => 
+            s.deadline.setBox(deadline)
+            s.deadline.validate
+        }
+
+        errors match {
+            case Nil => 
+                "$('#deadline_error').fadeOut()" &
+                "$('#goToActionType').attr('disabled', false)"
+            case xs  => 
+                "$('#deadline_error').fadeIn()" &
+                "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
+                "$('#goToActionType').attr('disabled', true)"
+        }
+    }
+
+
+    def setEndDateTime(dateTimeString: String): JsCmd = {
+        endDateTime = getCalendar(dateTimeString)
         Noop
-
     }
 
     def setStartDateTime(dateTimeString: String): JsCmd = {
@@ -354,6 +401,11 @@ class Process extends JSImplicit
         )
     }
 
+    def setDescription(description: String): JsCmd = {
+        this.description = description
+        Noop
+    }
+
     def hasStuffBinding(stuff: Stuff) = 
     {
         "#noStuffAlert" #> "" &
@@ -363,6 +415,12 @@ class Process extends JSImplicit
         "#startDateTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
         "#endDateTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
         "#saveScheduled [onclick]" #> SHtml.onEvent(saveScheduled(stuff)) &
+        "#processEdit" #> (
+            createProjectTags("editFormProject") &
+            createTopicTags("editFormTopic") &
+            "#processTitle" #> ("input" #> SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)) &
+            "#processEditDesc" #> SHtml.ajaxTextarea(description.getOrElse(""), setDescription _)
+        ) &
         "#itIsNextAction" #> (
             createContextTags("nextActionContext") &
             "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
@@ -383,6 +441,7 @@ class Process extends JSImplicit
         "#whatIsNextAction" #> (
             createTopicTags("nextActionTopic") &
             createProjectTags("nextActionProject") &
+            "#deadline" #> SHtml.textAjaxTest("", doNothing _, setDeadline _) &
             "name=nextActionTitle" #> 
                 SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         )
@@ -391,7 +450,8 @@ class Process extends JSImplicit
 
     def noStuffBinding = 
     {
-        ".dialog" #> ""
+        ".dialog" #> "" &
+        ".editForm" #> ""
     }
 
     def render = {
