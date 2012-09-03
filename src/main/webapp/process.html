@@ -116,7 +116,11 @@
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:1em">請問要在什麼時候把這件事放回收件匣呢？</div>
-              <div>在這個一天提醒我：<input type="text" name="ticklerDate" /></div>
+              <div>在這個一天提醒我：<input type="text" id="ticklerDate" />
+                <span class="control-group error hide" id="tickler_error">
+                  <span class="help-inline" id="tickler_error_msg">提醒時間要比今天晚</span>
+                </span>
+              </div>
             </div>
             <div>
               <button onclick="showDialog('itIsMaybe')" class="btn btn-info pull-left">上一步</button>
@@ -310,6 +314,14 @@
               onClose: function(dateText) {
                   $("#deadline").val(dateText)
                   $("#deadline").blur()
+              }
+          });
+
+          $( "#ticklerDate" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#ticklerDate").val(dateText)
+                  $("#ticklerDate").blur()
               }
           });
 

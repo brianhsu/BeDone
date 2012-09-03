@@ -51,6 +51,9 @@ class Process extends JSImplicit
     private var endDateTime: Option[Calendar] = None
     private var location: Option[String] = None
 
+    // Maybe attribute
+    private var tickler: Box[Calendar] = Empty
+
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
@@ -290,6 +293,21 @@ class Process extends JSImplicit
         )
     }
 
+    def saveMaybe(stuff: Stuff)(valueAttr: String): JsCmd = {
+
+        updateStuff(stuff, StuffType.Maybe)
+
+        val maybe = Maybe.createRecord.idField(stuff.idField.is)
+
+        maybe.tickler(this.tickler.toOption)
+        maybe.saveTheRecord()
+
+        S.redirectTo(
+            "/process", 
+             () => S.notice("已將「%s」放入也許 / 有一天清單" format(stuff.title.is))
+        )
+    }
+
     def saveScheduled(stuff: Stuff)(valueAttr: String): JsCmd = {
 
         val updatedStuff = updateStuff(stuff, StuffType.Scheduled)
@@ -406,6 +424,26 @@ class Process extends JSImplicit
         Noop
     }
 
+    def setTickler(dateString: String): JsCmd = {
+
+        this.tickler = getCalendarDate(dateString)
+        val errors = stuff.map(x => Maybe.createRecord).toList.flatMap { maybe => 
+            maybe.tickler.setBox(tickler)
+            maybe.tickler.validate
+        }
+
+
+        errors match {
+            case Nil => 
+                "$('#tickler_error').fadeOut()" &
+                "$('#saveMaybeTickler').attr('disabled', false)"
+            case xs  => 
+                "$('#tickler_error').fadeIn()" &
+                "$('#tickler_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
+                "$('#saveMaybeTickler').attr('disabled', true)"
+        }
+    }
+
     def hasStuffBinding(stuff: Stuff) = 
     {
         "#noStuffAlert" #> "" &
@@ -436,7 +474,12 @@ class Process extends JSImplicit
         ) &
         "#itIsMaybe" #> (
             createTopicTags("maybeTopic") &
-            createProjectTags("maybeProject")
+            createProjectTags("maybeProject") &
+            "#saveMaybe [onclick]" #> SHtml.onEvent(saveMaybe(stuff))
+        ) &
+        "#itIsMaybeTickler" #> (
+            "#ticklerDate" #> SHtml.textAjaxTest("", doNothing _, setTickler _) &
+            "#saveMaybeTickler [onclick]" #> SHtml.onEvent(saveMaybe(stuff))
         ) &
         "#whatIsNextAction" #> (
             createTopicTags("nextActionTopic") &
