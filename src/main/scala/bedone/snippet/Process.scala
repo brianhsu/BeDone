@@ -421,7 +421,7 @@ class Process extends JSImplicit
             "#processTitle" #> ("input" #> SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)) &
             "#processEditDesc" #> SHtml.ajaxTextarea(description.getOrElse(""), setDescription _)
         ) &
-        "#itIsNextAction" #> (
+        "#isNextAction" #> (
             createContextTags("nextActionContext") &
             "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
         ) &
