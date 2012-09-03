@@ -177,6 +177,6 @@ class MaybeList extends JSImplicit
         "#maybeTicklerTab [onclick]" #> SHtml.onEvent(s => updateList("maybeTicklerTab")) &
         "#maybeStaredTab [onclick]" #> SHtml.onEvent(s => updateList("maybeStaredTab")) &
         "#maybeShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#maybeList *" #> maybes.flatMap(createMaybeRow)
+        "#maybeList" #> (".row" #> maybes.map(createMaybeRow))
     }
 }
