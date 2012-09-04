@@ -9,7 +9,32 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div>Contacts</div>
+      <table class="table table-condensed">
+        <thead>
+          <tr><th>名稱</th><th>EMail</th><th>電話</th><th>地址</th><th></th></tr>
+        </thead>
+        <tbody data-lift="ContactTable">
+          <tr class="contactRow">
+            <td>
+              <div class="dropdown">
+                <span class="name">Name</span>
+                <a data-toggle="dropdown" class="dropdown-toggle" role="button" id="drop3" href="#"><b class="caret"></b></a>
+                <ul role="menu" class="dropdown-menu">
+                  <li><a href="#" tabindex="1">編輯</a></li>
+                  <li><a href="#" tabindex="2">刪除</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" tabindex="3">內容</a></li>
+                </ul>
+              </div>
+            </td>
+            <td class="email">EMail</td>
+            <td class="phone">Phone</td>
+            <td class="address">Address</td>
+            <td class="action">
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </body>
 </html>
