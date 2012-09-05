@@ -144,3 +144,6 @@ div.rapidEntry form {
 .dialog .messageBox {
   margin: 0.5em;
 }
+.contactTable th {
+  width: 25%;
+}
