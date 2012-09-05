@@ -23,7 +23,10 @@ class ContactDetail(contact: Contact) extends JSImplicit
         ".phone *"      #> contact.phone.is.getOrElse("") &
         ".phone [href]" #> contact.phone.is.map("tel:" + _).getOrElse("#") &
         ".address *"    #> contact.address.is.getOrElse("") &
-        ".avatar [src]" #> (Gravatar.avatarURL(contact.email.is.getOrElse("")) + "?d=mm")
+        ".avatar [src]" #> (Gravatar.avatarURL(contact.email.is.getOrElse("")) + "?d=mm") &
+        "#delegatedActionArea [data-lift]" #> (
+            "lift:embed?what=delegated/list?contactID=" + contact.idField.is
+        )
     }
 }
 
