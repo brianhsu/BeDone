@@ -1,5 +1,7 @@
 package org.bedone.model
 
+import org.bedone.lib._
+
 import net.liftweb.common.{Box, Full, Empty, Failure}
 
 import net.liftweb.util.FieldError
@@ -102,8 +104,5 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         postAction
     }
 
-    def avatarURL = {
-        val avatarHash = hexEncode(md5(email.is.trim.toLowerCase.getBytes))
-        "http://www.gravatar.com/avatar/%s?d=mm" format(avatarHash)
-    }
+    def avatarURL = Gravatar.avatarURL(email.is)
 }
