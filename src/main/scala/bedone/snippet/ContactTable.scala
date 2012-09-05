@@ -17,9 +17,10 @@ import java.text.SimpleDateFormat
 class ContactTable
 {
     val currentUser = CurrentUser.is.get
-    def contacts = Contact.findByUser(currentUser).openOr(Nil)
+    def contacts = Contact.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
 
     def createContactRow(contact: Contact) = {
+        ".contactRow [id]" #> ("contact" + contact.idField.is) &
         ".name *" #> contact.name.is &
         ".email *" #> contact.email.is &
         ".phone *" #> contact.phone.is &
