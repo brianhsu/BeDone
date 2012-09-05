@@ -1,6 +1,8 @@
 package org.bedone.model
 
 import net.liftweb.common.Box
+import net.liftweb.common.Empty
+
 import net.liftweb.util.Helpers.tryo
 import net.liftweb.util.Helpers.hashHex
 
@@ -38,6 +40,13 @@ object Contact extends Contact with MetaRecord[Contact]
         }.toList
     }
 
+    def paramParser(param: String): Box[Contact] = tryo {
+        inTransaction {
+            CurrentUser.is.flatMap { user => 
+                findByID(param.toInt).filter(_.userID.is == user.idField.is)
+            }.get
+        }
+    }
 }
 
 class Contact extends Record[Contact] with KeyedRecord[Int]

@@ -3,6 +3,8 @@
 package bootstrap.liftweb
 
 import org.bedone.model.User
+import org.bedone.model.Contact
+
 import org.bedone.view.AutoComplete
 
 import net.liftweb.common.Full
@@ -12,11 +14,14 @@ import net.liftweb.http.Html5Properties
 import net.liftweb.http.OldHtmlProperties
 import net.liftweb.http.XHtmlInHtml5OutProperties
 import net.liftweb.http.Req
+import net.liftweb.http.Templates
+import scala.xml.NodeSeq
 
 import net.liftweb.record.field.PasswordField
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.sitemap.Menu
 import net.liftweb.sitemap.Loc._
+import net.liftweb.sitemap._
 import net.liftweb.http.S
 import net.liftweb.util.LoanWrapper
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -43,6 +48,13 @@ class Boot
         // 我們的程式碼放在 org.bedone 這個 package 中
         LiftRules.addToPackages("org.bedone")
 
+        // Create a menu for /param/somedata
+        val contactDetail = Menu.param[Contact](
+            "Param", "Param", 
+            parser = Contact.paramParser _ , 
+            encoder = _.idField.is.toString
+        ) / "contact" / *
+
         def siteMap = SiteMap(
             Menu.i("Index") / "index",
             (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
@@ -54,7 +66,10 @@ class Boot
             (Menu.i("Reference") / "reference") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Preference") / "preference") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Process") / "process") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Contacts") / "contact") >> If(User.isLoggedIn _, "請先登入")
+            (Menu.i("Contacts") / "contact") >> If(User.isLoggedIn _, "請先登入"),
+            (contactDetail >> Template(() => 
+                Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)
+            )
         )
 
         LiftRules.setSiteMap(siteMap)

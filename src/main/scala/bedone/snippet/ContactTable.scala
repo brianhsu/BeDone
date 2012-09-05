@@ -25,12 +25,13 @@ class ContactTable extends JSImplicit
     }
 
     def createContactRow(contact: Contact) = {
-        ".contactRow [id]" #> ("contact" + contact.idField.is) &
-        ".name *" #> contact.name.is &
-        ".email *" #> contact.email.is.getOrElse("") &
-        ".phone *" #> contact.phone.is.getOrElse("") &
-        ".address *" #> contact.address.is.getOrElse("") &
-        ".delete [onclick]" #> SHtml.onEvent(deleteContact(contact))
+        ".contactRow [id]"  #> ("contact" + contact.idField.is) &
+        ".name *"           #> contact.name.is &
+        ".email *"          #> contact.email.is.getOrElse("") &
+        ".phone *"          #> contact.phone.is.getOrElse("") &
+        ".address *"        #> contact.address.is.getOrElse("") &
+        ".delete [onclick]" #> SHtml.onEvent(deleteContact(contact)) &
+        ".detail [href]"    #> ("/contact/" + contact.idField.is)
     }
 
     def render = {
