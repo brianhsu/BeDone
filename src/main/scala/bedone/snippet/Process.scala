@@ -97,7 +97,6 @@ class Process extends JSImplicit
                                      .saveTheRecord().get
 
                 val action = Action.createRecord.idField(stuff.idField.is)
-                                   .doneTime(Calendar.getInstance)
                                    .saveTheRecord().get
 
                 val delegated = Delegated.createRecord.idField(stuff.idField.is)

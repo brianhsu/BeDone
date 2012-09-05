@@ -85,10 +85,10 @@ class DelegatedAction extends JSImplicit
                     delegated.hasInformed(true).saveTheRecord()
                 case "delegateResponse" => 
                     delegated.hasInformed(true).saveTheRecord()
-                    delegated.action.isDone(true).saveTheRecord()
+                    delegated.action.isDone(true).doneTime(Calendar.getInstance).saveTheRecord()
                 case "delegateDone" => 
                     delegated.hasInformed(false).saveTheRecord()
-                    delegated.action.isDone(false).saveTheRecord()
+                    delegated.action.isDone(false).doneTime(None).saveTheRecord()
             }
 
             FadeOutAndRemove("delegate" + stuff.idField)
