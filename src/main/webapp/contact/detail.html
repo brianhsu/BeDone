@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div data-lift="ContactDetail" style="margin-bottom: 1em">
+        <div style="float: right">
+            <img class="avatar pull-right inline" src="http://www.gravatar.com/avatar/?d=mm" alt="頭像" style="float: right"/>
+        </div>
+        <div style="width: 92%; margin-bottom:2em">
+          <table class="table table-condensed contactTable">
+            <tbody>
+              <tr>
+                <th>名稱</th>
+                <th>EMail</th>
+                <th>電話</th>
+                <th>地址</th>
+              </tr>
+              <tr class="contactRow">
+                <td class="name">Name</td>
+                <td><a href="#" class="email">EMail</a></td>
+                <td><a href="#" class="phone">Phone</a></td>
+                <td class="address">Address</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="delegatedActionArea"></div>
+      </div>
+    </div>
+  </body>
+</html>
+

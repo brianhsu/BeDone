@@ -8,6 +8,7 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat
 
 class DelegatedAction extends JSImplicit
 {
+    lazy val contactID = S.attr("contactID").flatMap(x => tryo(x.toInt)).toOption
     lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
@@ -28,9 +30,15 @@ class DelegatedAction extends JSImplicit
 
     val currentUser = CurrentUser.get.get
 
-    def delegatedAction = Delegated.findByUser(currentUser)
-                                   .openOr(Nil)
-                                   .filterNot(_.action.stuff.isTrash.is)
+    def allDelegatedAction = {
+        Delegated.findByUser(currentUser).openOr(Nil)
+                 .filterNot(_.action.stuff.isTrash.is)
+    }
+
+    def delegatedAction = contactID match {
+        case None => allDelegatedAction
+        case Some(id) => allDelegatedAction.filter(_.contactID.is == id)
+    }
 
     def notInformedAction = delegatedAction.filterNot(_.hasInformed.is)
     def notRespondAction = delegatedAction.filter(x => x.hasInformed.is && !x.action.isDone.is)
@@ -77,10 +85,10 @@ class DelegatedAction extends JSImplicit
                     delegated.hasInformed(true).saveTheRecord()
                 case "delegateResponse" => 
                     delegated.hasInformed(true).saveTheRecord()
-                    delegated.action.isDone(true).saveTheRecord()
+                    delegated.action.isDone(true).doneTime(Calendar.getInstance).saveTheRecord()
                 case "delegateDone" => 
                     delegated.hasInformed(false).saveTheRecord()
-                    delegated.action.isDone(false).saveTheRecord()
+                    delegated.action.isDone(false).doneTime(None).saveTheRecord()
             }
 
             FadeOutAndRemove("delegate" + stuff.idField)
@@ -149,7 +157,7 @@ class DelegatedAction extends JSImplicit
 
     def contactFilter(buttonID: String, contact: Contact) =
     {
-        Noop
+        S.redirectTo("/contact/" + contact.idField.is)
     }
 
     def shouldDisplay(delegated: Delegated) = 
