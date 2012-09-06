@@ -106,7 +106,7 @@ class GMailFetcher(userID: Int, username: String, password: String)
 
     def decodeSubject(subject: String) = {
         subject.contains("=?") match {
-            case true  => MimeUtility.decodeText(subject.replace("=?GB2312", "=?GBK"))
+            case true  => MimeUtility.decodeText(subject.replaceAll("(?i)\\=\\?GB2312", "=?GBK"))
             case false => new String(subject.getBytes("iso8859-1"), "utf-8")
         }
     }

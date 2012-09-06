@@ -39,6 +39,11 @@ object Project extends Project with MetaRecord[Project]
 
     def findByTitle(userID: Int, title: String): Box[Project] = 
         BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
+
+    def delete(project: Project) = {
+        BeDoneSchema.projects.deleteWhere(p => p.idField === project.idField)
+        BeDoneSchema.stuffProjects.deleteWhere(sp => sp.projectID === project.idField)
+    }
 }
 
 class Project extends Record[Project] with KeyedRecord[Int]
@@ -51,11 +56,23 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    def stuffs = 
-        BeDoneSchema.stuffProjects.right(this)
-                    .filter(_.stuffType.is == StuffType.Stuff).toList
+    def allStuffs = BeDoneSchema.stuffProjects.right(this)
+    def stuffs = allStuffs.filter(_.stuffType.is == StuffType.Stuff).toList
+    def nextActions = allStuffs.filter(_.stuffType.is == StuffType.Action).toList
+    def delegateds = allStuffs.filter(_.stuffType.is == StuffType.Delegated).toList
+    def scheduleds = allStuffs.filter(_.stuffType.is == StuffType.Scheduled).toList
+    def maybes = allStuffs.filter(_.stuffType.is == StuffType.Maybe).toList
+    def references = allStuffs.filter(_.stuffType.is == StuffType.Reference).toList
 
     def className = "project%d%s" format (userID.is, hashHex(title.is))
 
-    override def saveTheRecord() = tryo(BeDoneSchema.projects.insert(this))
+    override def saveTheRecord() = tryo {
+        this.isPersisted match {
+            case true  => BeDoneSchema.projects.update(this)
+            case false => BeDoneSchema.projects.insert(this)
+        }
+
+        this
+    }
+
 }

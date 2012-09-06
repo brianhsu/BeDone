@@ -67,9 +67,8 @@ class Boot
             (Menu.i("Preference") / "preference") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Process") / "process") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Contacts") / "contact") >> If(User.isLoggedIn _, "請先登入"),
-            (contactDetail >> Template(() => 
-                Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)
-            )
+            (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
+            (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入")
         )
 
         LiftRules.setSiteMap(siteMap)
