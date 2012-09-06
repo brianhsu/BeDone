@@ -5,6 +5,7 @@ import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -37,6 +38,8 @@ class ContactTable extends JSImplicit
 
     def deleteContact(contact: Contact)(value: String) = {
         contact.isTrash(true).saveTheRecord()
+
+        S.notice("已將「%s」放入垃圾桶" format(contact.name.is))
         FadeOutAndRemove("contact" + contact.idField.is)
     }
 
