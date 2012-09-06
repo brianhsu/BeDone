@@ -39,6 +39,11 @@ object Project extends Project with MetaRecord[Project]
 
     def findByTitle(userID: Int, title: String): Box[Project] = 
         BeDoneSchema.projects.where(t => t.userID === userID and t.title === title).headOption
+
+    def delete(project: Project) = {
+        BeDoneSchema.projects.deleteWhere(p => p.idField === project.idField)
+        BeDoneSchema.stuffProjects.deleteWhere(sp => sp.projectID === project.idField)
+    }
 }
 
 class Project extends Record[Project] with KeyedRecord[Int]

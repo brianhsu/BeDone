@@ -5,6 +5,7 @@ import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -25,6 +26,12 @@ class ProjectTable extends JSImplicit
         stuff.isTrash.is || Action.findByID(stuff.idField.is).map(_.isDone.is).getOrElse(false)
     }
 
+    def deleteProject(project: Project)(): JsCmd = {
+        Project.delete(project)
+        S.notice("已刪除「%s」" format(project.title.is))
+        FadeOutAndRemove("project" + project.idField.is)
+    }
+
     def createProjectRow(project: Project) = {
 
         val stuffs = project.stuffs.filterNot(isTrashOrDone)
@@ -41,7 +48,12 @@ class ProjectTable extends JSImplicit
         ".delegated *"  #> stripZero(delegateds.size) &
         ".scheduled *"  #> stripZero(scheduleds.size) &
         ".maybe *"      #> stripZero(maybes.size) &
-        ".reference *"  #> stripZero(references.size)
+        ".reference *"  #> stripZero(references.size) &
+        ".delete [onclick]" #> Confirm(
+            "確定刪除「%s」嗎？這個動作無法還原喲！" format(project.title.is), 
+            SHtml.ajaxInvoke(deleteProject(project))
+        )
+
     }
 
     def render = {
