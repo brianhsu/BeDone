@@ -52,7 +52,9 @@ class EditProjectForm(project: Project, postAction: Project => JsCmd) extends JS
         "#projectEditDesc" #> (
             SHtml.textarea(description, description = _) ++ SHtml.hidden(updateProject)
         ) &
-        "#projectEditCancel [onclick]" #> FadeOutAndRemove("editProjectForm")
+        "#projectEditCancel [onclick]" #> (
+            FadeOutAndRemove("editProjectForm") & "return false"
+        )
     }
 
     def toForm = {
