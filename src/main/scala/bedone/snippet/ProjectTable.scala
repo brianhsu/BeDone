@@ -31,7 +31,8 @@ class ProjectTable extends JSImplicit
             val rowID = "#project" + project.idField.is
 
             FadeOutAndRemove("editProjectForm") &
-            "$('%s .name').text('%s')".format(rowID, project.title.is)
+            "$('%s .name').text('%s')".format(rowID, project.title.is) &
+            "$('%s .name').attr('data-original-title', '%s')".format(rowID, project.description.is)
         })
 
         JqSetHtml("editProjectHolder", editForm.toForm)
@@ -60,6 +61,7 @@ class ProjectTable extends JSImplicit
         ".scheduled *"  #> stripZero(scheduleds.size) &
         ".maybe *"      #> stripZero(maybes.size) &
         ".reference *"  #> stripZero(references.size) &
+        ".name [data-original-title]" #> project.description.is &
         ".delete [onclick]" #> Confirm(
             "確定刪除「%s」嗎？這個動作無法還原喲！" format(project.title.is), 
             SHtml.ajaxInvoke(deleteProject(project))

@@ -26,7 +26,7 @@
           </thead>
           <tbody data-lift="ProjectTable">
             <tr>
-              <td class="name">Name</td>
+              <td><a href="#" rel="tooltip" data-placement="right" data-original-title="Name" class="name">Name</a></td>
               <td class="center"><a href="#" class="inbox"><span>收件匣</span></a></td>
               <td class="center"><a href="#" class="nextAction">下一步行動</a></td>
               <td class="center"><a href="#" class="delegated">委派</a></td>
@@ -45,6 +45,9 @@
             </tr>
           </tbody>
         </table>
+        <script type="text/javascript">
+          $('.name').tooltip();
+        </script>
       </div>
     </div>
   </body>
