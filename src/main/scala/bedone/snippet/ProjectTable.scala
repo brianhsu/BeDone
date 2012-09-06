@@ -26,6 +26,17 @@ class ProjectTable extends JSImplicit
         stuff.isTrash.is || Action.findByID(stuff.idField.is).map(_.isDone.is).getOrElse(false)
     }
 
+    def editProject(project: Project)(value: String): JsCmd = {
+        val editForm = new EditProjectForm(project, project => {
+            val rowID = "#project" + project.idField.is
+
+            FadeOutAndRemove("editProjectForm") &
+            "$('%s .name').text('%s')".format(rowID, project.title.is)
+        })
+
+        JqSetHtml("editProjectHolder", editForm.toForm)
+    }
+
     def deleteProject(project: Project)(): JsCmd = {
         Project.delete(project)
         S.notice("已刪除「%s」" format(project.title.is))
@@ -52,7 +63,8 @@ class ProjectTable extends JSImplicit
         ".delete [onclick]" #> Confirm(
             "確定刪除「%s」嗎？這個動作無法還原喲！" format(project.title.is), 
             SHtml.ajaxInvoke(deleteProject(project))
-        )
+        ) &
+        ".edit [onclick]" #> SHtml.onEvent(editProject(project))
 
     }
 

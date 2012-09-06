@@ -66,5 +66,13 @@ class Project extends Record[Project] with KeyedRecord[Int]
 
     def className = "project%d%s" format (userID.is, hashHex(title.is))
 
-    override def saveTheRecord() = tryo(BeDoneSchema.projects.insert(this))
+    override def saveTheRecord() = tryo {
+        this.isPersisted match {
+            case true  => BeDoneSchema.projects.update(this)
+            case false => BeDoneSchema.projects.insert(this)
+        }
+
+        this
+    }
+
 }
