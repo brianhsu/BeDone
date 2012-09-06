@@ -147,3 +147,9 @@ div.rapidEntry form {
 .contactTable th {
   width: 25%;
 }
+th.center {
+  text-align: center;
+}
+td.center {
+  text-align: center;
+}

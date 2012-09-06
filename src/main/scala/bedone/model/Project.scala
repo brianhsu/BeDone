@@ -51,9 +51,13 @@ class Project extends Record[Project] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    def stuffs = 
-        BeDoneSchema.stuffProjects.right(this)
-                    .filter(_.stuffType.is == StuffType.Stuff).toList
+    def allStuffs = BeDoneSchema.stuffProjects.right(this)
+    def stuffs = allStuffs.filter(_.stuffType.is == StuffType.Stuff).toList
+    def nextActions = allStuffs.filter(_.stuffType.is == StuffType.Action).toList
+    def delegateds = allStuffs.filter(_.stuffType.is == StuffType.Delegated).toList
+    def scheduleds = allStuffs.filter(_.stuffType.is == StuffType.Scheduled).toList
+    def maybes = allStuffs.filter(_.stuffType.is == StuffType.Maybe).toList
+    def references = allStuffs.filter(_.stuffType.is == StuffType.Reference).toList
 
     def className = "project%d%s" format (userID.is, hashHex(title.is))
 
