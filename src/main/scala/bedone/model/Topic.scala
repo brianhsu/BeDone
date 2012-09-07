@@ -34,11 +34,21 @@ object Topic extends Topic with MetaRecord[Topic]
 
     def findByUser(user: User): Box[List[Topic]] = findByUser(user.idField.is)
     def findByUser(userID: Int): Box[List[Topic]] = tryo {
-        BeDoneSchema.topics.where(_.userID === userID).toList
+        from(BeDoneSchema.topics) { topic =>
+            where(topic.userID === userID).
+            select(topic).
+            orderBy(topic.title)
+        }.toList
     }
 
     def findByTitle(userID: Int, title: String): Box[Topic] = 
         BeDoneSchema.topics.where(t => t.userID === userID and t.title === title).headOption
+
+    def delete(topic: Topic) = {
+        BeDoneSchema.topics.deleteWhere(t => t.idField === topic.idField)
+        BeDoneSchema.stuffTopics.deleteWhere(st => st.topicID === topic.idField)
+    }
+
 }
 
 class Topic extends Record[Topic] with KeyedRecord[Int]
@@ -51,14 +61,25 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = tryo(BeDoneSchema.topics.insert(this))
+    override def saveTheRecord() = tryo {
+        this.isPersisted match {
+            case true  => BeDoneSchema.topics.update(this)
+            case false => BeDoneSchema.topics.insert(this)
+        }
 
-    def stuffs = { 
-        BeDoneSchema.stuffTopics.right(this)
-                    .filter(_.stuffType.is == StuffType.Stuff)toList
+        this
     }
 
     def className = "topic%d%s" format (userID.is, hashHex(title.is))
 
     def addStuff(stuff: Stuff) = BeDoneSchema.stuffTopics.right(this).associate(stuff)
+
+    def allStuffs = BeDoneSchema.stuffTopics.right(this)
+    def stuffs = allStuffs.filter(_.stuffType.is == StuffType.Stuff).toList
+    def nextActions = allStuffs.filter(_.stuffType.is == StuffType.Action).toList
+    def delegateds = allStuffs.filter(_.stuffType.is == StuffType.Delegated).toList
+    def scheduleds = allStuffs.filter(_.stuffType.is == StuffType.Scheduled).toList
+    def maybes = allStuffs.filter(_.stuffType.is == StuffType.Maybe).toList
+    def references = allStuffs.filter(_.stuffType.is == StuffType.Reference).toList
+
 }
