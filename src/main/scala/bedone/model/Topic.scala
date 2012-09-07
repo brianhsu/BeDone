@@ -61,7 +61,14 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
     val title = new StringField(this, "")
     val description = new TextareaField(this, 1000)
 
-    override def saveTheRecord() = tryo(BeDoneSchema.topics.insert(this))
+    override def saveTheRecord() = tryo {
+        this.isPersisted match {
+            case true  => BeDoneSchema.topics.update(this)
+            case false => BeDoneSchema.topics.insert(this)
+        }
+
+        this
+    }
 
     def className = "topic%d%s" format (userID.is, hashHex(title.is))
 
