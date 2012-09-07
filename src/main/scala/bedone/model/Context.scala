@@ -41,6 +41,12 @@ object Context extends Context with MetaRecord[Context]
 
     def findByTitle(userID: Int, title: String): Box[Context] = 
         BeDoneSchema.contexts.where(t => t.userID === userID and t.title === title).headOption
+
+    def delete(context: Context) = {
+        BeDoneSchema.contexts.deleteWhere(c => c.idField === context.idField)
+        BeDoneSchema.actionContexts.deleteWhere(ac => ac.contextID === context.idField)
+    }
+
 }
 
 class Context extends Record[Context] with KeyedRecord[Int]

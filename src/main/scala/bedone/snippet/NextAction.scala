@@ -176,16 +176,40 @@ class NextAction extends JSImplicit
         (done.toList, notDone.toList)
     }
 
+    def deleteContext(context: Context)(): JsCmd = {
+
+        this.currentContext = None
+
+        Context.delete(context)
+
+        FadeOutAndRemove("actionTab" + context.idField.is) &
+        showAllAction("")
+    }
+
     def updateList(): JsCmd =
     {
+        def deleteJS(context: Context) = Confirm(
+            "確定要刪除「%s」嗎？" format(context.title.is), 
+            SHtml.ajaxInvoke(deleteContext(context))
+        )
+
         val (doneList, notDoneList) = actions
         val doneHTML = doneList.map(createActionRow).flatten
         val notDoneHTML = notDoneList.map(createActionRow).flatten
+        val updateDeleteButton = currentContext match {
+            case None => Hide("deleteContext")
+            case Some(context) => 
+                Show("deleteContext") &
+                """$('#deleteContext').attr('onclick', '%s')""".format(
+                    deleteJS(context).toJsCmd
+                )
+        }
 
         JqEmpty("actionIsDone") &
         JqEmpty("actionNotDone") &
         JqSetHtml("actionIsDone", doneHTML) &
-        JqSetHtml("actionNotDone", notDoneHTML)
+        JqSetHtml("actionNotDone", notDoneHTML) &
+        updateDeleteButton
     }
 
     def createActionRow(action: Action) = 
