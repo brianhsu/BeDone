@@ -15,16 +15,10 @@ import net.liftweb.http.js.jquery.JqJsCmds._
 
 import java.text.SimpleDateFormat
 
-class ProjectTable extends JSImplicit
+class ProjectTable extends Table with JSImplicit
 {
     val currentUser = CurrentUser.is.get
     def projects = Project.findByUser(currentUser).openOr(Nil)
-
-    def stripZero(size: Int): String = if (size > 0) size.toString else ""
-
-    def isTrashOrDone(stuff: Stuff) = {
-        stuff.isTrash.is || Action.findByID(stuff.idField.is).map(_.isDone.is).getOrElse(false)
-    }
 
     def editProject(project: Project)(value: String): JsCmd = {
         val editForm = new EditProjectForm(project, project => {

@@ -53,12 +53,16 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
 
     override def saveTheRecord() = tryo(BeDoneSchema.topics.insert(this))
 
-    def stuffs = { 
-        BeDoneSchema.stuffTopics.right(this)
-                    .filter(_.stuffType.is == StuffType.Stuff)toList
-    }
-
     def className = "topic%d%s" format (userID.is, hashHex(title.is))
 
     def addStuff(stuff: Stuff) = BeDoneSchema.stuffTopics.right(this).associate(stuff)
+
+    def allStuffs = BeDoneSchema.stuffTopics.right(this)
+    def stuffs = allStuffs.filter(_.stuffType.is == StuffType.Stuff).toList
+    def nextActions = allStuffs.filter(_.stuffType.is == StuffType.Action).toList
+    def delegateds = allStuffs.filter(_.stuffType.is == StuffType.Delegated).toList
+    def scheduleds = allStuffs.filter(_.stuffType.is == StuffType.Scheduled).toList
+    def maybes = allStuffs.filter(_.stuffType.is == StuffType.Maybe).toList
+    def references = allStuffs.filter(_.stuffType.is == StuffType.Reference).toList
+
 }
