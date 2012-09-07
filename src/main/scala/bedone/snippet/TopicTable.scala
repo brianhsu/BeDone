@@ -29,6 +29,12 @@ class TopicTable extends Table with JSImplicit
     val currentUser = CurrentUser.is.get
     def topics = Topic.findByUser(currentUser).openOr(Nil)
 
+    def deleteTopic(topic: Topic)() = {
+        Topic.delete(topic)
+        S.notice("已刪除「%s」" format(topic.title.is))
+        FadeOutAndRemove("topic" + topic.idField.is)
+    }
+
     def createTopicRow(topic: Topic) = {
 
         val stuffs = topic.stuffs.filterNot(isTrashOrDone)
@@ -46,7 +52,11 @@ class TopicTable extends Table with JSImplicit
         ".scheduled *"  #> stripZero(scheduleds.size) &
         ".maybe *"      #> stripZero(maybes.size) &
         ".reference *"  #> stripZero(references.size) &
-        ".name [data-original-title]" #> topic.description.is
+        ".name [data-original-title]" #> topic.description.is &
+        ".delete [onclick]" #> Confirm(
+            "確定刪除「%s」嗎？這個動作無法還原喲！" format(topic.title.is), 
+            SHtml.ajaxInvoke(deleteTopic(topic))
+        )
     }
 
     def render = {

@@ -34,7 +34,11 @@ object Project extends Project with MetaRecord[Project]
 
     def findByUser(user: User): Box[List[Project]] = findByUser(user.idField.is)
     def findByUser(userID: Int): Box[List[Project]] = tryo{
-        BeDoneSchema.projects.where(_.userID === userID).toList
+        from(BeDoneSchema.projects) { project => 
+            where(project.userID === userID).
+            select(project).
+            orderBy(project.title)
+        }.toList
     }
 
     def findByTitle(userID: Int, title: String): Box[Project] = 

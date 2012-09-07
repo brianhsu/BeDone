@@ -34,11 +34,21 @@ object Topic extends Topic with MetaRecord[Topic]
 
     def findByUser(user: User): Box[List[Topic]] = findByUser(user.idField.is)
     def findByUser(userID: Int): Box[List[Topic]] = tryo {
-        BeDoneSchema.topics.where(_.userID === userID).toList
+        from(BeDoneSchema.topics) { topic =>
+            where(topic.userID === userID).
+            select(topic).
+            orderBy(topic.title)
+        }.toList
     }
 
     def findByTitle(userID: Int, title: String): Box[Topic] = 
         BeDoneSchema.topics.where(t => t.userID === userID and t.title === title).headOption
+
+    def delete(topic: Topic) = {
+        BeDoneSchema.topics.deleteWhere(t => t.idField === topic.idField)
+        BeDoneSchema.stuffTopics.deleteWhere(st => st.topicID === topic.idField)
+    }
+
 }
 
 class Topic extends Record[Topic] with KeyedRecord[Int]
