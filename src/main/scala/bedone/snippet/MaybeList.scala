@@ -161,7 +161,7 @@ class MaybeList extends JSImplicit
             actionBar(maybe) &
             ".maybe [id]"   #> ("maybe" + stuff.idField) &
             ".collapse [id]" #> ("maybeDesc" + stuff.idField) &
-            ".title *"       #> stuff.title.is &
+            ".title *"       #> stuff.titleWithLink &
             ".desc *"        #> stuff.descriptionHTML &
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"     #> stuff.projects.map(_.viewButton(projectFilter)).flatten &

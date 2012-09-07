@@ -200,7 +200,7 @@ class NextAction extends JSImplicit
             actionBar(action) &
             ".action [id]"    #> ("action" + action.idField) &
             ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
-            ".title *"        #> stuff.title.is &
+            ".title *"        #> stuff.titleWithLink &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
