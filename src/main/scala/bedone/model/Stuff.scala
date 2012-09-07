@@ -19,6 +19,8 @@ import net.liftweb.record.field.OptionalLongField
 import net.liftweb.record.field.BooleanField
 import net.liftweb.record.field.EnumField
 
+import net.liftweb.http.SHtml
+
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 
@@ -27,6 +29,9 @@ import org.squeryl.annotations.Column
 import java.io.StringReader
 import java.io.StringWriter
 import java.util.Calendar
+
+import scala.xml.Text
+import scala.xml.Elem
 
 object StuffType extends Enumeration 
 {
@@ -188,6 +193,15 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
 
         shouldRemove.foreach(removeTopic)
         shouldAdd.foreach(addTopic)
+    }
+
+    def gmailLink = gmailID.is.map { id => 
+        "https://mail.google.com/mail/u/0/?shva=1#all/" + id.toHexString
+    }
+
+    def titleWithLink  = gmailLink match {
+        case None       => Text(title.is)
+        case Some(link) => <a href={link}>{title.is}</a>
     }
 
 }

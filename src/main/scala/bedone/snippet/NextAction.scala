@@ -167,25 +167,19 @@ class NextAction extends JSImplicit
     }
 
     def actions: (List[Action], List[Action]) = {
-        Action.findByUser(currentUser).openOr(Nil)
-              .filterNot(_.stuff.isTrash.is)
-              .filter(shouldDisplay)
-              .partition(_.isDone.is)
+        val (done, notDone) = 
+            Action.findByUser(currentUser).openOr(Nil).view
+                  .filterNot(_.stuff.isTrash.is)
+                  .filter(shouldDisplay)
+                  .partition(_.isDone.is)
+
+        (done.toList, notDone.toList)
     }
 
     def updateList(): JsCmd =
     {
-        def byDoneTime(action1: Action, action2: Action) = {
-            val time1: Long = action1.doneTime.is.map(_.getTime.getTime).getOrElse(0)
-            val time2: Long = action2.doneTime.is.map(_.getTime.getTime).getOrElse(0)
-            time1 < time2
-        }
-
         val (doneList, notDoneList) = actions
-        val doneHTML = 
-            doneList.sortWith(byDoneTime)
-                    .map(createActionRow).flatten
-
+        val doneHTML = doneList.map(createActionRow).flatten
         val notDoneHTML = notDoneList.map(createActionRow).flatten
 
         JqEmpty("actionIsDone") &
@@ -206,7 +200,7 @@ class NextAction extends JSImplicit
             actionBar(action) &
             ".action [id]"    #> ("action" + action.idField) &
             ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
-            ".title *"        #> stuff.title.is &
+            ".title *"        #> stuff.titleWithLink &
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &

@@ -32,7 +32,7 @@ object Action extends Action with MetaRecord[Action]
                     action.idField === stuff.idField
                 ) 
                 select(action) 
-                orderBy(stuff.deadline desc)
+                orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
             ).toList
         }
     }
