@@ -180,6 +180,8 @@ class NextAction extends JSImplicit
 
         this.currentContext = None
 
+        Context.delete(context)
+
         FadeOutAndRemove("actionTab" + context.idField.is) &
         showAllAction("")
     }
