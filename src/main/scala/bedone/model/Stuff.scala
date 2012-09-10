@@ -104,6 +104,18 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
 
     def topics = BeDoneSchema.stuffTopics.left(this).toList
     def projects = BeDoneSchema.stuffProjects.left(this).toList
+    def reInbox(title: Option[String] = None)  = {
+
+        title.foreach(t => this.title(t))
+        this.stuffType(StuffType.Stuff)
+
+        BeDoneSchema.actions.deleteWhere(_.idField === this.idField)
+        BeDoneSchema.delegateds.deleteWhere(_.idField === this.idField)
+        BeDoneSchema.scheduleds.deleteWhere(_.idField === this.idField)
+        BeDoneSchema.maybes.deleteWhere(_.idField === this.idField)
+
+        this.saveTheRecord()
+    }
 
     def descriptionHTML = {
         import org.tautua.markdownpapers.Markdown
