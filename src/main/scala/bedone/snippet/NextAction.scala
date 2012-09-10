@@ -71,7 +71,13 @@ class NextAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("action" + stuff.idField, 0, 500)
+            FadeOutAndRemove("action" + stuff.idField.is)
+        }
+
+        def reInbox(): JsCmd = 
+        {
+            stuff.reInbox()
+            FadeOutAndRemove("action" + stuff.idField.is)
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
@@ -100,7 +106,8 @@ class NextAction extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(action)) &
-        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
+        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) & 
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
         ".showDesc [data-target]" #> ("#actionDesc" + stuff.idField) &

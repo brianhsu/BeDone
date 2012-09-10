@@ -245,6 +245,12 @@ class ScheduledAction extends JSImplicit
             new FadeOut("scheduled" + stuff.idField, 0, 500)
         }
 
+        def reInbox(): JsCmd = 
+        {
+            stuff.reInbox()
+            FadeOutAndRemove("scheduled" + stuff.idField.is)
+        }
+
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
         {
             val rowID = "scheduled" + action.idField.is
@@ -271,6 +277,7 @@ class ScheduledAction extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(scheduled)) &
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &

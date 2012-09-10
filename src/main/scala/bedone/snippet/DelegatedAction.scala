@@ -78,6 +78,12 @@ class DelegatedAction extends JSImplicit
             FadeOutAndRemove("delegate" + stuff.idField)
         }
 
+        def reInbox(): JsCmd = 
+        {
+            stuff.reInbox()
+            FadeOutAndRemove("delegate" + stuff.idField.is)
+        }
+
         def markDoneFlag(isDone: Boolean): JsCmd = 
         {
             currentTabID match {
@@ -100,6 +106,7 @@ class DelegatedAction extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(delegated)) &
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
