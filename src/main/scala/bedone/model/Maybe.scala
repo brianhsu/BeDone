@@ -18,6 +18,7 @@ import org.squeryl.annotations.Column
 import org.joda.time._
 
 import java.util.Calendar
+import java.util.Date
 
 object Maybe extends Maybe with MetaRecord[Maybe]
 {
@@ -29,6 +30,20 @@ object Maybe extends Maybe with MetaRecord[Maybe]
             ) 
             select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
         ).toList
+    }
+
+    def outdated(user: User) = tryo {
+        val maybes = 
+            from(BeDoneSchema.stuffs, BeDoneSchema.maybes) ( (stuff, maybe) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.idField === maybe.idField and
+                    maybe.tickler.isNotNull
+                ) 
+                select(maybe) orderBy(maybe.tickler)
+            ).toList
+        
+        maybes.filter(_.tickler.is.get.getTimeInMillis < now.getTime)
     }
 
 }

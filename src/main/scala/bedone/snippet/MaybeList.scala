@@ -121,6 +121,12 @@ class MaybeList extends JSImplicit
             fadeOutEffect
         }
 
+        def reInbox(): JsCmd = 
+        {
+            stuff.reInbox()
+            FadeOutAndRemove("maybe" + stuff.idField.is)
+        }
+
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
@@ -134,6 +140,7 @@ class MaybeList extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(maybe)) &
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
