@@ -49,6 +49,7 @@ class ProjectTable extends Table with JSImplicit
 
         "tr [id]"       #> ("project" + project.idField.is) &
         ".name *"       #> project.title.is &
+        ".name [href]"  #> ("/project/" + project.idField.is) &
         ".inbox *"      #> stripZero(stuffs.size) &
         ".nextAction *" #> stripZero(nextActions.size) &
         ".delegated *"  #> stripZero(delegateds.size) &

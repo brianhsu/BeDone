@@ -3,10 +3,6 @@ body {
 
   padding-top: 60px;
 }
-.heroText {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
 .alert ul {
   list-style: none;
   margin-top: 0.4em;
@@ -36,6 +32,11 @@ body {
 div.btn-tag {
   margin-left: 0.2em;
 }
+div.btn-group a i[class^="icon-"] {
+  position: relative;
+  top: -10px;
+  margin-right: 5px;
+}
 i.myicon-starOn {
   background-image: url('/img/star_on.png');
   display: inline-block;
@@ -43,6 +44,9 @@ i.myicon-starOn {
   height: 14px;
   line-height: 14px;
   vertical-align: text-middle;
+  position: relative;
+  top: 4px;
+  margin-right: 10em;
 }
 i.myicon-starOff {
   background-image: url('/img/star_off.png');
@@ -50,7 +54,9 @@ i.myicon-starOff {
   width: 14px;
   height: 14px;
   line-height: 14px;
-  vertical-align: text-middle;
+  position: relative;
+  top: 4px;
+  margin-right: 10px;
 }
 div.editForm {
   margin-bottom: 0.8em;

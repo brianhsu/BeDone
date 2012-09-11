@@ -48,6 +48,15 @@ object Project extends Project with MetaRecord[Project]
         BeDoneSchema.projects.deleteWhere(p => p.idField === project.idField)
         BeDoneSchema.stuffProjects.deleteWhere(sp => sp.projectID === project.idField)
     }
+
+    def paramParser(param: String): Box[Project] = tryo {
+        inTransaction {
+            CurrentUser.is.flatMap { user => 
+                findByID(param.toInt).filter(_.userID.is == user.idField.is)
+            }.get
+        }
+    }
+
 }
 
 class Project extends Record[Project] with KeyedRecord[Int]
