@@ -7,6 +7,8 @@ import org.bedone.snippet.TagButton.Implicit._
 
 import net.liftweb.actor.LiftActor
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Schedule
 
@@ -25,13 +27,16 @@ import scala.xml.NodeSeq
 
 trait StuffList extends JSImplicit
 {
+    val projectID: Box[Int]
+
     protected var rapidTitle: String = _
 
     protected lazy val currentUser = CurrentUser.get.get
     protected lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     protected lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    protected def stuffs = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
+    protected def allStuffs = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
+    protected def stuffs = allStuffs
     protected def completeStuffTable = createStuffTable(stuffs)
 
     def formatDeadline(stuff: Stuff) = 
