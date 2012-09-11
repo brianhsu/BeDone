@@ -46,7 +46,7 @@ i.myicon-starOn {
   vertical-align: text-middle;
   position: relative;
   top: 4px;
-  margin-right: 10em;
+  margin-right: 10px;
 }
 i.myicon-starOff {
   background-image: url('/img/star_off.png');

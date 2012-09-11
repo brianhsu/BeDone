@@ -63,7 +63,7 @@ class ReferenceList extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
-        ".reference [onclick]" #> SHtml.onEvent(s => reInbox) &
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
