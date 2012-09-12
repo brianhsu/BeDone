@@ -46,7 +46,7 @@ i.myicon-starOn {
   vertical-align: text-middle;
   position: relative;
   top: 4px;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 i.myicon-starOff {
   background-image: url('/img/star_off.png');
@@ -56,7 +56,7 @@ i.myicon-starOff {
   line-height: 14px;
   position: relative;
   top: 4px;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 div.editForm {
   margin-bottom: 0.8em;

@@ -3,6 +3,8 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
@@ -28,11 +30,18 @@ class DelegatedAction extends JSImplicit
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "delegateInform"
 
+    private val projectID: Box[Int] = S.attr("projectID").map(_.toInt)
+    private val topicID: Box[Int] = S.attr("topicID").map(_.toInt)
+
     val currentUser = CurrentUser.get.get
 
+    def userDelegated = Delegated.findByUser(currentUser).openOr(Nil)
+    def projectDelegated = projectID.map(Delegated.findByProject(currentUser, _).openOr(Nil))
+    def topicDelegated = topicID.map(Delegated.findByTopic(currentUser, _).openOr(Nil))
+
     def allDelegatedAction = {
-        Delegated.findByUser(currentUser).openOr(Nil)
-                 .filterNot(_.action.stuff.isTrash.is)
+        (projectDelegated or topicDelegated).getOrElse(userDelegated)
+                                            .filterNot(_.action.stuff.isTrash.is)
     }
 
     def delegatedAction = contactID match {
