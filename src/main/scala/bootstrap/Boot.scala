@@ -55,7 +55,7 @@ class Boot
             "Project Detail", "Project Detail",
             parser = Project.paramParser _,
             encoder = _.idField.is.toString
-        ) / "project" / * / "inbox"
+        ) / "project" / *
 
         def siteMap = SiteMap(
             Menu.i("Index") / "index",
