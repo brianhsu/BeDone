@@ -22,7 +22,7 @@ class MaybeList extends JSImplicit
     private val topicID = S.attr("topicID").map(_.toInt)
 
     private def projectMaybes = projectID.map(Maybe.findByProject(currentUser, _).openOr(Nil))
-    private def topicMaybes = projectID.map(Maybe.findByTopic(currentUser, _).openOr(Nil))
+    private def topicMaybes = topicID.map(Maybe.findByTopic(currentUser, _).openOr(Nil))
     private def allMaybes = Maybe.findByUser(currentUser).openOr(Nil)
 
     private def maybes = (projectMaybes or topicMaybes).getOrElse(allMaybes)

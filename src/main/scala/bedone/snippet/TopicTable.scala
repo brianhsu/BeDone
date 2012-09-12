@@ -15,15 +15,6 @@ import net.liftweb.http.js.jquery.JqJsCmds._
 
 import java.text.SimpleDateFormat
 
-trait Table
-{
-    def stripZero(size: Int): String = if (size > 0) size.toString else ""
-
-    def isTrashOrDone(stuff: Stuff) = {
-        stuff.isTrash.is || Action.findByID(stuff.idField.is).map(_.isDone.is).getOrElse(false)
-    }
-}
-
 class TopicTable extends Table with JSImplicit 
 {
     val currentUser = CurrentUser.is.get
@@ -61,6 +52,7 @@ class TopicTable extends Table with JSImplicit
 
         "tr [id]"       #> ("topic" + topic.idField.is) &
         ".name *"       #> topic.title.is &
+        ".name [href]"  #> ("/topic/" + topic.idField.is) &
         ".inbox *"      #> stripZero(stuffs.size) &
         ".nextAction *" #> stripZero(nextActions.size) &
         ".delegated *"  #> stripZero(delegateds.size) &
