@@ -49,9 +49,8 @@ class EditProjectForm(project: Project, postAction: Project => JsCmd) extends JS
 
     def cssBinder = {
         "#projectEditTitle" #> SHtml.textAjaxTest(title, setTitle _, validateTitle _) &
-        "#projectEditDesc" #> (
-            SHtml.textarea(description, description = _) ++ SHtml.hidden(updateProject)
-        ) &
+        "#projectEditDesc" #> SHtml.textarea(description, description = _) &
+        "#projectHidden" #> SHtml.hidden(updateProject) &
         "#projectEditCancel [onclick]" #> (
             FadeOutAndRemove("editProjectForm") & "return false"
         )
