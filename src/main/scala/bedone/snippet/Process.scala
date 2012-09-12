@@ -288,7 +288,7 @@ class Process extends JSImplicit
 
         S.redirectTo(
             "/process", 
-             () => S.notice("已將「%s」放入下一步行動清單" format(stuff.title.is))
+             () => S.notice("已將「%s」放入儘快完成清單" format(stuff.title.is))
         )
     }
 
