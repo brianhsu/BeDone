@@ -22,6 +22,34 @@ import java.util.Date
 
 object Maybe extends Maybe with MetaRecord[Maybe]
 {
+    def findByTopic(user: User, topicID: Int): Box[List[Maybe]] = tryo {
+        import BeDoneSchema._
+
+        from(stuffs, maybes, stuffTopics) ( (stuff, maybe, stuffTopic) =>
+            where(
+                stuff.userID === user.idField and 
+                stuff.idField === maybe.idField and
+                stuffTopic.stuffID === stuff.idField and
+                stuffTopic.topicID === topicID
+            ) 
+            select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
+        ).toList
+    }
+
+    def findByProject(user: User, projectID: Int): Box[List[Maybe]] = tryo {
+        import BeDoneSchema._
+
+        from(stuffs, maybes, stuffProjects) ( (stuff, maybe, stuffProject) =>
+            where(
+                stuff.userID === user.idField and 
+                stuff.idField === maybe.idField and
+                stuffProject.stuffID === stuff.idField and
+                stuffProject.projectID === projectID
+            ) 
+            select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
+        ).toList
+    }
+
     def findByUser(user: User): Box[List[Maybe]] = tryo {
         from(BeDoneSchema.stuffs, BeDoneSchema.maybes) ( (stuff, maybe) =>
             where(

@@ -3,8 +3,10 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -16,8 +18,15 @@ import java.text.SimpleDateFormat
 
 class MaybeList extends JSImplicit
 {
-    private def maybes = Maybe.findByUser(currentUser).openOr(Nil)
-                              .filterNot(_.stuff.isTrash.is)
+    private val projectID = S.attr("projectID").map(_.toInt)
+    private val topicID = S.attr("topicID").map(_.toInt)
+
+    private def projectMaybes = projectID.map(Maybe.findByProject(currentUser, _).openOr(Nil))
+    private def topicMaybes = projectID.map(Maybe.findByTopic(currentUser, _).openOr(Nil))
+    private def allMaybes = Maybe.findByUser(currentUser).openOr(Nil)
+
+    private def maybes = (projectMaybes or topicMaybes).getOrElse(allMaybes)
+                                                       .filterNot(_.stuff.isTrash.is)
 
     private lazy val currentUser = CurrentUser.get.get
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
