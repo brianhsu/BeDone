@@ -6,9 +6,12 @@ import org.bedone.snippet._
 
 import net.liftweb.actor.LiftActor
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Schedule
 
+import net.liftweb.http.S
 import net.liftweb.http.js.jquery.JqJsCmds._
 import net.liftweb.http.CometActor
 
@@ -31,6 +34,9 @@ object GMailListener extends LiftActor
 
 class Inbox extends CometActor with StuffList
 {
+    val projectID: Box[Int] = S.attr("projectID").map(_.toInt)
+    val topicID: Box[Int] = S.attr("topicID").map(_.toInt)
+
     override def render = NodeSeq.Empty
 
     override def lowPriority = {

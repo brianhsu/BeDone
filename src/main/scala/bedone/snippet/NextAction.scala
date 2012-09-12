@@ -3,11 +3,14 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 
@@ -28,6 +31,13 @@ class NextAction extends JSImplicit
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentContext: Option[Context] = None
+
+    private val topicID: Box[Int] = S.attr("topicID").map(_.toInt)
+    private val projectID: Box[Int] = S.attr("projectID").map(_.toInt)
+
+    private def allActions = Action.findByUser(currentUser).openOr(Nil)
+    private def projectAction = projectID.map(Action.findByProject(currentUser, _).openOr(Nil))
+    private def topicAction = topicID.map(Action.findByTopic(currentUser, _).openOr(Nil))
 
     def formatDoneTime(action: Action) = 
     {
@@ -174,11 +184,12 @@ class NextAction extends JSImplicit
     }
 
     def actions: (List[Action], List[Action]) = {
-        val (done, notDone) = 
-            Action.findByUser(currentUser).openOr(Nil).view
-                  .filterNot(_.stuff.isTrash.is)
-                  .filter(shouldDisplay)
-                  .partition(_.isDone.is)
+
+        val actions = (projectAction orElse topicAction).getOrElse(allActions)
+
+        val (done, notDone) = actions.view.filterNot(_.stuff.isTrash.is)
+                                     .filter(shouldDisplay)
+                                     .partition(_.isDone.is)
 
         (done.toList, notDone.toList)
     }
@@ -275,7 +286,7 @@ class NextAction extends JSImplicit
         val (doneActions, notDoneActions) = actions
 
         ClearClearable &
-        "#actionShowAll"   #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#actionShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#actionIsDone"  #> (".row" #> doneActions.map(createActionRow)) &
         "#actionNotDone" #> (".row" #> notDoneActions.map(createActionRow)) &
         "#allActionTab [onclick]" #> SHtml.onEvent(showAllAction _) &

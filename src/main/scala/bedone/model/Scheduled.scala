@@ -22,6 +22,42 @@ import scala.xml.Text
 
 object Scheduled extends Scheduled with MetaRecord[Scheduled]
 {
+    def findByTopic(user: User, topicID: Int): Box[List[Scheduled]] = {
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, scheduleds, stuffTopics) ( (stuff, scheduled, stuffTopic) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === StuffType.Scheduled and
+                    stuff.idField === scheduled.idField and
+                    stuffTopic.stuffID === stuff.idField and
+                    stuffTopic.topicID === topicID
+                ) 
+                select(scheduled) 
+                orderBy(scheduled.startTime)
+            ).toList
+        }
+    }
+
+    def findByProject(user: User, projectID: Int): Box[List[Scheduled]] = {
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, scheduleds, stuffProjects) ( (stuff, scheduled, stuffProject) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === StuffType.Scheduled and
+                    stuff.idField === scheduled.idField and
+                    stuffProject.stuffID === stuff.idField and
+                    stuffProject.projectID === projectID
+                ) 
+                select(scheduled) 
+                orderBy(scheduled.startTime)
+            ).toList
+        }
+    }
+
     def findByUser(user: User): Box[List[Scheduled]] = {
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.scheduleds) ( (stuff, scheduled) =>

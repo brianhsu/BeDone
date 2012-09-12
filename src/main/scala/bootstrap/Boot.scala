@@ -2,8 +2,7 @@
 
 package bootstrap.liftweb
 
-import org.bedone.model.User
-import org.bedone.model.Contact
+import org.bedone.model._
 
 import org.bedone.view.AutoComplete
 
@@ -26,9 +25,6 @@ import net.liftweb.http.S
 import net.liftweb.util.LoanWrapper
 import net.liftweb.squerylrecord.RecordTypeMode._
 
-import java.io.Writer
-import scala.xml.Node
-
 class Boot 
 {
     def initAjaxLoader()
@@ -50,10 +46,16 @@ class Boot
 
         // Create a menu for /param/somedata
         val contactDetail = Menu.param[Contact](
-            "Param", "Param", 
+            "Contact Detail", "Contact Detail", 
             parser = Contact.paramParser _ , 
             encoder = _.idField.is.toString
         ) / "contact" / *
+
+        val projectInbox = Menu.param[Project](
+            "Project Detail", "Project Detail",
+            parser = Project.paramParser _,
+            encoder = _.idField.is.toString
+        ) / "project" / *
 
         def siteMap = SiteMap(
             Menu.i("Index") / "index",
@@ -67,9 +69,10 @@ class Boot
             (Menu.i("Preference") / "preference") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Process") / "process") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Contacts") / "contact") >> If(User.isLoggedIn _, "請先登入"),
-            (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入")
+            (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
+            (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
+            (projectInbox >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty))
         )
 
         LiftRules.setSiteMap(siteMap)

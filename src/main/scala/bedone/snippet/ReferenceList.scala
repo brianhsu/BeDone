@@ -3,8 +3,11 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -16,8 +19,24 @@ import java.text.SimpleDateFormat
 
 class ReferenceList extends JSImplicit
 {
-    def references = CurrentUser.get.flatMap(Stuff.findReferenceByUser)
-                                .openOr(Nil).filterNot(_.isTrash.is)
+    private val projectID = S.attr("projectID").map(_.toInt)
+    private val topicID = S.attr("topicID").map(_.toInt)
+
+    private val currentUser = CurrentUser.get.get
+
+    def allReferences = Stuff.findByUser(currentUser, StuffType.Reference)
+    def projectReferences = projectID.map { projectID => 
+        Stuff.findByProject(currentUser, projectID, StuffType.Reference)
+    }
+
+    def topicReferences = topicID.map { topicID =>
+        Stuff.findByTopic(currentUser, topicID, StuffType.Reference)
+    }
+
+    def references = 
+        (projectReferences orElse topicReferences).getOrElse(allReferences)
+                                                  .openOr(Nil)
+                                                  .filterNot(_.isTrash.is)
 
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
@@ -63,7 +82,7 @@ class ReferenceList extends JSImplicit
         }
 
         ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
-        ".reference [onclick]" #> SHtml.onEvent(s => reInbox) &
+        ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &

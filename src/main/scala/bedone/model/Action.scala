@@ -22,6 +22,45 @@ object Action extends Action with MetaRecord[Action]
     def findByID(id: Int): Box[Action] = 
         tryo(BeDoneSchema.actions.where(_.idField === id).single)
 
+    def findByTopic(user: User, topicID: Int) = {
+
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, actions, stuffTopics) ( (stuff, action, stuffTopic) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === StuffType.Action and
+                    action.idField === stuff.idField and
+                    stuffTopic.stuffID === stuff.idField and 
+                    stuffTopic.topicID === topicID
+                ) 
+                select(action) 
+                orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
+            ).toList
+        }
+    }
+
+
+    def findByProject(user: User, projectID: Int) = {
+
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, actions, stuffProjects) ( (stuff, action, stuffProject) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === StuffType.Action and
+                    action.idField === stuff.idField and
+                    stuffProject.stuffID === stuff.idField and 
+                    stuffProject.projectID === projectID
+                ) 
+                select(action) 
+                orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
+            ).toList
+        }
+    }
+
     def findByUser(user: User, stuffType: StuffType = StuffType.Action): Box[List[Action]] = 
     {
         tryo {

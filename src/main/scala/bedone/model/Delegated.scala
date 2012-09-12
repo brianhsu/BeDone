@@ -15,6 +15,39 @@ import org.squeryl.annotations.Column
 
 object Delegated extends Delegated with MetaRecord[Delegated]
 {
+
+    def findByTopic(user: User, topicID: Int): Box[List[Delegated]] = tryo {
+        import BeDoneSchema._
+
+        from(stuffs, delegateds, stuffTopics) ( (stuff, delegated, stuffTopic) =>
+            where(
+                stuff.userID === user.idField.is and 
+                stuff.stuffType === StuffType.Delegated and
+                stuff.idField === delegated.idField.is and
+                stuffTopic.stuffID === stuff.idField and
+                stuffTopic.topicID === topicID
+            ) 
+            select(delegated) 
+            orderBy(stuff.createTime)
+        ).toList
+    }
+
+    def findByProject(user: User, projectID: Int): Box[List[Delegated]] = tryo {
+        import BeDoneSchema._
+
+        from(stuffs, delegateds, stuffProjects) ( (stuff, delegated, stuffProject) =>
+            where(
+                stuff.userID === user.idField.is and 
+                stuff.stuffType === StuffType.Delegated and
+                stuff.idField === delegated.idField.is and
+                stuffProject.stuffID === stuff.idField and
+                stuffProject.projectID === projectID
+            ) 
+            select(delegated) 
+            orderBy(stuff.createTime)
+        ).toList
+    }
+
     def findByUser(user: User): Box[List[Delegated]] = tryo {
         from(BeDoneSchema.stuffs, BeDoneSchema.delegateds) ( (stuff, delegated) =>
             where(

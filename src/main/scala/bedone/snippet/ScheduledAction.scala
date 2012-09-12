@@ -3,11 +3,14 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.common.Box
+
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 
@@ -29,7 +32,14 @@ class ScheduledAction extends JSImplicit
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "scheduledWeekTab"
 
-    def scheduledAction = Scheduled.findByUser(currentUser).openOr(Nil)
+    private val projectID = S.attr("projectID").map(_.toInt)
+    private val topicID = S.attr("topicID").map(_.toInt)
+
+    def projectScheduled = projectID.map(Scheduled.findByProject(currentUser, _).openOr(Nil))
+    def topicScheduled = topicID.map(Scheduled.findByTopic(currentUser, _).openOr(Nil))
+    def userScheduled = Scheduled.findByUser(currentUser).openOr(Nil)
+    def scheduledAction = (projectScheduled orElse topicScheduled).getOrElse(userScheduled)
+
     def todayAction = scheduledAction.filter(isToday)
     def weekAction  = scheduledAction.filter(isThisWeek).filterNot(isToday)
     def monthAction = scheduledAction.filter(isThisMonth).filterNot(isToday)
