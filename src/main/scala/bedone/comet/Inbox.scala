@@ -35,6 +35,7 @@ object GMailListener extends LiftActor
 class Inbox extends CometActor with StuffList
 {
     val projectID: Box[Int] = S.attr("projectID").map(_.toInt)
+    val topicID: Box[Int] = S.attr("topicID").map(_.toInt)
 
     override def render = NodeSeq.Empty
 

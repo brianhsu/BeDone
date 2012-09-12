@@ -28,6 +28,7 @@ import scala.xml.NodeSeq
 trait StuffList extends JSImplicit
 {
     val projectID: Box[Int]
+    val topicID: Box[Int]
 
     protected var rapidTitle: String = _
 
@@ -35,8 +36,16 @@ trait StuffList extends JSImplicit
     protected lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     protected lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    protected def allStuffs = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
-    protected def stuffs = allStuffs
+    protected def allStuff = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
+    protected def projectStuff = projectID.map { id =>
+        allStuff.filter(_.projects.exists(_.idField.is == id))
+    }
+    protected def topicStuff = projectID.map { id =>
+        allStuff.filter(_.topics.exists(_.idField.is == id))
+    }
+
+    protected def stuffs = (projectStuff orElse topicStuff).getOrElse(allStuff)
+
     protected def completeStuffTable = createStuffTable(stuffs)
 
     def formatDeadline(stuff: Stuff) = 
@@ -83,7 +92,7 @@ trait StuffList extends JSImplicit
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
     {
-        val stuffs = topic.stuffs
+        val stuffs = this.stuffs.filter(_.topics.exists(_.idField.is == topic.idField.is))
         val newTable = createStuffTable(stuffs)
 
         println("stuffs of Topic(%d): %s" format(topic.idField.is, stuffs))
@@ -96,7 +105,7 @@ trait StuffList extends JSImplicit
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
     {
-        val stuffs = project.stuffs
+        val stuffs = this.stuffs.filter(_.projects.exists(_.idField.is == project.idField.is))
         val newTable = createStuffTable(stuffs)
 
         println("stuffs of Project(%d): %s" format(project.idField.is, stuffs))
