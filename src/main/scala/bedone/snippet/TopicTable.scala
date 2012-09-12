@@ -52,6 +52,7 @@ class TopicTable extends Table with JSImplicit
 
         "tr [id]"       #> ("topic" + topic.idField.is) &
         ".name *"       #> topic.title.is &
+        ".name [href]"  #> ("/topic/" + topic.idField.is) &
         ".inbox *"      #> stripZero(stuffs.size) &
         ".nextAction *" #> stripZero(nextActions.size) &
         ".delegated *"  #> stripZero(delegateds.size) &
