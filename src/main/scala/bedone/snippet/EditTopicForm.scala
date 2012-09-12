@@ -49,11 +49,10 @@ class EditTopicForm(topic: Topic, postAction: Topic => JsCmd) extends JSImplicit
 
     def cssBinder = {
         "#topicEditTitle" #> SHtml.textAjaxTest(title, setTitle _, validateTitle _) &
-        "#topicEditDesc" #> (
-            SHtml.textarea(description, description = _) ++ SHtml.hidden(updateTopic)
-        ) &
+        "#topicEditDesc" #> SHtml.textarea(description, description = _) &
+        "#topicEditHidden" #> SHtml.hidden(updateTopic) &
         "#topicEditCancel [onclick]" #> (
-            FadeOutAndRemove("editProjectForm") & "return false"
+            FadeOutAndRemove("editTopicForm") & "return false"
         )
     }
 
