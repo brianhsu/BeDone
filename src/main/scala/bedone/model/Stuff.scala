@@ -47,24 +47,58 @@ object StuffType extends Enumeration
 
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
+    import StuffType.StuffType
+
     def findByID(id: Int): Box[Stuff] = tryo { 
         BeDoneSchema.stuffs.where(_.idField === id).single 
     }
 
-    def findByUser(user: User): Box[List[Stuff]] = tryo {
-        from(BeDoneSchema.stuffs)(table =>
-            where(table.userID === user.idField and table.stuffType === StuffType.Stuff) 
-            select(table)
-            orderBy(table.createTime asc)
-        ).toList
+    def findByTopic(user: User, topicID: Int, 
+                    stuffType: StuffType = StuffType.Stuff): Box[List[Stuff]] = 
+    {
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, stuffTopics)((stuff, stuffTopic) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === stuffType and
+                    stuffTopic.stuffID === stuff.idField and
+                    stuffTopic.topicID === topicID
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
+            ).toList
+        }
     }
 
-    def findReferenceByUser(user: User): Box[List[Stuff]] = tryo {
-        from(BeDoneSchema.stuffs)(table =>
-            where(table.userID === user.idField and table.stuffType === StuffType.Reference)
-            select(table)
-            orderBy(table.createTime asc)
-        ).toList
+    def findByProject(user: User, projectID: Int, 
+                      stuffType: StuffType = StuffType.Stuff): Box[List[Stuff]] = 
+    {
+        import BeDoneSchema._
+
+        tryo {
+            from(stuffs, stuffProjects)((stuff, stuffProject) =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.stuffType === stuffType and
+                    stuffProject.stuffID === stuff.idField and
+                    stuffProject.projectID === projectID
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
+            ).toList
+        }
+    }
+
+    def findByUser(user: User, stuffType: StuffType = StuffType.Stuff): Box[List[Stuff]] = {
+        tryo {
+            from(BeDoneSchema.stuffs)(table =>
+                where(table.userID === user.idField and table.stuffType === stuffType) 
+                select(table)
+                orderBy(table.createTime asc)
+            ).toList
+        }
     }
 }
 
