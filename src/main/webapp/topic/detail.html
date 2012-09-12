@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div data-lift="TopicDetail">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <a class="brand topicTitle" href="#">Title</a>
+            <ul class="nav">
+              <li class="navItem inbox active"><a href="#">收件匣</a></li>
+              <li class="navItem nextAction"><a href="#">下一步行動</a></li>
+              <li class="navItem delegated"><a href="#">委派他人</a></li>
+              <li class="navItem scheduled"><a href="#">行事曆</a></li>
+              <li class="navItem maybe"><a href="#">也許 / 有一天</a></li>
+              <li class="navItem reference"><a href="#">參考資料</a></li>
+            </ul>
+          </div>
+        </div>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+  </body>
+</html>
+

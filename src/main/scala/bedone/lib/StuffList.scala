@@ -36,15 +36,12 @@ trait StuffList extends JSImplicit
     protected lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
     protected lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    protected def allStuff = Stuff.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
-    protected def projectStuff = projectID.map { id =>
-        allStuff.filter(_.projects.exists(_.idField.is == id))
-    }
-    protected def topicStuff = projectID.map { id =>
-        allStuff.filter(_.topics.exists(_.idField.is == id))
-    }
+    protected def allStuff = Stuff.findByUser(currentUser).openOr(Nil)
+    protected def projectStuff = projectID.map(Stuff.findByProject(currentUser, _).openOr(Nil))
+    protected def topicStuff = topicID.map(Stuff.findByTopic(currentUser, _).openOr(Nil))
 
     protected def stuffs = (projectStuff orElse topicStuff).getOrElse(allStuff)
+                                                           .filterNot(_.isTrash.is)
 
     protected def completeStuffTable = createStuffTable(stuffs)
 

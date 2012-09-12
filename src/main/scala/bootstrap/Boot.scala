@@ -51,11 +51,17 @@ class Boot
             encoder = _.idField.is.toString
         ) / "contact" / *
 
-        val projectInbox = Menu.param[Project](
+        val projectDetail = Menu.param[Project](
             "Project Detail", "Project Detail",
             parser = Project.paramParser _,
             encoder = _.idField.is.toString
         ) / "project" / *
+
+        val topicDetail = Menu.param[Topic](
+            "Topic Detail", "Topic Detail",
+            parser = Topic.paramParser _,
+            encoder = _.idField.is.toString
+        ) / "topic" / *
 
         def siteMap = SiteMap(
             Menu.i("Index") / "index",
@@ -72,7 +78,8 @@ class Boot
             (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
-            (projectInbox >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty))
+            (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
+            (topicDetail >> Template(() => Templates("topic" :: "detail" :: Nil) openOr NodeSeq.Empty))
         )
 
         LiftRules.setSiteMap(siteMap)

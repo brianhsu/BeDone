@@ -49,6 +49,14 @@ object Topic extends Topic with MetaRecord[Topic]
         BeDoneSchema.stuffTopics.deleteWhere(st => st.topicID === topic.idField)
     }
 
+    def paramParser(param: String): Box[Topic] = tryo {
+        inTransaction {
+            CurrentUser.is.flatMap { user => 
+                findByID(param.toInt).filter(_.userID.is == user.idField.is)
+            }.get
+        }
+    }
+
 }
 
 class Topic extends Record[Topic] with KeyedRecord[Int]
