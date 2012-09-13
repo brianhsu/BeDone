@@ -41,7 +41,6 @@ trait StuffList extends JSImplicit
     protected def topicStuff = topicID.map(Stuff.findByTopic(currentUser, _).openOr(Nil))
 
     protected def stuffs = (projectStuff orElse topicStuff).getOrElse(allStuff)
-                                                           .filterNot(_.isTrash.is)
 
     protected def completeStuffTable = createStuffTable(stuffs)
 

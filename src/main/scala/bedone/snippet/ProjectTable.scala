@@ -41,12 +41,12 @@ class ProjectTable extends Table with JSImplicit
 
     def createProjectRow(project: Project) = {
 
-        val stuffs = project.stuffs.filterNot(isTrashOrDone)
-        val nextActions = project.nextActions.filterNot(isTrashOrDone)
-        val delegateds = project.delegateds.filterNot(isTrashOrDone)
-        val scheduleds = project.scheduleds.filterNot(isTrashOrDone)
-        val maybes = project.maybes.filterNot(isTrashOrDone)
-        val references = project.references.filterNot(isTrashOrDone)
+        val stuffs = project.stuffs.filterNot(isDone)
+        val nextActions = project.nextActions.filterNot(isDone)
+        val delegateds = project.delegateds.filterNot(isDone)
+        val scheduleds = project.scheduleds.filterNot(isDone)
+        val maybes = project.maybes.filterNot(isDone)
+        val references = project.references.filterNot(isDone)
 
         "tr [id]"       #> ("project" + project.idField.is) &
         ".name *"       #> project.title.is &

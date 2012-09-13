@@ -31,6 +31,7 @@ object Scheduled extends Scheduled with MetaRecord[Scheduled]
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
                     stuff.idField === scheduled.idField and
+                    stuff.isTrash === false and
                     stuffTopic.stuffID === stuff.idField and
                     stuffTopic.topicID === topicID
                 ) 
@@ -49,6 +50,7 @@ object Scheduled extends Scheduled with MetaRecord[Scheduled]
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
                     stuff.idField === scheduled.idField and
+                    stuff.isTrash === false and
                     stuffProject.stuffID === stuff.idField and
                     stuffProject.projectID === projectID
                 ) 
@@ -64,6 +66,7 @@ object Scheduled extends Scheduled with MetaRecord[Scheduled]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
+                    stuff.isTrash === false and
                     stuff.idField === scheduled.idField
                 ) 
                 select(scheduled) 

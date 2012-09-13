@@ -43,12 +43,12 @@ class TopicTable extends Table with JSImplicit
 
     def createTopicRow(topic: Topic) = {
 
-        val stuffs = topic.stuffs.filterNot(isTrashOrDone)
-        val nextActions = topic.nextActions.filterNot(isTrashOrDone)
-        val delegateds = topic.delegateds.filterNot(isTrashOrDone)
-        val scheduleds = topic.scheduleds.filterNot(isTrashOrDone)
-        val maybes = topic.maybes.filterNot(isTrashOrDone)
-        val references = topic.references.filterNot(isTrashOrDone)
+        val stuffs = topic.stuffs.filterNot(isDone)
+        val nextActions = topic.nextActions.filterNot(isDone)
+        val delegateds = topic.delegateds.filterNot(isDone)
+        val scheduleds = topic.scheduleds.filterNot(isDone)
+        val maybes = topic.maybes.filterNot(isDone)
+        val references = topic.references.filterNot(isDone)
 
         "tr [id]"       #> ("topic" + topic.idField.is) &
         ".name *"       #> topic.title.is &

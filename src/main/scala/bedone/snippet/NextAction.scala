@@ -187,7 +187,7 @@ class NextAction extends JSImplicit
 
         val actions = (projectAction orElse topicAction).getOrElse(allActions)
 
-        val (done, notDone) = actions.view.filterNot(_.stuff.isTrash.is)
+        val (done, notDone) = actions.view
                                      .filter(shouldDisplay)
                                      .partition(_.isDone.is)
 

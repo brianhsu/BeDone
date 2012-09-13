@@ -41,7 +41,6 @@ class DelegatedAction extends JSImplicit
 
     def allDelegatedAction = {
         (projectDelegated or topicDelegated).getOrElse(userDelegated)
-                                            .filterNot(_.action.stuff.isTrash.is)
     }
 
     def delegatedAction = contactID match {

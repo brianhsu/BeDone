@@ -79,6 +79,7 @@ object Stuff extends Stuff with MetaRecord[Stuff]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === stuffType and
+                    stuff.isTrash === false and
                     stuffTopic.stuffID === stuff.idField and
                     stuffTopic.topicID === topicID
                 ) 
@@ -98,6 +99,7 @@ object Stuff extends Stuff with MetaRecord[Stuff]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === stuffType and
+                    stuff.isTrash === false and
                     stuffProject.stuffID === stuff.idField and
                     stuffProject.projectID === projectID
                 ) 
@@ -109,10 +111,14 @@ object Stuff extends Stuff with MetaRecord[Stuff]
 
     def findByUser(user: User, stuffType: StuffType = StuffType.Stuff): Box[List[Stuff]] = {
         tryo {
-            from(BeDoneSchema.stuffs)(table =>
-                where(table.userID === user.idField and table.stuffType === stuffType) 
-                select(table)
-                orderBy(table.createTime asc)
+            from(BeDoneSchema.stuffs)(stuff =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.isTrash === false and
+                    stuff.stuffType === stuffType
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
             ).toList
         }
     }
