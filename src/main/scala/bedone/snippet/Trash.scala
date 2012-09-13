@@ -31,6 +31,36 @@ class Trash extends  JSImplicit
         }
     }
 
+    def topicFilter(buttonID: String, topic: Topic): JsCmd = 
+    {
+        val trashs = this.trashs.filter(_.topics.exists(_.idField.is == topic.idField.is))
+        val newTable = trashs.flatMap(createTrashRow)
+
+        JqSetHtml("trashList", newTable) &
+        JqSetHtml("trashCurrent", topic.title.is) &
+        JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#trashCurrent').attr("class", "btn btn-info")""")
+    }
+
+    def projectFilter(buttonID: String, project: Project): JsCmd = 
+    {
+        val trashs = this.trashs.filter(_.projects.exists(_.idField.is == project.idField.is))
+        val newTable = trashs.flatMap(createTrashRow)
+
+        JqSetHtml("trashList", newTable) &
+        JqSetHtml("trashCurrent", project.title.is) &
+        JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
+        JsRaw("""$('#trashCurrent').attr("class", "btn btn-success")""")
+    }
+
+    def showAllStuff() = 
+    {
+        JqSetHtml("trashList", trashs.flatMap(createTrashRow)) & 
+        JqSetHtml("trashCurrent", "全部") &
+        JsRaw("""$('#trashShowAll').prop("disabled", true)""") &
+        JsRaw("""$('#trashCurrent').attr("class", "btn btn-inverse")""")
+    }
+
     def actionBar(stuff: Stuff) = {
 
         def starClass = stuff.isStared.is match {
@@ -42,7 +72,7 @@ class Trash extends  JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
             
-            """$('#inboxRow%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
+            """$('#trashRow%s .star i').attr('class', '%s')""".format(stuff.idField, starClass)
         }
 
         def undelete(): JsCmd = {
@@ -83,12 +113,15 @@ class Trash extends  JSImplicit
             ".collapse [id]" #> ("trashDesc" + stuff.idField) &
             ".title *"       #> stuff.titleWithLink &
             ".desc *"        #> stuff.descriptionHTML &
-            ".deadline"      #> formatDeadline(stuff)
+            ".deadline"      #> formatDeadline(stuff) &
+            ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"     #> stuff.projects.map(_.viewButton(projectFilter)).flatten
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
    
     def render = {
+        "#trashShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         ".trashRow" #> trashs.flatMap(createTrashRow)
     }
 }
