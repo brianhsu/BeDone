@@ -45,6 +45,22 @@ object StuffType extends Enumeration
     val Maybe    = Value(5, "Maybe")
 }
 
+object Trash 
+{
+    def findByUser(user: User): Box[List[Stuff]] = {
+        tryo {
+            from(BeDoneSchema.stuffs)(stuff =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.isTrash === true
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
+            ).toList
+        }
+    }
+}
+
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
     import StuffType.StuffType
@@ -63,6 +79,7 @@ object Stuff extends Stuff with MetaRecord[Stuff]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === stuffType and
+                    stuff.isTrash === false and
                     stuffTopic.stuffID === stuff.idField and
                     stuffTopic.topicID === topicID
                 ) 
@@ -82,6 +99,7 @@ object Stuff extends Stuff with MetaRecord[Stuff]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === stuffType and
+                    stuff.isTrash === false and
                     stuffProject.stuffID === stuff.idField and
                     stuffProject.projectID === projectID
                 ) 
@@ -93,13 +111,29 @@ object Stuff extends Stuff with MetaRecord[Stuff]
 
     def findByUser(user: User, stuffType: StuffType = StuffType.Stuff): Box[List[Stuff]] = {
         tryo {
-            from(BeDoneSchema.stuffs)(table =>
-                where(table.userID === user.idField and table.stuffType === stuffType) 
-                select(table)
-                orderBy(table.createTime asc)
+            from(BeDoneSchema.stuffs)(stuff =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.isTrash === false and
+                    stuff.stuffType === stuffType
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
             ).toList
         }
     }
+
+    def delete(stuff: Stuff) = {
+        BeDoneSchema.stuffs.deleteWhere(s => s.idField === stuff.idField)
+        BeDoneSchema.stuffProjects.deleteWhere(sp => sp.stuffID === stuff.idField)
+        BeDoneSchema.stuffTopics.deleteWhere(st => st.stuffID === stuff.idField)
+        BeDoneSchema.actions.deleteWhere(a => a.idField === stuff.idField)
+        BeDoneSchema.maybes.deleteWhere(m => m.idField === stuff.idField)
+        BeDoneSchema.scheduleds.deleteWhere(s => s.idField === stuff.idField)
+        BeDoneSchema.delegateds.deleteWhere(d => d.idField === stuff.idField)
+        BeDoneSchema.actionContexts.deleteWhere(ac => ac.actionID === stuff.idField)
+    }
+
 }
 
 class Stuff extends Record[Stuff] with KeyedRecord[Int] 

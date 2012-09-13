@@ -24,6 +24,7 @@ object Delegated extends Delegated with MetaRecord[Delegated]
                 stuff.userID === user.idField.is and 
                 stuff.stuffType === StuffType.Delegated and
                 stuff.idField === delegated.idField.is and
+                stuff.isTrash === false and
                 stuffTopic.stuffID === stuff.idField and
                 stuffTopic.topicID === topicID
             ) 
@@ -40,6 +41,7 @@ object Delegated extends Delegated with MetaRecord[Delegated]
                 stuff.userID === user.idField.is and 
                 stuff.stuffType === StuffType.Delegated and
                 stuff.idField === delegated.idField.is and
+                stuff.isTrash === false and
                 stuffProject.stuffID === stuff.idField and
                 stuffProject.projectID === projectID
             ) 
@@ -53,6 +55,7 @@ object Delegated extends Delegated with MetaRecord[Delegated]
             where(
                 stuff.userID === user.idField.is and 
                 stuff.stuffType === StuffType.Delegated and
+                stuff.isTrash === false and
                 stuff.idField === delegated.idField.is
             ) 
             select(delegated) 

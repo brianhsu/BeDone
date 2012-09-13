@@ -29,6 +29,7 @@ object Maybe extends Maybe with MetaRecord[Maybe]
             where(
                 stuff.userID === user.idField and 
                 stuff.idField === maybe.idField and
+                stuff.isTrash === false and
                 stuffTopic.stuffID === stuff.idField and
                 stuffTopic.topicID === topicID
             ) 
@@ -43,6 +44,7 @@ object Maybe extends Maybe with MetaRecord[Maybe]
             where(
                 stuff.userID === user.idField and 
                 stuff.idField === maybe.idField and
+                stuff.isTrash === false and
                 stuffProject.stuffID === stuff.idField and
                 stuffProject.projectID === projectID
             ) 
@@ -54,6 +56,7 @@ object Maybe extends Maybe with MetaRecord[Maybe]
         from(BeDoneSchema.stuffs, BeDoneSchema.maybes) ( (stuff, maybe) =>
             where(
                 stuff.userID === user.idField and 
+                stuff.isTrash === false and
                 stuff.idField === maybe.idField
             ) 
             select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
@@ -66,6 +69,7 @@ object Maybe extends Maybe with MetaRecord[Maybe]
                 where(
                     stuff.userID === user.idField and 
                     stuff.idField === maybe.idField and
+                    stuff.isTrash === false and
                     maybe.tickler.isNotNull
                 ) 
                 select(maybe) orderBy(maybe.tickler)

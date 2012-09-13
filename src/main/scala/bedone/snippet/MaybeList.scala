@@ -26,7 +26,6 @@ class MaybeList extends JSImplicit
     private def allMaybes = Maybe.findByUser(currentUser).openOr(Nil)
 
     private def maybes = (projectMaybes or topicMaybes).getOrElse(allMaybes)
-                                                       .filterNot(_.stuff.isTrash.is)
 
     private lazy val currentUser = CurrentUser.get.get
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")

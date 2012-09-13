@@ -28,7 +28,7 @@ class Process extends JSImplicit
 
     private lazy val currentUser = CurrentUser.is.get
     private lazy val stuff = Stuff.findByUser(currentUser).openOr(Nil)
-                                  .filterNot(_.isTrash.is).headOption
+                                  .headOption
 
     private var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     private var currentTopics = stuff.map(_.topics).getOrElse(Nil)

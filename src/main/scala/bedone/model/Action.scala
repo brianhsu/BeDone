@@ -31,6 +31,7 @@ object Action extends Action with MetaRecord[Action]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Action and
+                    stuff.isTrash === false and
                     action.idField === stuff.idField and
                     stuffTopic.stuffID === stuff.idField and 
                     stuffTopic.topicID === topicID
@@ -51,6 +52,7 @@ object Action extends Action with MetaRecord[Action]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Action and
+                    stuff.isTrash === false and
                     action.idField === stuff.idField and
                     stuffProject.stuffID === stuff.idField and 
                     stuffProject.projectID === projectID
@@ -68,6 +70,7 @@ object Action extends Action with MetaRecord[Action]
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === stuffType and
+                    stuff.isTrash === false and
                     action.idField === stuff.idField
                 ) 
                 select(action) 
