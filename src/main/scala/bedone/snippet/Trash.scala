@@ -16,6 +16,7 @@ import net.liftweb.http.js.JE._
 import net.liftweb.http.js.jquery.JqJsCmds._
 
 import java.text.SimpleDateFormat
+import scala.xml.NodeSeq
 
 class Trash extends  JSImplicit
 {
@@ -119,9 +120,17 @@ class Trash extends  JSImplicit
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
+
+    def emptyTrash(): JsCmd = {
+        
+        trashs.foreach(Stuff.delete)
+
+        "$('.trashRow').fadeOut(500)"
+    }
    
     def render = {
         "#trashShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#emptyTrash [onclick]" #> SHtml.onEvent(s => Confirm("確定清空垃圾桶嗎？", SHtml.ajaxInvoke(emptyTrash))) &
         ".trashRow" #> trashs.flatMap(createTrashRow)
     }
 }
