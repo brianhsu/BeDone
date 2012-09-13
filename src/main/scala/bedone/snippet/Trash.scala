@@ -67,7 +67,7 @@ class Trash extends  JSImplicit
         ".remove [onclick]" #> SHtml.onEvent(s => delete) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
         ".star" #> ("i [class]" #> starClass) &
-        ".showDesc [data-target]" #> ("#inboxDesc" + stuff.idField) &
+        ".showDesc [data-target]" #> ("#trashDesc" + stuff.idField) &
         ".showDesc [style+]" #> descIconVisibility
     }
 
