@@ -116,6 +116,18 @@ object Stuff extends Stuff with MetaRecord[Stuff]
             ).toList
         }
     }
+
+    def delete(stuff: Stuff) = {
+        BeDoneSchema.stuffs.deleteWhere(s => s.idField === stuff.idField)
+        BeDoneSchema.stuffProjects.deleteWhere(sp => sp.stuffID === stuff.idField)
+        BeDoneSchema.stuffTopics.deleteWhere(st => st.stuffID === stuff.idField)
+        BeDoneSchema.actions.deleteWhere(a => a.idField === stuff.idField)
+        BeDoneSchema.maybes.deleteWhere(m => m.idField === stuff.idField)
+        BeDoneSchema.scheduleds.deleteWhere(s => s.idField === stuff.idField)
+        BeDoneSchema.delegateds.deleteWhere(d => d.idField === stuff.idField)
+        BeDoneSchema.actionContexts.deleteWhere(ac => ac.actionID === stuff.idField)
+    }
+
 }
 
 class Stuff extends Record[Stuff] with KeyedRecord[Int] 

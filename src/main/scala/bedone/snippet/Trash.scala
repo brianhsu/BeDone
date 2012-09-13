@@ -53,12 +53,8 @@ class Trash extends  JSImplicit
         }
 
         def delete(): JsCmd = {
-
             println("delete " + stuff.idField.is)
-            /*
-            stuff.isTrash(true)
-            stuff.saveTheRecord()
-            */
+            Stuff.delete(stuff)
             new FadeOut("trashRow" + stuff.idField, 0, 500)
         }
 
