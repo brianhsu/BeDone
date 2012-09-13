@@ -45,6 +45,22 @@ object StuffType extends Enumeration
     val Maybe    = Value(5, "Maybe")
 }
 
+object Trash 
+{
+    def findByUser(user: User): Box[List[Stuff]] = {
+        tryo {
+            from(BeDoneSchema.stuffs)(stuff =>
+                where(
+                    stuff.userID === user.idField and 
+                    stuff.isTrash === true
+                ) 
+                select(stuff)
+                orderBy(stuff.createTime asc)
+            ).toList
+        }
+    }
+}
+
 object Stuff extends Stuff with MetaRecord[Stuff]
 {
     import StuffType.StuffType
