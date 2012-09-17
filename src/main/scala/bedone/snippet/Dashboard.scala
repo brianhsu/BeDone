@@ -19,18 +19,25 @@ import java.text.SimpleDateFormat
 
 class DashBoard
 {
+    private val currentUser = CurrentUser.get.get
     def render = {
-        
-        val comboBox = new ComboBox("http://localhost:8081/autocomplete/contact", true) {
-            override def onItemSelected(id: String, text: String): JsCmd = {
-                println("onItemSelected:" + (id, text))
-            }
 
-            override def onItemAdded(text: String): JsCmd = {
-                println("onItemAdded:" + text)
-            }
-
+        def onItemSelected(id: String, text: String): JsCmd = {
+            println("onItemSelected:" + (id, text))
         }
+
+        def onItemAdded(text: String): JsCmd = {
+            println("onItemAdded:" + text)
+        }
+
+        def onSearching(term: String) = {
+            Contact.findByUser(currentUser).openOr(Nil)
+                   .filter(_.name.is.contains(term))
+                   .map(x => ComboItem(x.idField.is.toString, x.name.is))
+        }
+
+        val comboBox = ComboBox(onSearching _, onItemSelected _, onItemAdded _)
+
 
         "name=contactInput" #> comboBox.comboBox
     }

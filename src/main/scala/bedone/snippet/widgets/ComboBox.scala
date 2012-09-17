@@ -1,23 +1,69 @@
 package org.bedone.snippet
 
+import net.liftweb.common._
+
 import net.liftweb.json._
 import net.liftweb.json.JsonParser
+import net.liftweb.json.Serialization
 
+import net.liftweb.http.LiftRules
+import net.liftweb.http.JsonResponse
 import net.liftweb.http.js.JE.JsRaw
+import net.liftweb.http.js.JE.Call
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JE._
 
 import net.liftweb.http.SHtml
+import net.liftweb.http.S
+import net.liftweb.http.S._
 
 import net.liftweb.util.Helpers
 
 import scala.xml.NodeSeq
 
+
 case class ComboItem(id: String, text: String)
 
-class ComboBox(ajaxURL: String, allowCreate: Boolean, 
-               jsonOptions: List[(String, String)] = Nil)
+object ComboBox
+{
+    def apply(searching: (String) => List[ComboItem],
+              itemSelected: (String, String) => JsCmd, 
+              jsonOptions: List[(String, String)]): ComboBox = {
+
+        new ComboBox(false, jsonOptions) {
+            override def onItemSelected(id: String, text: String) = { itemSelected(id, text) }
+            override def onSearching(term: String) = { searching(term) }
+        }
+    }
+
+    def apply(searching: (String) => List[ComboItem],
+              itemSelected: (String, String) => JsCmd, 
+              itemAdded: (String) => JsCmd,
+              jsonOptions: List[(String, String)]): ComboBox = {
+
+        new ComboBox(true, jsonOptions) {
+            override def onItemSelected(id: String, text: String) = { itemSelected(id, text) }
+            override def onItemAdded(text: String) = { itemAdded(text) }
+            override def onSearching(term: String) = { searching(term) }
+        }
+    }
+
+    def apply(searching: (String) => List[ComboItem],
+              itemSelected: (String, String) => JsCmd): ComboBox = {
+
+        ComboBox.apply(searching, itemSelected, Nil)
+    }
+
+    def apply(searching: (String) => List[ComboItem],
+              itemSelected: (String, String) => JsCmd, 
+              itemAdded: (String) => JsCmd): ComboBox = {
+
+        ComboBox.apply(searching, itemSelected, itemAdded, Nil)
+    }
+}
+
+abstract class ComboBox(allowCreate: Boolean, jsonOptions: List[(String, String)] = Nil)
 {
     private implicit val formats = DefaultFormats
     private val NewItemPrefix = Helpers.nextFuncName
@@ -26,6 +72,7 @@ class ComboBox(ajaxURL: String, allowCreate: Boolean,
 
     def onItemSelected(id: String, text: String): JsCmd = { Noop }
     def onItemAdded(text: String): JsCmd = { Noop }
+    def onSearching(term: String): List[ComboItem]
 
     private def onItemSelected_*(value: String): JsCmd = {
 
@@ -37,15 +84,27 @@ class ComboBox(ajaxURL: String, allowCreate: Boolean,
         }
     }
 
+    private def ajaxURL: String = {
+
+        val ajaxFunc = (funcName: String) => {
+
+            val term = S.param("term").getOrElse("")
+            val jsonResult = onSearching(term)
+
+            JsonResponse(JsRaw(Serialization.write(jsonResult)))
+        }
+
+        fmapFunc(SFuncHolder(ajaxFunc)){ funcName =>
+           encodeURL(S.contextPath + "/" + LiftRules.ajaxPath+"?"+funcName+"=foo")
+        }
+    }
+
     def comboBox: NodeSeq = {
         
         val options = ("width" -> "'200px'") :: jsonOptions
         val jsOptions = JsRaw(options.map(t => "%s: %s" format(t._1, t._2)).mkString(","))
 
-        val onSelectJS = {
-            val jsExp = JsRaw("""getValue()""")
-            SHtml.ajaxCall(jsExp, onItemSelected_* _)._2.toJsCmd
-        }
+        val onSelectJS = SHtml.ajaxCall(Call("getValue"), onItemSelected_* _)._2.toJsCmd
 
         val ajaxJS = """{
             url: "%s",
@@ -67,8 +126,6 @@ class ComboBox(ajaxURL: String, allowCreate: Boolean,
         val getValueJS = """
             function getValue() {
                 var data = $('#%s').select2("data");
-                console.log("QQ.id:" + data.id);
-                console.log("QQ.text:" + data.text);
                 return '{"id": "' + data.id + '", "text": "' + data.text + '" }';
             }
         """.format(comboBoxID)
@@ -77,7 +134,6 @@ class ComboBox(ajaxURL: String, allowCreate: Boolean,
             function createNewItem (term, data) { 
                 if ($(data).filter(function() { return this.text.localeCompare(term)===0; })
                            .length===0) {
-                    console.log("add new:" + term);
                     return {"id": "%s" + term, "text": term};
                 } 
             }
