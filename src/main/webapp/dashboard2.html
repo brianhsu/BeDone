@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div class="hero-unit">
+      </div>
+      <div id="mails">
+        <input type="hidden" id="e1" />
+        <input type="text" id="e1val"/>
+      </div>
+      <script>
+          $(document).ready(function() { 
+              $("#e1").select2({
+                  width: '200px',
+                  placeholder: '請選擇負擇人',
+                  allowClear: true,
+                  formatSearching: function() { return '搜尋中……' },
+                  ajax: { 
+                      url: "/autocomplete/contact",
+                      dataType: 'json',
+                      data: function (term, page) {
+                          return {
+                              'term': term
+                          }
+                      },
+                      results: function (data, page) {
+                          return {results: data};
+                      }
+                  },
+                  createSearchChoice:function(term, data) { 
+                      function compare() {
+                          return this.text.localeCompare(term)===0; 
+                      }
+
+                      if ($(data).filter(compare).length===0) {
+                          $('#e1val').val(term);
+                          return {id:-1, text:term};
+                      }
+                  }
+              });
+              $('#e1').on("change", function(e) { console.log("e.val:" + e.val)})
+          });
+      </script>
+    </div>
+  </body>
+</html>
+
