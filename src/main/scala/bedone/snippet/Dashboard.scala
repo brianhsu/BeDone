@@ -3,6 +3,7 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftmodules.combobox._
 import net.liftweb.common.Box
 
 import net.liftweb.util.Helpers._

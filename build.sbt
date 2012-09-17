@@ -25,13 +25,14 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-    "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
+    "com.jolbox" % "bonecp" % "0.7.1.RELEASE",
     "javax.servlet" % "servlet-api" % "2.5" % "provided",
     "mysql" % "mysql-connector-java" % "5.1.6",
     "net.liftweb" % "lift-webkit_2.9.2" % "2.5-SNAPSHOT" % "compile->default",
     "net.liftweb" % "lift-squeryl-record_2.9.2" % "2.5-SNAPSHOT",
-    "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7",
-    "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
+    "net.liftmodules" %% "combobox" % "2.5-SNAPSHOT-0.1",
+    "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
+    "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7"
 )
 
 port in container.Configuration := 8081
