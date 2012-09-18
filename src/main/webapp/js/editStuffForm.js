@@ -95,14 +95,6 @@ function prepareActionEditForm()
 
 function prepareDelegateEditForm()
 {
-    $( "#delegateTopic" ).autocomplete({
-        source: "/autocomplete/topic",
-        select: function(event, ui) { 
-            $("#delegateTopic").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
     $( "#delegateProject" ).autocomplete({
         source: "/autocomplete/project",
         select: function(event, ui) { 
