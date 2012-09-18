@@ -162,98 +162,33 @@ class Process extends JSImplicit
         S.redirectTo("/process", () => S.notice("已將「%s」標記為完成" format(stuff.title.is)))
     }
 
-    def addProject(title: String): JsCmd = {
-
-        val userID = CurrentUser.get.get.idField.is
-        val containers = List(
-            "editFormProject", "referenceProject", 
-            "maybeProject", "nextActionProject"
-        )
-
-        def createProject = Project.createRecord.userID(userID).title(title)
-        def project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue.byClassName("projectInput")
-            case false =>
-                currentProjects ::= project
-
-                ClearValue.byClassName("projectInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, project.editButton(onProjectClick, onProjectRemove))
-                }
-        }
-    }
-
-    def addProject(): JsCmd = {
-
-        projectTitle match {
-            case None        => Noop
-            case Some(title) => addProject(title)
-        }
-    }
-    
-    def addTopic(title: String): JsCmd = {
-
-        val userID = CurrentUser.get.get.idField.is
-        val containers = List(
-            "editFormTopic", "referenceTopic", 
-            "maybeTopic", "nextActionTopic"
-        )
-
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        def topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
-
-        currentTopics.contains(topic) match {
-            case true  => ClearValue.byClassName("topicInput")
-            case false =>
-                currentTopics ::= topic
-
-                ClearValue.byClassName("topicInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, topic.editButton(onTopicClick, onTopicRemove))
-                }
-        }
-    }
-
-    def addTopic(): JsCmd = {
-        topicTitle match {
-            case None        => Noop
-            case Some(title) => addTopic(title)
-        }
-    }
-
-    def addContext(title: String): JsCmd = {
-        val containers = List("nextActionContext")
-        val userID = CurrentUser.get.get.idField.is
-
-        def createContext = Context.createRecord.userID(userID).title(title)
-        def context = Context.findByTitle(userID, title).getOrElse(createContext)
-
-        currentContexts.contains(context) match {
-            case true  => ClearValue.byClassName("contextInput")
-            case false =>
-                currentContexts ::= context
-
-                ClearValue.byClassName("contextInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, context.editButton(onContextClick, onContextRemove))
-                }
-        }
-    }
-
-    def addContext(): JsCmd = {
-        contextTitle match {
-            case None        => Noop
-            case Some(title) => addContext(title)
-        }
-    }
-
     def createTopicTags(containerID: String) =
     {
-        "name=topicInput"   #> SHtml.text("", topicTitle = _) &
-        ".topicInputHidden" #> SHtml.hidden(addTopic) &
-        ".topicTags [id]"   #> containerID &
+        val topicCombobox = new TopicComboBox{
+            val containers = List(
+                "editFormTopic", "referenceTopic", 
+                "maybeTopic", "nextActionTopic"
+            )
+
+            def addTopic(topic: Topic) = {
+                currentTopics.map(_.title.is).contains(topic.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentTopics ::= topic
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                topic.editButton(onTopicClick, onTopicRemove)
+                            )
+                        }
+
+                }
+            }
+        }
+
+        ".topicCombo"     #> topicCombobox.comboBox &
+        ".topicTags [id]" #> containerID &
         ".topicTags" #> (
             "span" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
         )
@@ -261,16 +196,65 @@ class Process extends JSImplicit
 
     def createProjectTags(containerID: String) =
     {
-        "name=projectInput"   #> SHtml.text("", projectTitle = _) &
-        ".projectInputHidden" #> SHtml.hidden(addProject) &
-        ".projectTags [id]"   #> containerID &
+        val projectCombobox = new ProjectComboBox {
+            val containers = List(
+                "editFormProject", "referenceProject", 
+                "maybeProject", "nextActionProject"
+            )
+
+            def addProject(project: Project) = {
+                currentProjects.map(_.title.is).contains(project.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentProjects ::= project
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                project.editButton(onProjectClick, onProjectRemove)
+                            )
+                    }
+                }
+            }
+        }
+
+        ".projectCombo"     #> projectCombobox.comboBox &
+        ".projectTags [id]" #> containerID &
         ".projectTags" #> (
             "span" #> currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         )
     }
 
-    def doNothing(s: String) {}
+    def createContextTags(containerID: String) =
+    {
+        val contextCombobox = new ContextComboBox{
+            val containers = List("nextActionContext")
 
+            def addContext(context: Context) = {
+                currentContexts.map(_.title.is).contains(context.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentContexts ::= context
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                context.editButton(onContextClick, onContextRemove)
+                            )
+                        }
+
+                }
+            }
+        }
+
+        ".contextCombo"     #> contextCombobox.comboBox &
+        ".contextTags [id]" #> containerID &
+        ".contextTags" #> (
+            "span" #> currentContexts.map(_.editButton(onContextClick, onContextRemove))
+        )
+    }
+
+    def doNothing(s: String) {}
 
     def setTitle(title: String): JsCmd = {
 
@@ -425,16 +409,6 @@ class Process extends JSImplicit
             case Empty => "$('#saveScheduled').attr('disabled', true)"
             case Failure(msg, _, _) => "$('#saveScheduled').attr('disabled', true)"
         }
-    }
-
-    def createContextTags(containerID: String) =
-    {
-        "name=contextInput"   #> SHtml.text("", contextTitle = _) &
-        ".contextInputHidden" #> SHtml.hidden(addContext) &
-        ".contextTags [id]"   #> containerID &
-        ".contextTags" #> (
-            "span" #> currentContexts.map(_.editButton(onContextClick, onContextRemove))
-        )
     }
 
     def setDescription(description: String): JsCmd = {

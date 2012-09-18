@@ -250,30 +250,6 @@
 
       <script type="text/javascript">
         
-          $(".projectInput").autocomplete({
-              source: "/autocomplete/project",
-              select: function(event, ui) { 
-                  $(this).val(ui.item.label)
-                  $(this).closest("form").submit()
-              }
-          });
-
-          $(".topicInput").autocomplete({
-              source: "/autocomplete/topic",
-              select: function(event, ui) { 
-                  $(this).val(ui.item.label)
-                  $(this).closest("form").submit()
-              }
-          });
-
-          $(".contextInput").autocomplete({
-              source: "/autocomplete/context",
-              select: function(event, ui) { 
-                  $(this).val(ui.item.label)
-                  $(this).closest("form").submit()
-              }
-          });
-
           $( "#startDateTime" ).datetimepicker({
               dateFormat: "yy-mm-dd",
               timeFormat: 'hh:mm',
@@ -314,7 +290,6 @@
           }
 
       </script>
-
     </div>
   </body>
 </html>
