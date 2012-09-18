@@ -88,32 +88,3 @@ function prepareScheduledEditForm()
         }
     });
 }
-
-function prepareMaybeEditForm()
-{
-    $( "#maybeTopic" ).autocomplete({
-        source: "/autocomplete/topic",
-        select: function(event, ui) { 
-            $("#maybeTopic").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#maybeProject" ).autocomplete({
-        source: "/autocomplete/project",
-        select: function(event, ui) { 
-            $("#maybeProject").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#maybeTicklerDate input" ).datepicker({
-        dateFormat: "yy-mm-dd",
-        onClose: function(dateText) {
-            $("#maybeTicklerDate input").val(dateText)
-            $("#maybeTicklerDate input").blur()
-        }
-    });
-
-}
-

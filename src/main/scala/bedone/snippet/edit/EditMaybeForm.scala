@@ -41,47 +41,34 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
  
-    def addTopic(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
-
-        currentTopics.contains(topic) match {
-            case true => ClearValue("maybeTopic")
-            case false =>
-                currentTopics ::= topic
-                ClearValue("maybeTopic") &
-                AppendHtml("maybeTopicTags", topic.editButton(onTopicClick, onTopicRemove))
+    val projectCombobox = new ProjectComboBox {
+        def addProject(project: Project) = {
+            currentProjects.map(_.title.is).contains(project.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentProjects ::= project
+                    this.clear &
+                    AppendHtml(
+                        "maybeProjectTags", 
+                        project.editButton(onProjectClick, onProjectRemove)
+                    )
+            }
         }
     }
 
-    def addProject(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createProject = Project.createRecord.userID(userID).title(title)
-        val project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue("maybeProject")
-            case false =>
-                currentProjects ::= project
-                ClearValue("maybeProject") &
-                AppendHtml(
-                    "maybeProjectTags", 
-                    project.editButton(onProjectClick, onProjectRemove)
-                )
+    val topicCombobox = new TopicComboBox{
+        def addTopic(topic: Topic) = {
+            currentTopics.map(_.title.is).contains(topic.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentTopics ::= topic
+                    this.clear &
+                    AppendHtml(
+                        "maybeTopicTags", 
+                        topic.editButton(onTopicClick, onTopicRemove)
+                    )
+            }
         }
-    }
-
-    def addTopic(): JsCmd = topic match {
-        case None => Noop
-        case Some(title) => addTopic(title)
-    }
-
-    def addProject(): JsCmd = project match {
-        case None => Noop
-        case Some(title) => addProject(title)
     }
 
     def doNothing(s: String) {}
@@ -168,15 +155,13 @@ class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
         val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
         val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
 
-        "#maybeTitle" #> ("input" #> titleInput) &
-        "#maybeEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#maybeTopic" #> (SHtml.text("", topic = _)) &
-        "#maybeTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#maybeProject" #> (SHtml.text("", project = _)) &
-        "#maybeProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#maybeTopicTags *" #> topicTags &
+        "#maybeTitle"         #> ("input" #> titleInput) &
+        "#maybeEditDesc"      #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#maybeProjectCombo"  #> projectCombobox.comboBox &
+        "#maybeTopicCombo"    #> topicCombobox.comboBox &
+        "#maybeTopicTags *"   #> topicTags &
         "#maybeProjectTags *" #> projectTags &
-        "#maybeTicklerDate" #> ("input" #> ticklerInput) &
+        "#maybeTicklerDate"   #> ("input" #> ticklerInput) &
         "#maybeCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("maybeEdit")) &
         "#maybeSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#maybeSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
