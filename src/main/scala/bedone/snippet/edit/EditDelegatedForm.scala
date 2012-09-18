@@ -2,11 +2,9 @@ package org.bedone.snippet
 
 import org.bedone.model._
 import org.bedone.lib._
+import org.bedone.lib.TagButton.Implicit._
 
-import net.liftweb.common.Box
-import net.liftweb.common.Full
-import net.liftweb.common.Empty
-import net.liftweb.common.Failure
+import net.liftmodules.combobox._
 
 import net.liftweb.util.Helpers._
 
@@ -19,12 +17,6 @@ import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds._
 
 
-import java.text.SimpleDateFormat
-import java.text.ParseException
-import java.util.Calendar
-
-import TagButton.Implicit._
-
 class EditDelegatedForm(user: User, delegated: Delegated, 
                         postAction: Stuff => JsCmd) extends JSImplicit
 {
@@ -32,6 +24,7 @@ class EditDelegatedForm(user: User, delegated: Delegated,
 
     private def template = Templates("templates-hidden" :: "delegated" :: "edit" :: Nil)
 
+    private lazy val currentUser = CurrentUser.get.get
     private lazy val action = delegated.action
     private lazy val stuff = action.stuff
 
@@ -42,47 +35,58 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     private var currentProjects: List[Project] = stuff.projects
     private var currentContact: Option[Contact] = Option(delegated.contact)
 
-    def addTopic(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
-
-        currentTopics.contains(topic) match {
-            case true => ClearValue("delegateTopic")
-            case false =>
-                currentTopics ::= topic
-                ClearValue("delegateTopic") &
-                AppendHtml("delegateTopicTags", topic.editButton(onTopicClick, onTopicRemove))
+    val projectCombobox = new ProjectComboBox {
+        def addProject(project: Project) = {
+            currentProjects.map(_.title.is).contains(project.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentProjects ::= project
+                    this.clear &
+                    AppendHtml(
+                        "delegateProjectTags", 
+                        project.editButton(onProjectClick, onProjectRemove)
+                    )
+            }
         }
     }
 
-    def addProject(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createProject = Project.createRecord.userID(userID).title(title)
-        val project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue("delegateProject")
-            case false =>
-                currentProjects ::= project
-                ClearValue("delegateProject") &
-                AppendHtml(
-                    "delegateProjectTags", 
-                    project.editButton(onProjectClick, onProjectRemove)
-                )
+    val topicCombobox = new TopicComboBox{
+        def addTopic(topic: Topic) = {
+            currentTopics.map(_.title.is)contains(topic.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentTopics ::= topic
+                    this.clear &
+                    AppendHtml(
+                        "delegateTopicTags", 
+                        topic.editButton(onTopicClick, onTopicRemove)
+                    )
+            }
         }
     }
 
-    def addTopic(): JsCmd = topic match {
-        case None => Noop
-        case Some(title) => addTopic(title)
-    }
+    val contactCombobox = {
 
-    def addProject(): JsCmd = project match {
-        case None => Noop
-        case Some(title) => addProject(title)
+        def onSearching(term: String): List[ComboItem] = {
+            Contact.findByUser(currentUser).openOr(Nil)
+                   .filter(c => c.name.is.contains(term))
+                   .map(c => ComboItem(c.idField.toString, c.name.is))
+        }
+
+        def onItemSelected(item: Option[ComboItem]): JsCmd = {
+            for (selected <- item) {
+                currentContact = Contact.findByID(selected.id.toInt).toOption
+            }
+        }
+
+        def onItemAdded(name: String): JsCmd = {
+            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
+            currentContact = Some(newContact)
+        }
+
+        val defaultItem = currentContact.map(c => ComboItem(c.idField.toString, c.name.is))
+
+        ComboBox(defaultItem, onSearching _, onItemSelected _, onItemAdded _)
     }
 
     def doNothing(s: String) {}
@@ -111,21 +115,6 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     {
         stuff.description(desc)
         Noop
-    }
-
-    def setContact(contactName: String): JsCmd = 
-    {
-        def createNewContact() = Contact.createRecord.name(contactName).userID(user.idField.is)
-        
-        optFromStr(contactName) match {
-            case None => 
-                currentContact = None
-                ShowFieldError("editDelegatedContact", "此為必填欄位")
-
-            case Some(name) =>
-                currentContact = Some(Contact.findByName(user, name).openOr(createNewContact))
-                ClearFieldError("editDelegatedContact")
-        }
     }
 
     def save(): JsCmd = 
@@ -157,19 +146,16 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     {
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val contactName = delegated.contact.name.is
-        val contactInput = SHtml.textAjaxTest(contactName, doNothing _, setContact _)
         val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
 
         "#delegateTitle" #> ("input" #> titleInput) &
         "#delegateEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#delegateTopic" #> (SHtml.text("", topic = _)) &
-        "#delegateTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#delegateProject" #> (SHtml.text("", project = _)) &
-        "#delegateProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#delegateContact" #>  ("input" #> contactInput) &
         "#delegateTopicTags *" #> topicTags &
         "#delegateProjectTags *" #> projectTags &
+        "#delegateProjectCombo" #> projectCombobox.comboBox &
+        "#delegateTopicCombo" #> topicCombobox.comboBox &
+        "#delegateContactCombo" #> contactCombobox.comboBox &
         "#delegateCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("delegateEdit")) &
         "#delegateSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#delegateSave *" #> (if (stuff.isPersisted) "儲存" else "新增")

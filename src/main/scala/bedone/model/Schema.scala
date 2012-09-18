@@ -49,7 +49,6 @@ object BeDoneSchema extends Schema
     on(projects) { project => declare(columns(project.userID, project.title) are unique)}
     on(topics) { topic => declare(columns(topic.userID, topic.title) are unique)}
     on(contexts) { context => declare(columns(context.userID, context.title) are unique)}
-    on(contacts) { contact => declare(columns(contact.userID, contact.name) are unique)}
 
     on(maybes)     { maybe => declare(maybe.idField is primaryKey) }
     on(actions)    { action => declare(action.idField is primaryKey) }

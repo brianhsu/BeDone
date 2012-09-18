@@ -100,10 +100,8 @@ class MaybeList extends JSImplicit
         val editStuff = new EditMaybeForm(maybe, editPostAction)
 
         """$('#maybeEdit').remove()""" &
-        AppendHtml("maybeEditHolder", editStuff.toForm) &
-        """prepareMaybeEditForm()"""
+        SetHtml("maybeEditHolder", editStuff.toForm)
     }
-
 
     def actionBar(maybe: Maybe) = 
     {

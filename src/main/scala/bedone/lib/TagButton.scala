@@ -1,4 +1,4 @@
-package org.bedone.snippet
+package org.bedone.lib
 
 import org.bedone.model._
 

@@ -14,24 +14,8 @@
       </div>
     </fieldset>
     <div class="pull-right form-inline">
-
-      <div class="input-prepend" style="margin-right:0.5em;">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="主題" class="add-on">
-            <i class="icon-tags"></i>
-          </span><input id="scheduledTopic" class="input-medium" type="text" placeholder="主題" />
-          <input type="hidden" id="scheduledTopicHidden" />
-        </form>
-      </div>
-
-      <div class="input-prepend" style="margin-right: 0.5em">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="專案" class="add-on">
-            <i class="icon-folder-open"></i>
-          </span><input id="scheduledProject" class="input-medium" type="text" placeholder="專案" />
-          <input type="hidden" id="scheduledProjectHidden" />
-        </form>
-      </div>
+      <div id="scheduledTopicCombo"></div>
+      <div id="scheduledProjectCombo"></div>
     </div>
   </div>
   <div style="margin: 0.5em; display: table; width: 98%">
@@ -72,5 +56,24 @@
       <button type="reset" id="scheduledCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="scheduledSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
   </div>
+  <script type="text/javascript">
+      $( "#scheduledStartTime input" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#scheduledStartTime input").val(dateText)
+              $("#scheduledStartTime input").blur()
+          }
+      });
+  
+      $( "#scheduledEndTime input" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#scheduledEndTime input").val(dateText)
+              $("#scheduledEndTime input").blur()
+          }
+      });
+  </script>
 
 </div>

@@ -133,8 +133,7 @@ class DelegatedAction extends JSImplicit
         val editStuff = new EditDelegatedForm(currentUser, delegated, editPostAction)
 
         """$('#delegateEdit').remove()""" &
-        AppendHtml("delegateEditHolder", editStuff.toForm) &
-        Run("prepareDelegateEditForm()")
+        SetHtml("delegateEditHolder", editStuff.toForm)
     }
 
     def topicFilter(buttonID: String, topic: Topic) = 

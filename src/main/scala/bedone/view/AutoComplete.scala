@@ -55,7 +55,7 @@ object AutoComplete {
 
             val contacts = Contact.findByUser(user).openOr(Nil)
             val jsonContacts = contacts.filter(_.name.is.contains(term)).map { contact => 
-                ("id" -> contact.name.is) ~ ("label" -> contact.name.is)
+                ("id" -> contact.idField.is) ~ ("text" -> contact.name.is)
             }
 
             JsonResponse(jsonContacts)

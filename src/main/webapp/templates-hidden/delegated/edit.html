@@ -13,25 +13,9 @@
         <span id="delegateTitle_msg" class="help-inline"></span>
       </div>
     </fieldset>
-    <div class="pull-right form-inline">
-
-      <div class="input-prepend" style="margin-right:0.5em;">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="主題" class="add-on">
-            <i class="icon-tags"></i>
-          </span><input id="delegateTopic" class="input-medium" type="text" placeholder="主題" />
-          <input type="hidden" id="delegateTopicHidden" />
-        </form>
-      </div>
-
-      <div class="input-prepend" style="margin-right: 0.5em">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="專案" class="add-on">
-            <i class="icon-folder-open"></i>
-          </span><input id="delegateProject" class="input-medium" type="text" placeholder="專案" />
-          <input type="hidden" id="delegateProjectHidden" />
-        </form>
-      </div>
+    <div class="pull-right form-inline" style="margin-right:10px">
+      <div id="delegateTopicCombo"></div>
+      <div id="delegateProjectCombo"></div>
     </div>
   </div>
   <div style="margin: 0.5em; display: table; width: 98%">
@@ -44,17 +28,18 @@
   </div>
 
   <fieldset id="delegateContact" class="inline pull-left control-group">
-    <div class="input-prepend" style="margin-left:0.3em">
-      <span title="連絡人" class="add-on">
-        <i class="icon-user"></i>
-      </span><input class="input-medium" type="text" placeholder="聯絡人" />
-      <span id="delegateContact_msg" class="help-inline"></span>
-    </div>
+    <div><span style="position: relative; top:3px">請選擇負擇人：</span><div id="delegateContactCombo"></div></div>
+    <span id="delegateContact_msg" class="help-inline"></span>
   </fieldset>
 
   <div style="text-align: right; margin-right: 0.5em">
       <button type="reset" id="delegateCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="delegateSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
   </div>
+  <script type="text/javascript">
+      $('#delegateSave').click(function () {
+          $(this).button('loading')
+      })
+  </script>
 
 </div>

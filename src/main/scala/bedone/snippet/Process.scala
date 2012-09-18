@@ -6,6 +6,8 @@ import org.bedone.lib._
 import org.bedone.model.StuffType.StuffType
 import TagButton.Implicit._
 
+import net.liftmodules.combobox._
+
 import net.liftweb.common.Box
 import net.liftweb.common.Empty
 import net.liftweb.common.Full
@@ -44,7 +46,7 @@ class Process extends JSImplicit
     private var contextTitle: Option[String] = None
 
     // Delegated attribute
-    private var contactName: Option[String] = None
+    private var currentContact: Option[Contact] = None
 
     // Scheduled attribute
     private var startDateTime: Option[Calendar] = None
@@ -56,6 +58,36 @@ class Process extends JSImplicit
 
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+    val contactCombobox = {
+
+        def onSearching(term: String): List[ComboItem] = {
+            Contact.findByUser(currentUser).openOr(Nil)
+                   .filter(c => c.name.is.contains(term))
+                   .map(c => ComboItem(c.idField.toString, c.name.is))
+        }
+
+        def onItemSelected(item: Option[ComboItem]): JsCmd = {
+            item match {
+                case None => """$('#saveDelegated').attr('disabled', true)"""
+                case Some(selected) =>
+                    currentContact = Contact.findByID(selected.id.toInt).toOption
+                    """$('#saveDelegated').attr('disabled', false)"""
+            }
+        }
+
+        def onItemAdded(name: String): JsCmd = {
+            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
+            currentContact = Some(newContact)
+
+            """$('#saveDelegated').attr('disabled', false)"""
+        }
+
+        val options = ("placeholder" -> "請選擇負責人") :: ("allowClear" -> "true") :: Nil
+
+        ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, options)
+    }
+
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -81,20 +113,14 @@ class Process extends JSImplicit
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
 
-        def createContact = 
-            Contact.createRecord.userID(currentUser.idField.is).name(contactName.get)
-
-        contactName match {
+        currentContact match {
             case None => Alert("負責人為必填欄位")
-            case Some(name) =>
+            case Some(contact) =>
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 stuff.stuffType(StuffType.Delegated)
                 stuff.saveTheRecord()
-
-                val contact = Contact.findByName(currentUser, name)
-                                     .openOr(createContact)
-                                     .saveTheRecord().get
+                contact.saveTheRecord()
 
                 val action = Action.createRecord.idField(stuff.idField.is)
                                    .saveTheRecord().get
@@ -136,98 +162,33 @@ class Process extends JSImplicit
         S.redirectTo("/process", () => S.notice("已將「%s」標記為完成" format(stuff.title.is)))
     }
 
-    def addProject(title: String): JsCmd = {
-
-        val userID = CurrentUser.get.get.idField.is
-        val containers = List(
-            "editFormProject", "referenceProject", 
-            "maybeProject", "nextActionProject"
-        )
-
-        def createProject = Project.createRecord.userID(userID).title(title)
-        def project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue.byClassName("projectInput")
-            case false =>
-                currentProjects ::= project
-
-                ClearValue.byClassName("projectInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, project.editButton(onProjectClick, onProjectRemove))
-                }
-        }
-    }
-
-    def addProject(): JsCmd = {
-
-        projectTitle match {
-            case None        => Noop
-            case Some(title) => addProject(title)
-        }
-    }
-    
-    def addTopic(title: String): JsCmd = {
-
-        val userID = CurrentUser.get.get.idField.is
-        val containers = List(
-            "editFormTopic", "referenceTopic", 
-            "maybeTopic", "nextActionTopic"
-        )
-
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        def topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
-
-        currentTopics.contains(topic) match {
-            case true  => ClearValue.byClassName("topicInput")
-            case false =>
-                currentTopics ::= topic
-
-                ClearValue.byClassName("topicInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, topic.editButton(onTopicClick, onTopicRemove))
-                }
-        }
-    }
-
-    def addTopic(): JsCmd = {
-        topicTitle match {
-            case None        => Noop
-            case Some(title) => addTopic(title)
-        }
-    }
-
-    def addContext(title: String): JsCmd = {
-        val containers = List("nextActionContext")
-        val userID = CurrentUser.get.get.idField.is
-
-        def createContext = Context.createRecord.userID(userID).title(title)
-        def context = Context.findByTitle(userID, title).getOrElse(createContext)
-
-        currentContexts.contains(context) match {
-            case true  => ClearValue.byClassName("contextInput")
-            case false =>
-                currentContexts ::= context
-
-                ClearValue.byClassName("contextInput") &
-                containers.map { htmlID => 
-                    AppendHtml(htmlID, context.editButton(onContextClick, onContextRemove))
-                }
-        }
-    }
-
-    def addContext(): JsCmd = {
-        contextTitle match {
-            case None        => Noop
-            case Some(title) => addContext(title)
-        }
-    }
-
     def createTopicTags(containerID: String) =
     {
-        "name=topicInput"   #> SHtml.text("", topicTitle = _) &
-        ".topicInputHidden" #> SHtml.hidden(addTopic) &
-        ".topicTags [id]"   #> containerID &
+        val topicCombobox = new TopicComboBox{
+            val containers = List(
+                "editFormTopic", "referenceTopic", 
+                "maybeTopic", "nextActionTopic"
+            )
+
+            def addTopic(topic: Topic) = {
+                currentTopics.map(_.title.is).contains(topic.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentTopics ::= topic
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                topic.editButton(onTopicClick, onTopicRemove)
+                            )
+                        }
+
+                }
+            }
+        }
+
+        ".topicCombo"     #> topicCombobox.comboBox &
+        ".topicTags [id]" #> containerID &
         ".topicTags" #> (
             "span" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
         )
@@ -235,23 +196,65 @@ class Process extends JSImplicit
 
     def createProjectTags(containerID: String) =
     {
-        "name=projectInput"   #> SHtml.text("", projectTitle = _) &
-        ".projectInputHidden" #> SHtml.hidden(addProject) &
-        ".projectTags [id]"   #> containerID &
+        val projectCombobox = new ProjectComboBox {
+            val containers = List(
+                "editFormProject", "referenceProject", 
+                "maybeProject", "nextActionProject"
+            )
+
+            def addProject(project: Project) = {
+                currentProjects.map(_.title.is).contains(project.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentProjects ::= project
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                project.editButton(onProjectClick, onProjectRemove)
+                            )
+                    }
+                }
+            }
+        }
+
+        ".projectCombo"     #> projectCombobox.comboBox &
+        ".projectTags [id]" #> containerID &
         ".projectTags" #> (
             "span" #> currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         )
     }
 
-    def doNothing(s: String) {}
+    def createContextTags(containerID: String) =
+    {
+        val contextCombobox = new ContextComboBox{
+            val containers = List("nextActionContext")
 
-    def setContact(name: String): JsCmd = {
-        this.contactName = name
-        this.contactName match {
-            case None    => "$('#saveDelegated').attr('disabled', true)"
-            case Some(t) => "$('#saveDelegated').attr('disabled', false)"
+            def addContext(context: Context) = {
+                currentContexts.map(_.title.is).contains(context.title.is) match {
+                    case true  => this.clear
+                    case false =>
+                        currentContexts ::= context
+                        this.clear &
+                        containers.map { htmlID => 
+                            AppendHtml(
+                                htmlID, 
+                                context.editButton(onContextClick, onContextRemove)
+                            )
+                        }
+
+                }
+            }
         }
+
+        ".contextCombo"     #> contextCombobox.comboBox &
+        ".contextTags [id]" #> containerID &
+        ".contextTags" #> (
+            "span" #> currentContexts.map(_.editButton(onContextClick, onContextRemove))
+        )
     }
+
+    def doNothing(s: String) {}
 
     def setTitle(title: String): JsCmd = {
 
@@ -408,16 +411,6 @@ class Process extends JSImplicit
         }
     }
 
-    def createContextTags(containerID: String) =
-    {
-        "name=contextInput"   #> SHtml.text("", contextTitle = _) &
-        ".contextInputHidden" #> SHtml.hidden(addContext) &
-        ".contextTags [id]"   #> containerID &
-        ".contextTags" #> (
-            "span" #> currentContexts.map(_.editButton(onContextClick, onContextRemove))
-        )
-    }
-
     def setDescription(description: String): JsCmd = {
         this.description = description
         Noop
@@ -463,7 +456,7 @@ class Process extends JSImplicit
             "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
         ) &
         "#isDelegated" #> (
-            ".contactInput" #> SHtml.textAjaxTest("", doNothing _, setContact _) &
+            "#contactCombo" #> contactCombobox.comboBox &
             "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
         ) &
         "#itIsReference" #> (

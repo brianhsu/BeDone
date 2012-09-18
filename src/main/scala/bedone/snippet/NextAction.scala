@@ -167,8 +167,7 @@ class NextAction extends JSImplicit
         val editStuff = new EditActionForm(action, editPostAction)
 
         """$('#actionEdit').remove()""" &
-        AppendHtml("actionEditHolder", editStuff.toForm) &
-        Run("prepareActionEditForm()")
+        SetHtml("actionEditHolder", editStuff.toForm)
     }
 
 

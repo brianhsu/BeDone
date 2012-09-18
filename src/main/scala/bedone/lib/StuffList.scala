@@ -2,8 +2,8 @@ package org.bedone.lib
 
 import org.bedone.model._
 import org.bedone.lib._
+import org.bedone.lib.TagButton.Implicit._
 import org.bedone.snippet._
-import org.bedone.snippet.TagButton.Implicit._
 
 import net.liftweb.actor.LiftActor
 
@@ -149,8 +149,7 @@ trait StuffList extends JSImplicit
         })
 
         """$('#stuffEdit').remove()""" &
-        AppendHtml("inboxEditHolder", editStuff.toForm) &
-        Run("prepareInboxEditForm()")
+        SetHtml("inboxEditHolder", editStuff.toForm)
     }
 
     def showEditForm(stuff: Stuff): JsCmd = 
@@ -158,8 +157,7 @@ trait StuffList extends JSImplicit
         val editStuff = new EditStuffForm(stuff, editPostAction _)
 
         """$('#stuffEdit').remove()""" &
-        AppendHtml("inboxEditHolder", editStuff.toForm) &
-        Run("prepareInboxEditForm()")
+        SetHtml("inboxEditHolder", editStuff.toForm)
     }
 
     def editPostAction(stuff: Stuff): JsCmd = 

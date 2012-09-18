@@ -16,22 +16,8 @@
     </fieldset>
 
     <div class="pull-right form-inline">
-      <div class="input-prepend" style="margin-right:0.5em;">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="主題" class="add-on">
-            <i class="icon-tags"></i>
-          </span><input id="inboxTopic" class="input-medium" type="text" placeholder="主題" />
-          <input type="hidden" id="inboxTopicHidden" />
-        </form>
-      </div>
-      <div class="input-prepend" style="margin-right: 0.5em">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="專案" class="add-on">
-            <i class="icon-folder-open"></i>
-          </span><input id="inboxProject" class="input-medium" type="text" placeholder="專案" />
-          <input type="hidden" id="inboxProjectHidden" />
-        </form>
-      </div>
+      <div id="inboxTopicCombo"></div>
+      <div id="inboxProjectCombo"></div>
     </div>
   </div>
 
@@ -57,5 +43,18 @@
       <button type="reset" id="inboxCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="inboxSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
   </div>
+  <script type="text/javascript">
+      $( "#inboxDeadline input" ).datepicker({
+          dateFormat: "yy-mm-dd",
+          onClose: function(dateText) {
+              $("#inboxDeadline input").val(dateText)
+              $("#inboxDeadline input").blur()
+          }
+      });
+
+      $('#inboxSave').click(function () {
+          $(this).button('loading')
+      })
+  </script>
 
 </div>

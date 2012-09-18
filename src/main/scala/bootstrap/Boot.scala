@@ -25,6 +25,8 @@ import net.liftweb.http.S
 import net.liftweb.util.LoanWrapper
 import net.liftweb.squerylrecord.RecordTypeMode._
 
+import net.liftmodules.combobox._
+
 class Boot 
 {
     def initAjaxLoader()
@@ -39,11 +41,8 @@ class Boot
         })
     }
 
-    def boot 
+    def siteMap = 
     {
-        // 我們的程式碼放在 org.bedone 這個 package 中
-        LiftRules.addToPackages("org.bedone")
-
         // Create a menu for /param/somedata
         val contactDetail = Menu.param[Contact](
             "Contact Detail", "Contact Detail", 
@@ -63,7 +62,7 @@ class Boot
             encoder = _.idField.is.toString
         ) / "topic" / *
 
-        def siteMap = SiteMap(
+        SiteMap(
             Menu.i("Index") / "index",
             (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Inbox") / "inbox") >> If(User.isLoggedIn _, "請先登入"),
@@ -82,17 +81,19 @@ class Boot
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (topicDetail >> Template(() => Templates("topic" :: "detail" :: Nil) openOr NodeSeq.Empty))
         )
+    }
 
+    def boot 
+    {
+        // 我們的程式碼放在 org.bedone 這個 package 中
+        LiftRules.addToPackages("org.bedone")
         LiftRules.setSiteMap(siteMap)
-
-        initAjaxLoader()
-        PasswordField.minPasswordLength = 7
-
         LiftRules.dispatch.append(AutoComplete.autoComplete)
-
         LiftRules.htmlProperties.default.set { r: Req => 
             new XHtmlInHtml5OutProperties(r.userAgent)
         }
+
+        PasswordField.minPasswordLength = 7
            
         S.addAround(new LoanWrapper{
             override def apply[T](f: => T): T = {
@@ -102,7 +103,9 @@ class Boot
             }
         })
 
+        initAjaxLoader()
         DBSettings.initDB()
+        ComboBox.init
     }
 
 }

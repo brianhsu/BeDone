@@ -40,68 +40,50 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
     private var currentContexts: List[Context] = action.contexts
- 
-    def addContext(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createContext = Context.createRecord.userID(userID).title(title)
-        val context = Context.findByTitle(userID, title).getOrElse(createContext)
 
-        currentContexts.contains(context) match {
-            case true => ClearValue("actionContext")
-            case false =>
-                currentContexts ::= context
-                ClearValue("actionContext") &
-                AppendHtml("actionContextTags", context.editButton(onContextClick, onContextRemove))
+    val projectCombobox = new ProjectComboBox {
+        def addProject(project: Project) = {
+            currentProjects.map(_.title.is).contains(project.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentProjects ::= project
+                    this.clear &
+                    AppendHtml(
+                        "actionProjectTags", 
+                        project.editButton(onProjectClick, onProjectRemove)
+                    )
+            }
         }
     }
 
-    def addTopic(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
-
-        currentTopics.contains(topic) match {
-            case true => ClearValue("actionTopic")
-            case false =>
-                currentTopics ::= topic
-                ClearValue("actionTopic") &
-                AppendHtml("actionTopicTags", topic.editButton(onTopicClick, onTopicRemove))
+    val topicCombobox = new TopicComboBox{
+        def addTopic(topic: Topic) = {
+            currentTopics.map(_.title.is).contains(topic.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentTopics ::= topic
+                    this.clear &
+                    AppendHtml(
+                        "actionTopicTags", 
+                        topic.editButton(onTopicClick, onTopicRemove)
+                    )
+            }
         }
     }
 
-    def addProject(title: String) = 
-    {
-        val userID = CurrentUser.get.get.idField.is
-        def createProject = Project.createRecord.userID(userID).title(title)
-        val project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue("actionProject")
-            case false =>
-                currentProjects ::= project
-                ClearValue("actionProject") &
-                AppendHtml(
-                    "actionProjectTags", 
-                    project.editButton(onProjectClick, onProjectRemove)
-                )
+    val contextCombobox = new ContextComboBox{
+        def addContext(context: Context) = {
+            currentContexts.map(_.title.is).contains(context.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentContexts ::= context
+                    this.clear &
+                    AppendHtml(
+                        "actionContextTags", 
+                        context.editButton(onContextClick, onContextRemove)
+                    )
+            }
         }
-    }
-
-    def addContext(): JsCmd = context match {
-        case None => Noop
-        case Some(context) => addContext(context)
-    }
-
-    def addTopic(): JsCmd = topic match {
-        case None => Noop
-        case Some(title) => addTopic(title)
-    }
-
-    def addProject(): JsCmd = project match {
-        case None => Noop
-        case Some(title) => addProject(title)
     }
 
     def doNothing(s: String) {}
@@ -187,17 +169,14 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         val contextTags = currentContexts.map(_.editButton(onContextClick, onContextRemove))
         val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
 
-        "#actionTitle" #> ("input" #> titleInput) &
-        "#actionEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#actionDeadline" #> ("input" #> deadlineInput) &
-        "#actionContext" #> (SHtml.text("", context = _)) &
-        "#actionContextHidden" #> (SHtml.hidden(addContext)) &
-        "#actionTopic" #> (SHtml.text("", topic = _)) &
-        "#actionTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#actionProject" #> (SHtml.text("", project = _)) &
-        "#actionProjectHidden" #> (SHtml.hidden(addProject)) &
+        "#actionTitle"         #> ("input" #> titleInput) &
+        "#actionEditDesc"      #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#actionDeadline"      #> ("input" #> deadlineInput) &
+        "#actionContextCombo"  #> contextCombobox.comboBox &
+        "#actionProjectCombo"  #> projectCombobox.comboBox &
+        "#actionTopicCombo"    #> topicCombobox.comboBox &
         "#actionContextTags *" #> contextTags &
-        "#actionTopicTags *" #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
+        "#actionTopicTags *"   #> currentTopics.map(_.editButton(onTopicClick, onTopicRemove)) &
         "#actionProjectTags *" #> projectTags &
         "#actionCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("actionEdit")) &
         "#actionSave [onclick]" #> SHtml.onEvent(x => save()) &

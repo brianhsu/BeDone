@@ -151,8 +151,7 @@ class ReferenceList extends JSImplicit
         val editStuff = new EditReferenceForm(stuff, editPostAction _)
 
         """$('#referenceEdit').remove()""" &
-        AppendHtml("referenceEditHolder", editStuff.toForm) &
-        """prepareReferenceEditForm()"""
+        SetHtml("referenceEditHolder", editStuff.toForm)
     }
 
     def editPostAction(stuff: Stuff): JsCmd = 
