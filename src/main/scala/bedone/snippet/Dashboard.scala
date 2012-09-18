@@ -23,8 +23,8 @@ class DashBoard
     private val currentUser = CurrentUser.get.get
     def render = {
 
-        def onItemSelected(id: String, text: String): JsCmd = {
-            println("onItemSelected:" + (id, text))
+        def onItemSelected(item: Option[ComboItem]): JsCmd = {
+            println("onItemSelected:" + item)
         }
 
         def onItemAdded(text: String): JsCmd = {
@@ -37,7 +37,12 @@ class DashBoard
                    .map(x => ComboItem(x.idField.is.toString, x.name.is))
         }
 
-        val comboBox = ComboBox(onSearching _, onItemSelected _, onItemAdded _)
+        val jsonOption = List(
+            ("placeholder" -> "請選擇負責人"),
+            ("allowClear" -> "true")
+        )
+
+        val comboBox = ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, jsonOption)
 
 
         "name=contactInput" #> comboBox.comboBox

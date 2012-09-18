@@ -111,14 +111,6 @@ function prepareDelegateEditForm()
         }
     });
 
-    $( "#delegateContact input" ).autocomplete({
-        source: "/autocomplete/contact",
-        select: function(event, ui) { 
-            $("#delegateContact input").val(ui.item.label)
-            $("#delegateContact input").blur()
-        }
-    });
-
     $( "#delegateDeadline input" ).datepicker({
         dateFormat: "yy-mm-dd",
         onClose: function(dateText) {

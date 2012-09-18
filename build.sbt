@@ -13,7 +13,7 @@ seq(lessSettings:_*)
 (LessKeys.filter in (Compile, LessKeys.less)) := ("custom.less")
 
 (resourceManaged in (Compile, LessKeys.less)) <<= 
-    (sourceDirectory in Compile)(_ / "webapp" / "bootstrap" / "css")
+    (sourceDirectory in Compile)(_ / "webapp" / "bootstrap" / "custom")
 
 (compile in Compile) <<= compile in Compile dependsOn (LessKeys.less in Compile)
 

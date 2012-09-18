@@ -3,6 +3,8 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftmodules.combobox._
+
 import net.liftweb.common.Box
 import net.liftweb.common.Full
 import net.liftweb.common.Empty
@@ -32,6 +34,7 @@ class EditDelegatedForm(user: User, delegated: Delegated,
 
     private def template = Templates("templates-hidden" :: "delegated" :: "edit" :: Nil)
 
+    private lazy val currentUser = CurrentUser.get.get
     private lazy val action = delegated.action
     private lazy val stuff = action.stuff
 
@@ -41,6 +44,30 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
     private var currentContact: Option[Contact] = Option(delegated.contact)
+
+    val contactCombobox = {
+
+        def onSearching(term: String): List[ComboItem] = {
+            Contact.findByUser(currentUser).openOr(Nil)
+                   .filter(c => c.name.is.contains(term))
+                   .map(c => ComboItem(c.idField.toString, c.name.is))
+        }
+
+        def onItemSelected(item: Option[ComboItem]): JsCmd = {
+            for (selected <- item) {
+                currentContact = Contact.findByID(selected.id.toInt).toOption
+            }
+        }
+
+        def onItemAdded(name: String): JsCmd = {
+            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
+            currentContact = Some(newContact)
+        }
+
+        val defaultItem = currentContact.map(c => ComboItem(c.idField.toString, c.name.is))
+
+        ComboBox(defaultItem, onSearching _, onItemSelected _, onItemAdded _)
+    }
 
     def addTopic(title: String) = 
     {
@@ -113,21 +140,6 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         Noop
     }
 
-    def setContact(contactName: String): JsCmd = 
-    {
-        def createNewContact() = Contact.createRecord.name(contactName).userID(user.idField.is)
-        
-        optFromStr(contactName) match {
-            case None => 
-                currentContact = None
-                ShowFieldError("editDelegatedContact", "此為必填欄位")
-
-            case Some(name) =>
-                currentContact = Some(Contact.findByName(user, name).openOr(createNewContact))
-                ClearFieldError("editDelegatedContact")
-        }
-    }
-
     def save(): JsCmd = 
     {
         val status = List(
@@ -157,9 +169,10 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     {
         val titleInput = SHtml.textAjaxTest(stuff.title.is, doNothing _, setTitle _)
         val contactName = delegated.contact.name.is
-        val contactInput = SHtml.textAjaxTest(contactName, doNothing _, setContact _)
         val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
+
+        val combo = contactCombobox.comboBox
 
         "#delegateTitle" #> ("input" #> titleInput) &
         "#delegateEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
@@ -167,9 +180,9 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         "#delegateTopicHidden" #> (SHtml.hidden(addTopic)) &
         "#delegateProject" #> (SHtml.text("", project = _)) &
         "#delegateProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#delegateContact" #>  ("input" #> contactInput) &
         "#delegateTopicTags *" #> topicTags &
         "#delegateProjectTags *" #> projectTags &
+        ".delegateContactCombo" #> combo &
         "#delegateCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("delegateEdit")) &
         "#delegateSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#delegateSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
