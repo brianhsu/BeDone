@@ -37,46 +37,35 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
 
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
-  
-    def addTopic(title: String) = {
-        val userID = CurrentUser.get.get.idField.is
-        def createTopic = Topic.createRecord.userID(userID).title(title)
-        val topic = Topic.findByTitle(userID, title).getOrElse(createTopic)
 
-        currentTopics.contains(topic) match {
-            case true => ClearValue("inboxTopic")
-            case false =>
-                currentTopics ::= topic
-                ClearValue("inboxTopic") &
-                AppendHtml("inboxTopicTags", topic.editButton(onTopicClick, onTopicRemove))
+    val projectCombobox = new ProjectComboBox {
+        def addProject(project: Project) = {
+            currentProjects.map(_.title.is).contains(project.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentProjects ::= project
+                    this.clear &
+                    AppendHtml(
+                        "inboxProjectTags", 
+                        project.editButton(onProjectClick, onProjectRemove)
+                    )
+            }
         }
     }
 
-    def addProject(title: String) = {
-        val userID = CurrentUser.get.get.idField.is
-        def createProject = Project.createRecord.userID(userID).title(title)
-        val project = Project.findByTitle(userID, title).getOrElse(createProject)
-
-        currentProjects.contains(project) match {
-            case true  => ClearValue("inboxProject")
-            case false =>
-                currentProjects ::= project
-                ClearValue("inboxProject") &
-                AppendHtml(
-                    "inboxProjectTags", 
-                    project.editButton(onProjectClick, onProjectRemove)
-                )
+    val topicCombobox = new TopicComboBox{
+        def addTopic(topic: Topic) = {
+            currentTopics.map(_.title.is).contains(topic.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentTopics ::= topic
+                    this.clear &
+                    AppendHtml(
+                        "inboxTopicTags", 
+                        topic.editButton(onTopicClick, onTopicRemove)
+                    )
+            }
         }
-    }
-
-    def addTopic(): JsCmd = topic match {
-        case None => Noop
-        case Some(title) => addTopic(title)
-    }
-
-    def addProject(): JsCmd = project match {
-        case None => Noop
-        case Some(title) => addProject(title)
     }
 
     def doNothing(s: String) {}
@@ -151,14 +140,12 @@ class EditStuffForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImplicit
         val projectTags = currentProjects.map(_.editButton(onProjectClick, onProjectRemove))
         val topicTags = currentTopics.map(_.editButton(onTopicClick, onTopicRemove))
 
-        "#inboxTitle" #> ("input" #> titleInput) &
-        "#inboxEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
-        "#inboxDeadline" #> ("input" #> deadlineInput) &
-        "#inboxTopic" #> (SHtml.text("", topic = _)) &
-        "#inboxTopicHidden" #> (SHtml.hidden(addTopic)) &
-        "#inboxProject" #> (SHtml.text("", project = _)) &
-        "#inboxProjectHidden" #> (SHtml.hidden(addProject)) &
-        "#inboxTopicTags *" #>  topicTags &
+        "#inboxTitle"        #> ("input" #> titleInput) &
+        "#inboxEditDesc"     #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
+        "#inboxDeadline"     #> ("input" #> deadlineInput) &
+        "#inboxProjectCombo" #> projectCombobox.comboBox &
+        "#inboxTopicCombo"   #> topicCombobox.comboBox &
+        "#inboxTopicTags *"  #>  topicTags &
         "#inboxProjectTags *" #> projectTags &
         "#inboxCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("inboxEdit")) &
         "#inboxSave [onclick]" #> SHtml.onEvent(x => save()) &
