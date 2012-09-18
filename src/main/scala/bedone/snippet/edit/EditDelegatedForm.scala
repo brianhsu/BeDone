@@ -2,13 +2,9 @@ package org.bedone.snippet
 
 import org.bedone.model._
 import org.bedone.lib._
+import org.bedone.lib.TagButton.Implicit._
 
 import net.liftmodules.combobox._
-
-import net.liftweb.common.Box
-import net.liftweb.common.Full
-import net.liftweb.common.Empty
-import net.liftweb.common.Failure
 
 import net.liftweb.util.Helpers._
 
@@ -20,12 +16,6 @@ import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.jquery.JqJsCmds._
 
-
-import java.text.SimpleDateFormat
-import java.text.ParseException
-import java.util.Calendar
-
-import TagButton.Implicit._
 
 class EditDelegatedForm(user: User, delegated: Delegated, 
                         postAction: Stuff => JsCmd) extends JSImplicit
@@ -45,87 +35,32 @@ class EditDelegatedForm(user: User, delegated: Delegated,
     private var currentProjects: List[Project] = stuff.projects
     private var currentContact: Option[Contact] = Option(delegated.contact)
 
-    val projectCombobox = {
-
-        val options = 
-            ("placeholder" -> """<i class="icon-folder-open"> </i> 請選擇專案""") :: Nil
-
-        new ComboBox(None, true, options) {
-
-            def addProject(project: Project) = {
-                currentProjects.map(_.title.is).contains(project.title.is) match {
-                    case true  => this.clear
-                    case false =>
-                        currentProjects ::= project
-                        this.clear &
-                        AppendHtml(
-                            "delegateProjectTags", 
-                            project.editButton(onProjectClick, onProjectRemove)
-                        )
-                }
-            }
-
-            override def onSearching(term: String): List[ComboItem] = {
-                Project.findByUser(currentUser).openOr(Nil)
-                       .filter(p => p.title.is.contains(term))
-                       .map(p => ComboItem(p.idField.toString, p.title.is))
-            }
-    
-            override def onItemSelected(item: Option[ComboItem]): JsCmd = {
-                item match {
-                    case None => Noop
-                    case Some(selected) =>
-                        val project = Project.findByID(selected.id.toInt).get
-                        addProject(project)
-                }
-            }
-    
-            override def onItemAdded(name: String): JsCmd = {
-                val userID = CurrentUser.get.get.idField.is
-                val topic = Project.createRecord.userID(userID).title(name)
-                addProject(topic)
+    val projectCombobox = new ProjectComboBox {
+        def addProject(project: Project) = {
+            currentProjects.map(_.title.is).contains(project.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentProjects ::= project
+                    this.clear &
+                    AppendHtml(
+                        "delegateProjectTags", 
+                        project.editButton(onProjectClick, onProjectRemove)
+                    )
             }
         }
     }
 
-    val topicCombobox = {
-
-        val options = ("placeholder" -> """<i class="icon-tag"> </i> 請選擇主題""") :: Nil
-
-        new ComboBox(None, true, options) {
-
-            def addTopic(topic: Topic) = {
-                currentTopics.map(_.title.is)contains(topic.title.is) match {
-                    case true  => this.clear
-                    case false =>
-                        currentTopics ::= topic
-                        this.clear &
-                        AppendHtml(
-                            "delegateTopicTags", 
-                            topic.editButton(onTopicClick, onTopicRemove)
-                        )
-                }
-            }
-
-            override def onSearching(term: String): List[ComboItem] = {
-                Topic.findByUser(currentUser).openOr(Nil)
-                       .filter(t => t.title.is.contains(term))
-                       .map(t => ComboItem(t.idField.toString, t.title.is))
-            }
-    
-            override def onItemSelected(item: Option[ComboItem]): JsCmd = {
-                item match {
-                    case None => Noop
-                    case Some(selected) =>
-                        val topic = Topic.findByID(selected.id.toInt).get
-                        addTopic(topic)
-                }
-            }
-    
-            override def onItemAdded(name: String): JsCmd = {
-                val userID = CurrentUser.get.get.idField.is
-                val topic = Topic.createRecord.userID(userID).title(name)
-                addTopic(topic)
+    val topicCombobox = new TopicComboBox{
+        def addTopic(topic: Topic) = {
+            currentTopics.map(_.title.is)contains(topic.title.is) match {
+                case true  => this.clear
+                case false =>
+                    currentTopics ::= topic
+                    this.clear &
+                    AppendHtml(
+                        "delegateTopicTags", 
+                        topic.editButton(onTopicClick, onTopicRemove)
+                    )
             }
         }
     }
@@ -218,9 +153,9 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         "#delegateEditDesc" #> SHtml.ajaxTextarea(stuff.description.is, setDescription _) &
         "#delegateTopicTags *" #> topicTags &
         "#delegateProjectTags *" #> projectTags &
-        ".delegateProjectCombo" #> projectCombobox.comboBox &
-        ".delegateTopicCombo" #> topicCombobox.comboBox &
-        ".delegateContactCombo" #> contactCombobox.comboBox &
+        "#delegateProjectCombo" #> projectCombobox.comboBox &
+        "#delegateTopicCombo" #> topicCombobox.comboBox &
+        "#delegateContactCombo" #> contactCombobox.comboBox &
         "#delegateCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("delegateEdit")) &
         "#delegateSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#delegateSave *" #> (if (stuff.isPersisted) "儲存" else "新增")

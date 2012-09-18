@@ -2,8 +2,8 @@ package org.bedone.lib
 
 import org.bedone.model._
 import org.bedone.lib._
+import org.bedone.lib.TagButton.Implicit._
 import org.bedone.snippet._
-import org.bedone.snippet.TagButton.Implicit._
 
 import net.liftweb.actor.LiftActor
 

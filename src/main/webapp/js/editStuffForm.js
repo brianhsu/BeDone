@@ -93,30 +93,6 @@ function prepareActionEditForm()
 
 }
 
-function prepareDelegateEditForm()
-{
-    $( "#delegateProject" ).autocomplete({
-        source: "/autocomplete/project",
-        select: function(event, ui) { 
-            $("#delegateProject").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#delegateDeadline input" ).datepicker({
-        dateFormat: "yy-mm-dd",
-        onClose: function(dateText) {
-            $("#delegateDeadline input").val(dateText)
-            $("#delegateDeadline input").blur()
-        }
-    });
-
-    $('#delegateSave').click(function () {
-        $(this).button('loading')
-    })
-
-}
-
 function prepareScheduledEditForm() 
 {
     $( "#scheduledTopic" ).autocomplete({

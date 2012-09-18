@@ -14,8 +14,8 @@
       </div>
     </fieldset>
     <div class="pull-right form-inline" style="margin-right:10px">
-      <div class="delegateTopicCombo"></div>
-      <div class="delegateProjectCombo"></div>
+      <div id="delegateTopicCombo"></div>
+      <div id="delegateProjectCombo"></div>
     </div>
   </div>
   <div style="margin: 0.5em; display: table; width: 98%">
@@ -28,7 +28,7 @@
   </div>
 
   <fieldset id="delegateContact" class="inline pull-left control-group">
-    <div><span style="position: relative; top:3px">請選擇負擇人：</span><div class="delegateContactCombo"></div></div>
+    <div><span style="position: relative; top:3px">請選擇負擇人：</span><div id="delegateContactCombo"></div></div>
     <span id="delegateContact_msg" class="help-inline"></span>
   </fieldset>
 
@@ -36,5 +36,10 @@
       <button type="reset" id="delegateCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="delegateSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
   </div>
+  <script type="text/javascript">
+      $('#delegateSave').click(function () {
+          $(this).button('loading')
+      })
+  </script>
 
 </div>
