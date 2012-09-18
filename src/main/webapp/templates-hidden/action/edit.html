@@ -15,33 +15,10 @@
       </div>
     </fieldset>
 
-    <div class="pull-right form-inline">
-      <div class="input-prepend" style="margin-right:0.5em;">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="Context" class="add-on">
-            <i class="icon-briefcase"></i>
-          </span><input id="actionContext" class="input-medium" type="text" placeholder="Context" />
-          <input type="hidden" id="actionContextHidden" />
-        </form>
-      </div>
-
-      <div class="input-prepend" style="margin-right:0.5em;">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="主題" class="add-on">
-            <i class="icon-tags"></i>
-          </span><input id="actionTopic" class="input-medium" type="text" placeholder="主題" />
-          <input type="hidden" id="actionTopicHidden" />
-        </form>
-      </div>
-
-      <div class="input-prepend" style="margin-right: 0.5em">
-        <form action="." data-lift="lift:Form.ajax">
-          <span title="專案" class="add-on">
-            <i class="icon-folder-open"></i>
-          </span><input id="actionProject" class="input-medium" type="text" placeholder="專案" />
-          <input type="hidden" id="actionProjectHidden" />
-        </form>
-      </div>
+    <div class="pull-right form-inline" style="margin-right:10px">
+      <div id="actionContextCombo"></div>
+      <div id="actionTopicCombo"></div>
+      <div id="actionProjectCombo"></div>
     </div>
   </div>
 
@@ -67,5 +44,17 @@
       <button type="reset" id="actionCancel" class="btn" style="margin-right:0.5em">取消</button>
       <button id="actionSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
   </div>
+  <script type="text/javascript">
+      $( "#actionDeadline input" ).datepicker({
+          dateFormat: "yy-mm-dd",
+          onClose: function(dateText) {
+              $("#actionDeadline input").val(dateText)
+              $("#actionDeadline input").blur()
+          }
+      });
 
+      $('#actionSave').click(function () {
+          $(this).button('loading')
+      })
+  </script>
 </div>

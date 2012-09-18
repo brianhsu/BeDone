@@ -52,47 +52,6 @@ function prepareReferenceEditForm()
     })
 }
 
-
-function prepareActionEditForm()
-{
-    $( "#actionContext" ).autocomplete({
-        source: "/autocomplete/context",
-        select: function(event, ui) { 
-            $("#actionContext").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#actionTopic" ).autocomplete({
-        source: "/autocomplete/topic",
-        select: function(event, ui) { 
-            $("#actionTopic").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#actionProject" ).autocomplete({
-        source: "/autocomplete/project",
-        select: function(event, ui) { 
-            $("#actionProject").val(ui.item.label)
-            $(this).closest("form").submit()
-        }
-    });
-
-    $( "#actionDeadline input" ).datepicker({
-        dateFormat: "yy-mm-dd",
-        onClose: function(dateText) {
-            $("#actionDeadline input").val(dateText)
-            $("#actionDeadline input").blur()
-        }
-    });
-
-    $('#actionSave').click(function () {
-        $(this).button('loading')
-    })
-
-}
-
 function prepareScheduledEditForm() 
 {
     $( "#scheduledTopic" ).autocomplete({
