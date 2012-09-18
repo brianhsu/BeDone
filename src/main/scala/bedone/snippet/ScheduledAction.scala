@@ -227,8 +227,7 @@ class ScheduledAction extends JSImplicit
         val editStuff = new EditScheduledForm(scheduled, editPostAction)
 
         """$('#scheduledEdit').remove()""" &
-        AppendHtml("scheduledEditHolder", editStuff.toForm) &
-        """prepareScheduledEditForm()"""
+        SetHtml("scheduledEditHolder", editStuff.toForm)
     }
 
     def actionBar(scheduled: Scheduled) = 

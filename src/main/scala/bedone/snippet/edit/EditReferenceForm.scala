@@ -38,7 +38,7 @@ class EditReferenceForm(stuff: Stuff, postAction: Stuff => JsCmd) extends JSImpl
     private var currentTopics: List[Topic] = stuff.topics
     private var currentProjects: List[Project] = stuff.projects
 
-     val projectCombobox = new ProjectComboBox {
+    val projectCombobox = new ProjectComboBox {
         def addProject(project: Project) = {
             currentProjects.map(_.title.is).contains(project.title.is) match {
                 case true  => this.clear
