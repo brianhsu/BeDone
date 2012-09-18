@@ -45,6 +45,7 @@ class DashBoard
         val comboBox = ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, jsonOption)
 
 
-        "name=contactInput" #> comboBox.comboBox
+        "name=contactInput" #> comboBox.comboBox &
+        "#clear [onclick]" #> SHtml.onEvent(s => comboBox.clear)
     }
 }

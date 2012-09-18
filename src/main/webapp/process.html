@@ -204,16 +204,7 @@
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
-              <div>
-                <div class="inline">
-                  <form data-lift="lift:Form.ajax">
-                    <div class="input-prepend">
-                      <span class="add-on"><i class="icon-user"></i> 負責人：</span><input class="contactInput" type="text" />
-                    </div>
-                    <input class="contactInputHidden" type="hidden" />
-                  </form>
-                </div>
-              </div>
+              <div id="contactCombo"></div>
             </div>
             <div>
               <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
@@ -272,14 +263,6 @@
               select: function(event, ui) { 
                   $(this).val(ui.item.label)
                   $(this).closest("form").submit()
-              }
-          });
-
-          $(".contactInput").autocomplete({
-              source: "/autocomplete/contact",
-              select: function(event, ui) { 
-                  $(this).val(ui.item.label)
-                  $(this).blur()
               }
           });
 

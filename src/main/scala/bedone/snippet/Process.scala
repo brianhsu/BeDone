@@ -6,6 +6,8 @@ import org.bedone.lib._
 import org.bedone.model.StuffType.StuffType
 import TagButton.Implicit._
 
+import net.liftmodules.combobox._
+
 import net.liftweb.common.Box
 import net.liftweb.common.Empty
 import net.liftweb.common.Full
@@ -44,7 +46,7 @@ class Process extends JSImplicit
     private var contextTitle: Option[String] = None
 
     // Delegated attribute
-    private var contactName: Option[String] = None
+    private var currentContact: Option[Contact] = None
 
     // Scheduled attribute
     private var startDateTime: Option[Calendar] = None
@@ -56,6 +58,36 @@ class Process extends JSImplicit
 
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+    val contactCombobox = {
+
+        def onSearching(term: String): List[ComboItem] = {
+            Contact.findByUser(currentUser).openOr(Nil)
+                   .filter(c => c.name.is.contains(term))
+                   .map(c => ComboItem(c.idField.toString, c.name.is))
+        }
+
+        def onItemSelected(item: Option[ComboItem]): JsCmd = {
+            item match {
+                case None => """$('#saveDelegated').attr('disabled', true)"""
+                case Some(selected) =>
+                    currentContact = Contact.findByID(selected.id.toInt).toOption
+                    """$('#saveDelegated').attr('disabled', false)"""
+            }
+        }
+
+        def onItemAdded(name: String): JsCmd = {
+            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
+            currentContact = Some(newContact)
+
+            """$('#saveDelegated').attr('disabled', false)"""
+        }
+
+        val options = ("placeholder" -> "請選擇負責人") :: ("allowClear" -> "true") :: Nil
+
+        ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, options)
+    }
+
 
     def onTopicClick(buttonID: String, topic: Topic) = Noop
     def onProjectClick(buttonID: String, project: Project) = Noop
@@ -81,20 +113,14 @@ class Process extends JSImplicit
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
 
-        def createContact = 
-            Contact.createRecord.userID(currentUser.idField.is).name(contactName.get)
-
-        contactName match {
+        currentContact match {
             case None => Alert("負責人為必填欄位")
-            case Some(name) =>
+            case Some(contact) =>
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
                 stuff.stuffType(StuffType.Delegated)
                 stuff.saveTheRecord()
-
-                val contact = Contact.findByName(currentUser, name)
-                                     .openOr(createContact)
-                                     .saveTheRecord().get
+                contact.saveTheRecord()
 
                 val action = Action.createRecord.idField(stuff.idField.is)
                                    .saveTheRecord().get
@@ -245,13 +271,6 @@ class Process extends JSImplicit
 
     def doNothing(s: String) {}
 
-    def setContact(name: String): JsCmd = {
-        this.contactName = name
-        this.contactName match {
-            case None    => "$('#saveDelegated').attr('disabled', true)"
-            case Some(t) => "$('#saveDelegated').attr('disabled', false)"
-        }
-    }
 
     def setTitle(title: String): JsCmd = {
 
@@ -463,7 +482,7 @@ class Process extends JSImplicit
             "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
         ) &
         "#isDelegated" #> (
-            ".contactInput" #> SHtml.textAjaxTest("", doNothing _, setContact _) &
+            "#contactCombo" #> contactCombobox.comboBox &
             "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
         ) &
         "#itIsReference" #> (
