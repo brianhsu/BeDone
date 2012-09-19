@@ -4,16 +4,18 @@ import org.bedone.model._
 
 import net.liftmodules.combobox._
 
+import net.liftweb.http.js.JE.Str
+import net.liftweb.http.js.JsExp
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 
 object ContextComboBox {
     val defaultOptions = List(
-        "placeholder" -> """<i class="icon-briefcase"></i> 請選擇所屬的情境"""
+        "placeholder" -> Str("""<i class="icon-briefcase"></i> 請選擇所屬的情境""")
     )
 }
 
-abstract class ContextComboBox(options: List[(String, String)] = ContextComboBox.defaultOptions) extends ComboBox(None, true, options) {
+abstract class ContextComboBox(options: List[(String, JsExp)] = ContextComboBox.defaultOptions) extends ComboBox(None, true, options) {
     
     private lazy val currentUser = CurrentUser.get.get
 

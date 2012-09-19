@@ -17,6 +17,10 @@ import net.liftweb.util.Helpers._
 
 import net.liftweb.http.S
 import net.liftweb.http.SHtml
+
+import net.liftweb.http.js.JE.JsTrue
+import net.liftweb.http.js.JE.Str
+import net.liftweb.http.js.JsExp
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.jquery.JqJsCmds._
@@ -83,7 +87,9 @@ class Process extends JSImplicit
             """$('#saveDelegated').attr('disabled', false)"""
         }
 
-        val options = ("placeholder" -> "請選擇負責人") :: ("allowClear" -> "true") :: Nil
+        val options = 
+            ("placeholder" -> Str("請選擇負責人")) :: 
+            ("allowClear"  -> JsTrue) :: Nil
 
         ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, options)
     }

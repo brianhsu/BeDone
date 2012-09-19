@@ -4,16 +4,18 @@ import org.bedone.model._
 
 import net.liftmodules.combobox._
 
+import net.liftweb.http.js.JE.Str
+import net.liftweb.http.js.JsExp
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 
 object TopicComboBox {
     val defaultOptions = List(
-        "placeholder" -> """<i class="icon-tag"></i> 請選擇所屬的主題"""
+        "placeholder" -> Str("""<i class="icon-tag"></i> 請選擇所屬的主題""")
     )
 }
 
-abstract class TopicComboBox(options: List[(String, String)] = TopicComboBox.defaultOptions) extends ComboBox(None, true, options) {
+abstract class TopicComboBox(options: List[(String, JsExp)] = TopicComboBox.defaultOptions) extends ComboBox(None, true, options) {
     
     private lazy val currentUser = CurrentUser.get.get
 
