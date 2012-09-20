@@ -2,6 +2,9 @@ package org.bedone.snippet
 
 import org.bedone.model._
 import org.bedone.lib._
+import org.bedone.session._
+
+import net.liftweb.common._
 
 import net.liftweb.util.Helpers._
 
@@ -57,7 +60,14 @@ class ContactTable extends JSImplicit
         rowTemplate.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
+    def gmailAuth() {
+        val contactsOAuth = new GMailContacts
+        ContactsOAuth(Full(contactsOAuth))
+        S.redirectTo(contactsOAuth.authURL)
+    }
+
     def render = {
+        "#importContact [onclick]" #> SHtml.onEvent(s => gmailAuth()) &
         ".contactRow" #> contacts.map(createContactRow)
     }
 }

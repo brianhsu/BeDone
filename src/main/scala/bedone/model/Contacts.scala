@@ -40,6 +40,16 @@ object Contact extends Contact with MetaRecord[Contact]
         }.toList
     }
 
+    def findByGoogleID(userID: Int, googleID: String): Box[Contact] = tryo(classOf[Exception]) {
+        from(BeDoneSchema.contacts) { contact => 
+            where(
+                contact.userID === userID and
+                contact.googleID === Some(googleID)
+            ).
+            select(contact)
+        }.head
+    }
+
     def paramParser(param: String): Box[Contact] = tryo {
         inTransaction {
             CurrentUser.is.flatMap { user => 
@@ -61,21 +71,37 @@ class Contact extends Record[Contact] with KeyedRecord[Int]
     val email = new OptionalEmailField(this, 100)
     val address = new OptionalStringField(this, 255)
     val phone = new OptionalStringField(this, 20)
+    val googleID = new OptionalStringField(this, 255)
+
     val isTrash = new BooleanField(this, false)
 
     def className = "topic%d%s" format (userID.is, hashHex(name.is))
 
-    def isDirty = allFields.exists(_.dirty_?)
-
     override def saveTheRecord() = tryo {
 
-        this.isPersisted match {
-            case true  if isDirty => BeDoneSchema.contacts.update(this)
-            case false => BeDoneSchema.contacts.insert(this)
-            case _ =>
-        }
+        val googleContact = googleID.is.flatMap(gID => Contact.findByGoogleID(userID.is, gID))
 
-        this
+        if (googleContact.isDefined && !this.isPersisted) {
+            
+            val contact = googleContact.get
+            contact.name(this.name.is).email(this.email.is)
+                   .address(this.address.is).phone(this.phone.is)
+                   .isTrash(this.isTrash.is)
+                   .saveTheRecord()
+
+            contact
+
+        } else {
+
+            this.isPersisted match {
+                case true  => BeDoneSchema.contacts.update(this)
+                case false => BeDoneSchema.contacts.insert(this)
+            }
+
+            this
+        }
+        
+
     }
 
 }

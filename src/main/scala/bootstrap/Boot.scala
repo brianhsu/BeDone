@@ -77,6 +77,7 @@ class Boot
             (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Trash") / "trash") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Import Contacts") / "contact" / "import") >> If(User.isLoggedIn _, "請先登入"),
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (topicDetail >> Template(() => Templates("topic" :: "detail" :: Nil) openOr NodeSeq.Empty))
