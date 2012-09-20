@@ -17,7 +17,6 @@ import scala.xml.XML
 
 class GMailContacts
 {
-
     val scope = "https://www.google.com/m8/feeds/"
     val clientID = "32168263492-s20ia0f4pl30cu60dnbu099rdqj6uieu.apps.googleusercontent.com"
     val clientSecret = "Uo3VizoTG4yBGTVp-Q8XrhOT"
@@ -26,22 +25,20 @@ class GMailContacts
 
     private var accessToken: Box[Token] = Empty
     private val service = new ServiceBuilder()
-                  .provider(classOf[GoogleApi])
+                  .provider(classOf[Google2Api])
                   .apiKey(clientID)
                   .apiSecret(clientSecret)
                   .callback(callbackURL)
                   .scope(scope)
                   .build()
 
-    private lazy val requestToken = service.getRequestToken
-
-    def authURL = service.getAuthorizationUrl(requestToken)
+    def authURL = service.getAuthorizationUrl(null)
 
     def setAccessToken(verifierCode: String) {
         
         if (!accessToken.isDefined) {
             val verifier = new Verifier(verifierCode)
-            accessToken = tryo(service.getAccessToken(requestToken, verifier))
+            accessToken = tryo(service.getAccessToken(null, verifier))
         }
     }
 

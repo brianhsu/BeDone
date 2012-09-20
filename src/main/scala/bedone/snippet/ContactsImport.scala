@@ -21,8 +21,9 @@ class ContactsImport
     private var shouldBeSaved = contacts.toSet
 
     def getContacts = {
+
         ContactsOAuth.is.flatMap { api =>
-            api.setAccessToken(S.param("oauth_verifier").openOr(""))
+            api.setAccessToken(S.param("code").openOr(""))
             api.contacts
         }.openOr(Nil).sortBy(_.name.is)
     }
@@ -45,9 +46,6 @@ class ContactsImport
 
     def render = {
 
-        if (contacts.isEmpty) {
-            S.redirectTo("/contact", () => S.notice("無可匯入的資料"))
-        }
 
         ".backButton [onclick]" #> SHtml.onEvent(s => S.redirectTo("/contact")) &
         ".confirmButton [onclick]" #> SHtml.onEvent(s => importContacts()) &
