@@ -9,19 +9,19 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div data-lift="ContactTable">
+      <div data-lift="ContactsImport">
         <div class="pull-right">
           <div class="btn-group inline">
-            <a class="btn btn-primary" href="#" id="importContact">匯入 GMail 通訊錄</a>
+            <button class="btn btn-inverse backButton">回通訊錄</button>
+            <button class="btn btn-success confirmButton">確認匯入</button>
           </div>
         </div>
-
         <div class="clearfix"></div>
 
-        <div id="editContactHolder" style="margin-top:10px"></div>
-        <table class="table table-condensed contactTable">
+        <table class="table table-condensed">
           <thead>
             <tr>
+              <th>匯入</th>
               <th>名稱</th>
               <th>EMail</th>
               <th>電話</th>
@@ -29,9 +29,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="contactRow"></tr>
+            <tr class="contactRow">
+              <td class="save">AA</td>
+              <td class="name" >名稱</td>
+              <td class="email">EMail</td>
+              <td class="phone">電話</td>
+              <td class="address">地址</td>
+            </tr>
           </tbody>
         </table>
+
       </div>
     </div>
   </body>
