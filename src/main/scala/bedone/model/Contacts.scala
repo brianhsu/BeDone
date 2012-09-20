@@ -81,9 +81,6 @@ class Contact extends Record[Contact] with KeyedRecord[Int]
 
         val googleContact = googleID.is.flatMap(gID => Contact.findByGoogleID(userID.is, gID))
 
-        println("isDefined:" + googleContact.isDefined)
-        println("isPersisted:" + this.isPersisted)
-
         if (googleContact.isDefined && !this.isPersisted) {
             
             val contact = googleContact.get
