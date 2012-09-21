@@ -20,9 +20,13 @@ import org.joda.time._
 import java.util.Calendar
 import java.util.Date
 
+case class MaybeT(stuff: Stuff, maybe: Maybe)
+
 object Maybe extends Maybe with MetaRecord[Maybe]
 {
-    def findByTopic(user: User, topicID: Int): Box[List[Maybe]] = tryo {
+    def toMaybeT(t: (Stuff, Maybe)) = MaybeT(t._1, t._2)
+
+    def findByTopic(user: User, topicID: Int): Box[List[MaybeT]] = tryo {
         import BeDoneSchema._
 
         from(stuffs, maybes, stuffTopics) ( (stuff, maybe, stuffTopic) =>
@@ -33,11 +37,11 @@ object Maybe extends Maybe with MetaRecord[Maybe]
                 stuffTopic.stuffID === stuff.idField and
                 stuffTopic.topicID === topicID
             ) 
-            select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
-        ).toList
+            select(stuff, maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
+        ).map(toMaybeT).toList
     }
 
-    def findByProject(user: User, projectID: Int): Box[List[Maybe]] = tryo {
+    def findByProject(user: User, projectID: Int): Box[List[MaybeT]] = tryo {
         import BeDoneSchema._
 
         from(stuffs, maybes, stuffProjects) ( (stuff, maybe, stuffProject) =>
@@ -48,19 +52,19 @@ object Maybe extends Maybe with MetaRecord[Maybe]
                 stuffProject.stuffID === stuff.idField and
                 stuffProject.projectID === projectID
             ) 
-            select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
-        ).toList
+            select(stuff, maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
+        ).map(toMaybeT).toList
     }
 
-    def findByUser(user: User): Box[List[Maybe]] = tryo {
+    def findByUser(user: User): Box[List[MaybeT]] = tryo {
         from(BeDoneSchema.stuffs, BeDoneSchema.maybes) ( (stuff, maybe) =>
             where(
                 stuff.userID === user.idField and 
                 stuff.isTrash === false and
                 stuff.idField === maybe.idField
             ) 
-            select(maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
-        ).toList
+            select(stuff, maybe) orderBy(maybe.tickler.isNull, maybe.tickler)
+        ).map(toMaybeT).toList
     }
 
     def outdated(user: User) = tryo {
@@ -72,10 +76,10 @@ object Maybe extends Maybe with MetaRecord[Maybe]
                     stuff.isTrash === false and
                     maybe.tickler.isNotNull
                 ) 
-                select(maybe) orderBy(maybe.tickler)
-            ).toList
+                select(stuff, maybe) orderBy(maybe.tickler)
+            ).map(toMaybeT).toList
         
-        maybes.filter(_.tickler.is.get.getTimeInMillis < now.getTime)
+        maybes.filter(_.maybe.tickler.is.get.getTimeInMillis < now.getTime)
     }
 
 }
@@ -97,8 +101,6 @@ class Maybe extends Record[Maybe] with KeyedRecord[Int]
 
         override def validations = afterToday _ :: super.validations
     }
-
-    def stuff = Stuff.findByID(idField.is).get
 
     override def saveTheRecord() = tryo{
         this.isPersisted match {

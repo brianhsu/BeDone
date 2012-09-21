@@ -21,11 +21,11 @@ class MaybeList extends JSImplicit
     private val projectID = S.attr("projectID").map(_.toInt)
     private val topicID = S.attr("topicID").map(_.toInt)
 
-    private def projectMaybes = projectID.map(Maybe.findByProject(currentUser, _).openOr(Nil))
-    private def topicMaybes = topicID.map(Maybe.findByTopic(currentUser, _).openOr(Nil))
-    private def allMaybes = Maybe.findByUser(currentUser).openOr(Nil)
+    private def projectMaybeTs = projectID.map(Maybe.findByProject(currentUser, _).openOr(Nil))
+    private def topicMaybeTs = topicID.map(Maybe.findByTopic(currentUser, _).openOr(Nil))
+    private def allMaybeTs = Maybe.findByUser(currentUser).openOr(Nil)
 
-    private def maybes = (projectMaybes or topicMaybes).getOrElse(allMaybes)
+    private def maybeTs: List[MaybeT] = (projectMaybeTs or topicMaybeTs).getOrElse(allMaybeTs)
 
     private lazy val currentUser = CurrentUser.get.get
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -34,10 +34,10 @@ class MaybeList extends JSImplicit
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "maybeAllTab"
 
-    def shouldDisplay(maybe: Maybe) = 
+    def shouldDisplay(maybeT: MaybeT) = 
     {
-        val hasTopic = currentTopic.map(maybe.stuff.topics.contains).getOrElse(true)
-        val hasProject = currentProject.map(maybe.stuff.projects.contains).getOrElse(true)
+        val hasTopic = currentTopic.map(maybeT.stuff.topics.contains).getOrElse(true)
+        val hasProject = currentProject.map(maybeT.stuff.projects.contains).getOrElse(true)
 
         hasTopic && hasProject
     }
@@ -46,15 +46,15 @@ class MaybeList extends JSImplicit
     {
         this.currentTabID = tabID
 
-        val maybes = tabID match {
-            case "maybeAllTab"     => this.maybes
-            case "maybeTicklerTab" => this.maybes.filter(_.tickler.is.isDefined)
-            case "maybeStaredTab"  => this.maybes.filter(_.stuff.isStared.is)
+        val maybeTs = tabID match {
+            case "maybeAllTab"     => this.maybeTs
+            case "maybeTicklerTab" => this.maybeTs.filter(_.maybe.tickler.is.isDefined)
+            case "maybeStaredTab"  => this.maybeTs.filter(_.stuff.isStared.is)
         }
 
         """$('.maybeTab li').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("maybeList", maybes.filter(shouldDisplay).flatMap(createMaybeRow))
+        JqSetHtml("maybeList", maybeTs.filter(shouldDisplay).flatMap(createMaybeRow))
     }
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
@@ -85,7 +85,7 @@ class MaybeList extends JSImplicit
         this.currentProject = None
 
         JqSetHtml("maybeCurrent", "全部") &
-        JqSetHtml("maybeList", maybes.flatMap(createMaybeRow)) &
+        JqSetHtml("maybeList", maybeTs.flatMap(createMaybeRow)) &
         JsRaw("""$('#maybeShowAll').prop("disabled", true)""") &
         JsRaw("""$('#maybeCurrent').attr("class", "btn btn-inverse")""") &
         updateList(currentTabID)
@@ -95,17 +95,17 @@ class MaybeList extends JSImplicit
         updateList(currentTabID)
     }
 
-    def showEditForm(maybe: Maybe) = 
+    def showEditForm(maybeT: MaybeT) = 
     {
-        val editStuff = new EditMaybeForm(maybe, editPostAction)
+        val editStuff = new EditMaybeForm(maybeT, editPostAction)
 
         """$('#maybeEdit').remove()""" &
         SetHtml("maybeEditHolder", editStuff.toForm)
     }
 
-    def actionBar(maybe: Maybe) = 
+    def actionBar(maybeT: MaybeT) = 
     {
-        val stuff = maybe.stuff
+        val stuff = maybeT.stuff
 
         def starClass = stuff.isStared.is match {
             case true  => "myicon-starOn"
@@ -145,7 +145,7 @@ class MaybeList extends JSImplicit
             case false => "visibility:visible"
         }
 
-        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(maybe)) &
+        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(maybeT)) &
         ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
         ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
         ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
@@ -162,16 +162,16 @@ class MaybeList extends JSImplicit
         }
     }
 
-    def createMaybeRow(maybe: Maybe) = 
+    def createMaybeRow(maybeT: MaybeT) = 
     {
         import TagButton.Implicit._
 
         def template = Templates("templates-hidden" :: "maybe" :: "item" :: Nil)
 
-        val stuff = maybe.stuff
+        val stuff = maybeT.stuff
 
         val cssBinding = 
-            actionBar(maybe) &
+            actionBar(maybeT) &
             ".maybe [id]"   #> ("maybe" + stuff.idField) &
             ".collapse [id]" #> ("maybeDesc" + stuff.idField) &
             ".title *"       #> stuff.titleWithLink &
@@ -179,7 +179,7 @@ class MaybeList extends JSImplicit
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"     #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".deadline"      #> "" &
-            ".ticklerDate"   #> formatTickler(maybe) 
+            ".ticklerDate"   #> formatTickler(maybeT.maybe) 
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
@@ -190,6 +190,6 @@ class MaybeList extends JSImplicit
         "#maybeTicklerTab [onclick]" #> SHtml.onEvent(s => updateList("maybeTicklerTab")) &
         "#maybeStaredTab [onclick]" #> SHtml.onEvent(s => updateList("maybeStaredTab")) &
         "#maybeShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#maybeList" #> (".row" #> maybes.map(createMaybeRow))
+        "#maybeList" #> (".row" #> maybeTs.map(createMaybeRow))
     }
 }
