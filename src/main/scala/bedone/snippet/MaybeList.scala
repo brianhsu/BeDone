@@ -36,10 +36,9 @@ class MaybeList extends JSImplicit
 
     def shouldDisplay(maybeT: MaybeT) = 
     {
-        val hasTopic = currentTopic.map(maybeT.stuff.topics.contains).getOrElse(true)
-        val hasProject = currentProject.map(maybeT.stuff.projects.contains).getOrElse(true)
-
-        hasTopic && hasProject
+        val stuff = maybeT.stuff
+        currentTopic.map(t => stuff.hasTopic(t.idField.is)).getOrElse(true) &&
+        currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
     }
 
     def updateList(tabID: String) =
