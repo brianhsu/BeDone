@@ -65,28 +65,10 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         }
     }
 
-    val contactCombobox = {
-
-        def onSearching(term: String): List[ComboItem] = {
-            Contact.findByUser(currentUser).openOr(Nil)
-                   .filter(c => c.name.is.contains(term))
-                   .map(c => ComboItem(c.idField.toString, c.name.is))
+    val contactCombobox = new ContactComboBox {
+        override def setContact(contact: Option[Contact]) = {
+            currentContact = contact
         }
-
-        def onItemSelected(item: Option[ComboItem]): JsCmd = {
-            for (selected <- item) {
-                currentContact = Contact.findByID(selected.id.toInt).toOption
-            }
-        }
-
-        def onItemAdded(name: String): JsCmd = {
-            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
-            currentContact = Some(newContact)
-        }
-
-        val defaultItem = currentContact.map(c => ComboItem(c.idField.toString, c.name.is))
-
-        ComboBox(defaultItem, onSearching _, onItemSelected _, onItemAdded _)
     }
 
     def doNothing(s: String) {}

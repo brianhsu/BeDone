@@ -63,35 +63,16 @@ class Process extends JSImplicit
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-    val contactCombobox = {
+    val contactCombobox = new ContactComboBox {
 
-        def onSearching(term: String): List[ComboItem] = {
-            Contact.findByUser(currentUser).openOr(Nil)
-                   .filter(c => c.name.is.contains(term))
-                   .map(c => ComboItem(c.idField.toString, c.name.is))
-        }
-
-        def onItemSelected(item: Option[ComboItem]): JsCmd = {
-            item match {
+        override def setContact(selected: Option[Contact]): JsCmd = {
+            selected match {
                 case None => """$('#saveDelegated').attr('disabled', true)"""
-                case Some(selected) =>
-                    currentContact = Contact.findByID(selected.id.toInt).toOption
+                case Some(contact) =>
+                    currentContact = selected
                     """$('#saveDelegated').attr('disabled', false)"""
             }
         }
-
-        def onItemAdded(name: String): JsCmd = {
-            val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
-            currentContact = Some(newContact)
-
-            """$('#saveDelegated').attr('disabled', false)"""
-        }
-
-        val options = 
-            ("placeholder" -> Str("請選擇負責人")) :: 
-            ("allowClear"  -> JsTrue) :: Nil
-
-        ComboBox(None, onSearching _, onItemSelected _, onItemAdded _, options)
     }
 
 
