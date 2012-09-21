@@ -17,8 +17,12 @@ import org.squeryl.annotations.Column
 
 import StuffType.StuffType
 
+case class ActionT(stuff: Stuff, action: Action)
+
 object Action extends Action with MetaRecord[Action]
 {
+    def toActionT(t: (Stuff, Action)) = ActionT(t._1, t._2)
+
     def findByID(id: Int): Box[Action] = 
         tryo(BeDoneSchema.actions.where(_.idField === id).single)
 
@@ -36,9 +40,9 @@ object Action extends Action with MetaRecord[Action]
                     stuffTopic.stuffID === stuff.idField and 
                     stuffTopic.topicID === topicID
                 ) 
-                select(action) 
+                select(stuff, action) 
                 orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
-            ).toList
+            ).map(toActionT).toList
         }
     }
 
@@ -57,13 +61,13 @@ object Action extends Action with MetaRecord[Action]
                     stuffProject.stuffID === stuff.idField and 
                     stuffProject.projectID === projectID
                 ) 
-                select(action) 
+                select(stuff, action) 
                 orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
-            ).toList
+            ).map(toActionT).toList
         }
     }
 
-    def findByUser(user: User, stuffType: StuffType = StuffType.Action): Box[List[Action]] = 
+    def findByUser(user: User, stuffType: StuffType = StuffType.Action): Box[List[ActionT]] = 
     {
         tryo {
             from(BeDoneSchema.stuffs, BeDoneSchema.actions) ( (stuff, action) =>
@@ -73,9 +77,9 @@ object Action extends Action with MetaRecord[Action]
                     stuff.isTrash === false and
                     action.idField === stuff.idField
                 ) 
-                select(action) 
+                select(stuff, action) 
                 orderBy(action.doneTime desc, stuff.deadline desc, stuff.createTime)
-            ).toList
+            ).map(toActionT).toList
         }
     }
 }
@@ -90,8 +94,6 @@ class Action extends Record[Action] with KeyedRecord[Int]
     val doneTime = new OptionalDateTimeField(this)
 
     def stuff = Stuff.findByID(idField.is).get
-    def topics = stuff.topics
-    def projects = stuff.projects
     def contexts = BeDoneSchema.actionContexts.left(this).toList
 
     def removeContext(context: Context) = 

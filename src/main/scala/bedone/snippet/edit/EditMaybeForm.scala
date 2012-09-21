@@ -25,13 +25,14 @@ import java.util.Calendar
 
 import TagButton.Implicit._
 
-class EditMaybeForm(maybe: Maybe, postAction: Stuff => JsCmd) extends JSImplicit
+class EditMaybeForm(maybeT: MaybeT, postAction: Stuff => JsCmd) extends JSImplicit
 {
     private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
 
     private def template = Templates("templates-hidden" :: "maybe" :: "edit" :: Nil)
 
-    private lazy val stuff = maybe.stuff
+    private lazy val stuff = maybeT.stuff
+    private lazy val maybe = maybeT.maybe
 
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 

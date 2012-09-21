@@ -172,6 +172,15 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
 
     def topics = BeDoneSchema.stuffTopics.left(this).toList
     def projects = BeDoneSchema.stuffProjects.left(this).toList
+
+    def hasTopic(topicID: Int) = BeDoneSchema.stuffTopics.where { st => 
+        st.stuffID === idField.is and st.topicID === topicID
+    }.nonEmpty
+
+    def hasProject(projectID: Int) = BeDoneSchema.stuffProjects.where { sp => 
+        sp.stuffID === idField.is and sp.projectID === projectID
+    }.nonEmpty
+
     def reInbox(title: Option[String] = None)  = {
 
         title.foreach(t => this.title(t))

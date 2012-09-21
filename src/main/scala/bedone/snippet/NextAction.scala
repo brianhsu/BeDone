@@ -171,26 +171,23 @@ class NextAction extends JSImplicit
     }
 
 
-    def shouldDisplay(action: Action) = 
+    def shouldDisplay(actionT: ActionT) = 
     {
-        val hasCurrentTopic = currentTopic.map(action.topics.contains).getOrElse(true)
-        val hasCurrentProject = currentProject.map(action.projects.contains).getOrElse(true)
-        val hasCurrentContext = currentContext.map(action.contexts.contains).getOrElse(true)
-   
-        hasCurrentTopic && 
-        hasCurrentProject &&
-        hasCurrentContext
+        val stuff = actionT.stuff
+        val action = actionT.action
+
+        currentTopic.map(p => stuff.hasTopic(p.idField.is)).getOrElse(true) &&
+        currentProject.map(t => stuff.hasProject(t.idField.is)).getOrElse(true) &&
+        currentContext.map(action.contexts.contains).getOrElse(true)
     }
 
-    def actions: (List[Action], List[Action]) = {
+    def actions: (List[ActionT], List[ActionT]) = {
 
         val actions = (projectAction orElse topicAction).getOrElse(allActions)
 
-        val (done, notDone) = actions.view
-                                     .filter(shouldDisplay)
-                                     .partition(_.isDone.is)
+        val (done, notDone) = actions.partition(_.action.isDone.is)
 
-        (done.toList, notDone.toList)
+        (done.filter(shouldDisplay), notDone.filter(shouldDisplay))
     }
 
     def deleteContext(context: Context)(): JsCmd = {
@@ -229,12 +226,13 @@ class NextAction extends JSImplicit
         updateDeleteButton
     }
 
-    def createActionRow(action: Action) = 
+    def createActionRow(actionT: ActionT) = 
     {
         import TagButton.Implicit._
 
         def template = Templates("templates-hidden" :: "action" :: "item" :: Nil)
 
+        val action = actionT.action
         val stuff = action.stuff
 
         val cssBinding = 
@@ -243,8 +241,8 @@ class NextAction extends JSImplicit
             ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
             ".title *"        #> stuff.titleWithLink &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
-            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
+            ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".deadline"       #> formatDeadline(action) &
             ".doneTime"       #> formatDoneTime(action)
 

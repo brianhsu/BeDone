@@ -45,11 +45,11 @@ class DelegatedAction extends JSImplicit
 
     def delegatedAction = contactID match {
         case None => allDelegatedAction
-        case Some(id) => allDelegatedAction.filter(_.contactID.is == id)
+        case Some(id) => allDelegatedAction.filter(_.delegated.contactID.is == id)
     }
 
-    def notInformedAction = delegatedAction.filterNot(_.hasInformed.is)
-    def notRespondAction = delegatedAction.filter(x => x.hasInformed.is && !x.action.isDone.is)
+    def notInformedAction = delegatedAction.filterNot(_.delegated.hasInformed.is)
+    def notRespondAction = delegatedAction.filter(x => x.delegated.hasInformed.is && !x.action.isDone.is)
     def doneAction = delegatedAction.filter(_.action.isDone.is)
 
     def formatDoneTime(action: Action) = 
@@ -174,10 +174,11 @@ class DelegatedAction extends JSImplicit
         S.redirectTo("/contact/" + contact.idField.is)
     }
 
-    def shouldDisplay(delegated: Delegated) = 
+    def shouldDisplay(delegatedT: DelegatedT) = 
     {
-        val hasTopic = currentTopic.map(delegated.action.topics.contains).getOrElse(true)
-        val hasProject = currentProject.map(delegated.action.projects.contains).getOrElse(true)
+        val stuff = delegatedT.stuff
+        val hasTopic = currentTopic.map(t => stuff.hasTopic(t.idField.is)).getOrElse(true)
+        val hasProject = currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
 
         hasTopic && hasProject
     }
@@ -197,14 +198,15 @@ class DelegatedAction extends JSImplicit
         JqSetHtml("delegateActions", events.filter(shouldDisplay).flatMap(createActionRow))
     }
 
-    def createActionRow(delegated: Delegated) = 
+    def createActionRow(delegatedT: DelegatedT) = 
     {
         import TagButton.Implicit._
 
         def template = Templates("templates-hidden" :: "delegated" :: "item" :: Nil)
 
-        val action = delegated.action
-        val stuff = action.stuff
+        val delegated = delegatedT.delegated
+        val action = delegatedT.action
+        val stuff = delegatedT.stuff
 
         val cssBinding = 
             actionBar(delegated) &
@@ -212,8 +214,8 @@ class DelegatedAction extends JSImplicit
             ".collapse [id]"  #> ("delegateDesc" + action.stuff.idField) &
             ".title *"        #> stuff.title.is &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
-            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
+            ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".doneTime"       #> formatDoneTime(action) &
             ".contact"        #> delegated.contact.viewButton(contactFilter)
 
