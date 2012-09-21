@@ -29,7 +29,7 @@ class ContactsImport extends JSImplicit
         ContactsOAuth.is.flatMap { api =>
             api.setAccessToken(S.param("code").openOr(""))
             api.contacts
-        }.openOr(Nil).sortBy(_.name.is)
+        }.openOr(Nil).sortBy(_.name.is.toLowerCase)
     }
 
     def updateImportSet (contact: Contact, isChecked: Boolean): JsCmd = {
@@ -47,7 +47,7 @@ class ContactsImport extends JSImplicit
 
     def importContacts() {
         shouldBeSaved.foreach { contact => 
-            contact.userID(currentUser.idField.is)
+            contact.userID(currentUser.idField.is).isTrash(false).saveTheRecord()
         }
 
         S.redirectTo("/contact", () => S.notice("已匯入 GMail 通訊錄"))
