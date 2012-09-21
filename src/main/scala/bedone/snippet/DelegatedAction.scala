@@ -214,8 +214,8 @@ class DelegatedAction extends JSImplicit
             ".collapse [id]"  #> ("delegateDesc" + action.stuff.idField) &
             ".title *"        #> stuff.title.is &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
-            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
+            ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".doneTime"       #> formatDoneTime(action) &
             ".contact"        #> delegated.contact.viewButton(contactFilter)
 

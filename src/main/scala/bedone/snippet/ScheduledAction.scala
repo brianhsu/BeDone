@@ -45,39 +45,39 @@ class ScheduledAction extends JSImplicit
     def monthAction = scheduledAction.filter(isThisMonth).filterNot(isToday)
     def allAction = scheduledAction.filterNot(isToday)
 
-    def isOutdated(scheduled: Scheduled): Boolean = 
+    def isOutdated(scheduledT: ScheduledT): Boolean = 
     {
         val todayStart = (new DateMidnight())
 
-        scheduled.startTime.is.getTime.before(todayStart.toDate) &&
-        !scheduled.action.isDone.is
+        scheduledT.scheduled.startTime.is.getTime.before(todayStart.toDate) &&
+        !scheduledT.scheduled.action.isDone.is
     }
 
-    def isThisMonth(scheduled: Scheduled): Boolean =
+    def isThisMonth(scheduledT: ScheduledT): Boolean =
     {
         val monthStart = (new DateMidnight).withDayOfMonth(1)
         val monthEnd = monthStart.plusMonths(1)
 
-        scheduled.startTime.is.getTime.after(monthStart.toDate) &&
-        scheduled.startTime.is.getTime.before(monthEnd.toDate)
+        scheduledT.scheduled.startTime.is.getTime.after(monthStart.toDate) &&
+        scheduledT.scheduled.startTime.is.getTime.before(monthEnd.toDate)
     }
 
-    def isThisWeek(scheduled: Scheduled): Boolean = 
+    def isThisWeek(scheduledT: ScheduledT): Boolean = 
     {
         val weekStart = (new DateMidnight).withDayOfWeek(1)
         val weekEnd = weekStart.plusDays(7)
 
-        scheduled.startTime.is.getTime.after(weekStart.toDate) &&
-        scheduled.startTime.is.getTime.before(weekEnd.toDate)
+        scheduledT.scheduled.startTime.is.getTime.after(weekStart.toDate) &&
+        scheduledT.scheduled.startTime.is.getTime.before(weekEnd.toDate)
     }
 
-    def isToday(scheduled: Scheduled): Boolean = 
+    def isToday(scheduledT: ScheduledT): Boolean = 
     {
         val todayStart = (new DateMidnight())
         val todayEnd = (new DateMidnight()).plusDays(1)
 
-        scheduled.startTime.is.getTime.after(todayStart.toDate) &&
-        scheduled.startTime.is.getTime.before(todayEnd.toDate)
+        scheduledT.scheduled.startTime.is.getTime.after(todayStart.toDate) &&
+        scheduledT.scheduled.startTime.is.getTime.before(todayEnd.toDate)
     }
 
     def formatDoneTime(action: Action) = 
@@ -138,14 +138,15 @@ class ScheduledAction extends JSImplicit
         endTime.getOrElse("") + location.getOrElse("")
     }
 
-    def createActionRow(scheduled: Scheduled) = 
+    def createActionRow(scheduledT: ScheduledT) = 
     {
         import TagButton.Implicit._
 
         def template = Templates("templates-hidden" :: "scheduled" :: "item" :: Nil)
 
-        val action = scheduled.action
-        val stuff = action.stuff
+        val scheduled = scheduledT.scheduled
+        val action = scheduledT.action
+        val stuff = scheduledT.stuff
 
         val cssBinding = 
             actionBar(scheduled) &
@@ -153,8 +154,8 @@ class ScheduledAction extends JSImplicit
             ".collapse [id]"  #> ("scheduledDesc" + action.stuff.idField) &
             ".title *"        #> stuff.titleWithLink &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
-            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
+            ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".startTime"      #> formatStartTime(scheduled) &
             ".doneTime"       #> formatDoneTime(action) &
             "rel=tooltip [title]" #> createTooltip(scheduled)
@@ -162,15 +163,15 @@ class ScheduledAction extends JSImplicit
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
 
-    def shouldDisplay(scheduled: Scheduled) = 
+    def shouldDisplay(scheduledT: ScheduledT) = 
     {
-        val hasTopic = currentTopic.map(scheduled.action.topics.contains).getOrElse(true)
-        val hasProject = currentProject.map(scheduled.action.projects.contains).getOrElse(true)
-   
-        hasTopic && hasProject
+        val stuff = scheduledT.stuff
+
+        currentTopic.map(t => stuff.hasTopic(t.idField.is)).getOrElse(true) &&
+        currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
     }
 
-    def createActionList(intervalAction: List[Scheduled]) = 
+    def createActionList(intervalAction: List[ScheduledT]) = 
     {
         val outdatedList = allAction.filter(isOutdated).filter(shouldDisplay)
         val todayList = todayAction.filter(shouldDisplay).filterNot(isOutdated)
@@ -201,7 +202,7 @@ class ScheduledAction extends JSImplicit
         updateList(tabID, title, intervalAction)
     }
 
-    def updateList(tabID: String, title: String, intervalAction: List[Scheduled]): JsCmd = 
+    def updateList(tabID: String, title: String, intervalAction: List[ScheduledT]): JsCmd = 
     {
         val (todayList, intervalList, doneList, outdatedList) = createActionList(intervalAction)
 

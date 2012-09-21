@@ -241,8 +241,8 @@ class NextAction extends JSImplicit
             ".collapse [id]"  #> ("actionDesc" + action.stuff.idField) &
             ".title *"        #> stuff.titleWithLink &
             ".desc *"         #> stuff.descriptionHTML &
-            ".topic *"        #> action.topics.map(_.viewButton(topicFilter)).flatten &
-            ".project *"      #> action.projects.map(_.viewButton(projectFilter)).flatten &
+            ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
+            ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".deadline"       #> formatDeadline(action) &
             ".doneTime"       #> formatDoneTime(action)
 

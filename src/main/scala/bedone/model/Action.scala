@@ -94,8 +94,6 @@ class Action extends Record[Action] with KeyedRecord[Int]
     val doneTime = new OptionalDateTimeField(this)
 
     def stuff = Stuff.findByID(idField.is).get
-    def topics = stuff.topics
-    def projects = stuff.projects
     def contexts = BeDoneSchema.actionContexts.left(this).toList
 
     def removeContext(context: Context) = 

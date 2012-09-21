@@ -20,58 +20,66 @@ import org.squeryl.annotations.Column
 import java.util.Calendar
 import scala.xml.Text
 
+case class ScheduledT(stuff: Stuff, action: Action, scheduled: Scheduled)
+
 object Scheduled extends Scheduled with MetaRecord[Scheduled]
 {
-    def findByTopic(user: User, topicID: Int): Box[List[Scheduled]] = {
+    def toScheduledT(t: (Stuff, Action, Scheduled)) = ScheduledT(t._1, t._2, t._3)
+    def findByTopic(user: User, topicID: Int): Box[List[ScheduledT]] = {
         import BeDoneSchema._
 
         tryo {
-            from(stuffs, scheduleds, stuffTopics) ( (stuff, scheduled, stuffTopic) =>
+            from(stuffs, actions, scheduleds, stuffTopics) ( (stuff, action, scheduled, st) =>
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
                     stuff.idField === scheduled.idField and
                     stuff.isTrash === false and
-                    stuffTopic.stuffID === stuff.idField and
-                    stuffTopic.topicID === topicID
+                    action.idField === stuff.idField and
+                    st.stuffID === stuff.idField and
+                    st.topicID === topicID
                 ) 
-                select(scheduled) 
+                select(stuff, action, scheduled) 
                 orderBy(scheduled.startTime)
-            ).toList
+            ).map(toScheduledT).toList
         }
     }
 
-    def findByProject(user: User, projectID: Int): Box[List[Scheduled]] = {
+    def findByProject(user: User, projectID: Int): Box[List[ScheduledT]] = {
         import BeDoneSchema._
 
         tryo {
-            from(stuffs, scheduleds, stuffProjects) ( (stuff, scheduled, stuffProject) =>
+            from(stuffs, actions, scheduleds, stuffProjects) ( (stuff, action, scheduled, sp) =>
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
                     stuff.idField === scheduled.idField and
                     stuff.isTrash === false and
-                    stuffProject.stuffID === stuff.idField and
-                    stuffProject.projectID === projectID
+                    action.idField === stuff.idField and
+                    sp.stuffID === stuff.idField and
+                    sp.projectID === projectID
                 ) 
-                select(scheduled) 
+                select(stuff, action, scheduled) 
                 orderBy(scheduled.startTime)
-            ).toList
+            ).map(toScheduledT).toList
         }
     }
 
-    def findByUser(user: User): Box[List[Scheduled]] = {
+    def findByUser(user: User): Box[List[ScheduledT]] = {
+        import BeDoneSchema._
+
         tryo {
-            from(BeDoneSchema.stuffs, BeDoneSchema.scheduleds) ( (stuff, scheduled) =>
+            from(stuffs, actions, scheduleds) ( (stuff, action, scheduled) =>
                 where(
                     stuff.userID === user.idField and 
                     stuff.stuffType === StuffType.Scheduled and
                     stuff.isTrash === false and
+                    action.idField === stuff.idField and
                     stuff.idField === scheduled.idField
                 ) 
-                select(scheduled) 
+                select(stuff, action, scheduled) 
                 orderBy(scheduled.startTime)
-            ).toList
+            ).map(toScheduledT).toList
         }
     }
 }
