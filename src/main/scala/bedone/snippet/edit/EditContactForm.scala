@@ -8,6 +8,7 @@ import net.liftweb.common.Empty
 import net.liftweb.common.Failure
 
 import net.liftweb.util.Helpers._
+import net.liftweb.util.PassThru
 
 import net.liftweb.http.S
 import net.liftweb.http.SHtml
@@ -63,6 +64,13 @@ class EditContactForm(contact: Contact, postAction: Contact => JsCmd) extends JS
     }
 
     def cssBinder = {
+
+        val disabled = optFromStr(name).isDefined match {
+            case true  => "#contactEditSave [disabled-]" #> "disabled"
+            case false => "#contactEditSave [disabled]" #> "disabled"
+        }
+
+        disabled &
         "#contactEditName"    #> SHtml.textAjaxTest(name, setName _, validateName _) &
         "#contactEditEmail"   #> SHtml.text(email.getOrElse(""), setEmail _) &
         "#contactEditPhone"   #> SHtml.text(phone.getOrElse(""), setPhone _) &
@@ -71,7 +79,6 @@ class EditContactForm(contact: Contact, postAction: Contact => JsCmd) extends JS
         "#contactEditCancel [onclick]" #> (
             FadeOutAndRemove("editContactForm") & "return false"
         )
-
     }
 
     def toForm = {

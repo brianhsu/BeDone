@@ -16,6 +16,8 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JE._
 import net.liftweb.http.js.jquery.JqJsCmds._
 
+import scala.xml.NodeSeq
+
 import java.text.SimpleDateFormat
 
 class ContactTable extends JSImplicit
@@ -36,6 +38,26 @@ class ContactTable extends JSImplicit
         }
 
         val editForm = new EditContactForm(contact, callback)
+        SetHtml("editContactHolder", editForm.toForm)
+    }
+
+    def showInsertForm(): JsCmd = 
+    {
+        def userID = CurrentUser.is.map(_.idField.is).get
+        def createNewStuff: Stuff = Stuff.createRecord.userID(userID)
+        val contact = Contact.createRecord.userID(userID)
+
+        def callback(contact: Contact) = {
+            val rowID = "contact" + contact.idField.is
+            val contactList = NodeSeq.fromSeq(contacts.flatMap(createContactRow))
+
+            FadeOutAndRemove("editContactForm") &
+            SetHtml("contactList", contactList)
+        }
+
+        val editForm = new EditContactForm(contact, callback)
+
+        FadeOutAndRemove("editContactForm") &
         SetHtml("editContactHolder", editForm.toForm)
     }
 
@@ -126,7 +148,8 @@ class ContactTable extends JSImplicit
     def render = {
         "#selectAll" #> SHtml.ajaxCheckbox(false, toggleSelectAll _) &
         "#importContact [onclick]"  #> SHtml.onEvent(s => gmailAuth()) &
+        "#addContact [onclick]" #> SHtml.onEvent(s => showInsertForm) &
         "#deleteSelected [onclick]" #> SHtml.onEvent(s => deleteSelected()) &
-        ".contactRow" #> contacts.map(createContactRow)
+        "#contactList *" #> NodeSeq.fromSeq(contacts.flatMap(createContactRow))
     }
 }
