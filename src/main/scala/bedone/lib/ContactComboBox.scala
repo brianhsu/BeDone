@@ -41,7 +41,7 @@ abstract class ContactComboBox(options: List[(String, JsExp)] = ContactComboBox.
         
         Contact.findByUser(currentUser).openOr(Nil)
                .filter(matchNameOrEMail)
-               .map(createComboItem)
+               .map(createComboItem).toList
     }
 
     override def onItemSelected(item: Option[ComboItem]): JsCmd = {

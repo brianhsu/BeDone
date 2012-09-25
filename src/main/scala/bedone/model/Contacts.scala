@@ -32,12 +32,12 @@ object Contact extends Contact with MetaRecord[Contact]
         ).single
     }
 
-    def findByUser(user: User): Box[List[Contact]] = tryo {
+    def findByUser(user: User) = tryo {
         from(BeDoneSchema.contacts) { contact => 
             where(contact.userID === user.idField).
             select(contact).
             orderBy(contact.name)
-        }.toList
+        }
     }
 
     def findByGoogleID(userID: Int, googleID: String): Box[Contact] = tryo(classOf[Exception]) {
