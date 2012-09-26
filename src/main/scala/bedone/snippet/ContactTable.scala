@@ -23,9 +23,12 @@ class ContactTable extends JSImplicit
 
     var selected: Set[Contact] = Set()
     val contacts = new Paging(Contact.findByUser(currentUser), 10, 5, switchPage _)
+    var currentPage: Int = 1
 
     def switchPage(page: Int): JsCmd = {
         val newTable = contacts(page).map(createContactRow).flatten
+        this.currentPage = page
+
         SetHtml("pageSelector", contacts.pageSelector(page)) &
         SetHtml("contactList", newTable)
     }
@@ -51,10 +54,10 @@ class ContactTable extends JSImplicit
 
         def callback(contact: Contact) = {
             val rowID = "contact" + contact.idField.is
-            val contactList = NodeSeq.fromSeq(contacts(1).flatMap(createContactRow))
+            val contactList = NodeSeq.fromSeq(contacts(currentPage).flatMap(createContactRow))
 
             FadeOutAndRemove("editContactForm") &
-            SetHtml("contactList", contactList)
+            switchPage(currentPage)
         }
 
         val editForm = new EditContactForm(contact, callback)
@@ -137,14 +140,16 @@ class ContactTable extends JSImplicit
     def deleteSelected(): JsCmd = {
 
         val deleteJS = selected.map { contact => 
-            contact.isTrash(true).saveTheRecord()
+            println(contact.isTrash(true).saveTheRecord())
             FadeOutAndRemove("contact" + contact.idField.is)
         }
 
+        deleteJS.toList &
+        switchPage(currentPage) &
         """
           $('#selectAll').attr('checked', false);
           $('#deleteSelected').hide();
-        """ & deleteJS.toList
+        """
     }
 
     def render = {

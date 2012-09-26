@@ -10,7 +10,7 @@ import net.liftweb.http.js.JsCmd
 
 import scala.xml.NodeSeq
 
-class Paging[T](query: Box[Query[T]], pageLength: Int, pageGroup: Int, 
+class Paging[T](query: => Box[List[T]], pageLength: Int, pageGroup: Int, 
                 onSwitchPage: Int => JsCmd) 
 {
     val size = query.map(_.size).openOr(0)
@@ -21,7 +21,7 @@ class Paging[T](query: Box[Query[T]], pageLength: Int, pageGroup: Int,
 
     def apply(page: Int) = query.map { x => 
         val offset = (page - 1) * pageLength
-        x.page(offset, pageLength).toList
+        x.slice(offset, offset + pageLength).toList
     }.openOr(Nil)
 
     def pageSelector(currentPage: Int): NodeSeq = {
@@ -62,4 +62,3 @@ class Paging[T](query: Box[Query[T]], pageLength: Int, pageGroup: Int,
         )
     }
 }
-
