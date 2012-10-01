@@ -11,7 +11,7 @@ import net.liftweb.http.js.JsCmd
 import scala.xml.NodeSeq
 
 class Paging[T](query: => Box[List[T]], pageLength: Int, pageGroup: Int, 
-                onSwitchPage: Int => JsCmd) 
+                onSwitchPage: (Paging[T], Int) => JsCmd) 
 {
     val size = query.map(_.size).openOr(0)
     val totalPage = (size % pageLength) match {
@@ -25,6 +25,11 @@ class Paging[T](query: => Box[List[T]], pageLength: Int, pageGroup: Int,
     }.openOr(Nil)
 
     def pageSelector(currentPage: Int): NodeSeq = {
+
+        if (currentPage <= 0 || currentPage < totalPage || currentPage > totalPage) {
+            return NodeSeq.Empty
+        }
+
         val startPage = (currentPage % pageGroup) match {
             case 0 => ((currentPage / pageGroup) - 1) * pageGroup + 1
             case x => (currentPage / pageGroup) * pageGroup +1
@@ -37,7 +42,7 @@ class Paging[T](query: => Box[List[T]], pageLength: Int, pageGroup: Int,
         val pageList = (startPage to endPage).map { page => 
             val className = if (page == currentPage) "active" else ""
             val cssBinding = {
-                "a [onclick]" #> SHtml.onEvent(s => onSwitchPage(page)) &
+                "a [onclick]" #> SHtml.onEvent(s => onSwitchPage(this, page)) &
                 "a *" #> page
             }
 
@@ -49,8 +54,8 @@ class Paging[T](query: => Box[List[T]], pageLength: Int, pageGroup: Int,
         val disableNext = if (currentPage == totalPage) "disabled" else ""
         val disablePrev = if (currentPage == 1) "disabled" else ""
         val cssBinding = {
-            "#prevContactPage [onclick]" #> SHtml.onEvent(s => onSwitchPage(prevPage)) &
-            "#nextContactPage [onclick]" #> SHtml.onEvent(s => onSwitchPage(nextPage))
+            "#prevContactPage [onclick]" #> SHtml.onEvent(s => onSwitchPage(this, prevPage)) &
+            "#nextContactPage [onclick]" #> SHtml.onEvent(s => onSwitchPage(this, nextPage))
         }
 
         cssBinding(

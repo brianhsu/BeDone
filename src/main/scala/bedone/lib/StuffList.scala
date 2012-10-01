@@ -8,9 +8,11 @@ import org.bedone.snippet._
 import net.liftweb.actor.LiftActor
 
 import net.liftweb.common.Box
+import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Schedule
+import net.liftweb.util.CssSel
 
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
@@ -42,7 +44,9 @@ trait StuffList extends JSImplicit
 
     protected def stuffs = (projectStuff orElse topicStuff).getOrElse(allStuff)
 
-    protected def completeStuffTable = createStuffTable(stuffs)
+    private var currentTopic: Option[Topic] = None
+    private var currentProject: Option[Project] = None
+    private var currentPage: Int = 1
 
     def formatDeadline(stuff: Stuff) = 
     {
@@ -52,7 +56,7 @@ trait StuffList extends JSImplicit
         }
     }
 
-    def actionBar(stuff: Stuff) = {
+    def actionBar(stuff: Stuff): CssSel = {
 
         def starClass = stuff.isStared.is match {
             case true  => "myicon-starOn"
@@ -70,7 +74,14 @@ trait StuffList extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("inboxRow" + stuff.idField, 0, 500)
+            val newPaging = getPagedStuff
+            val targetPage = (getPagedStuff.totalPage < currentPage) match {
+                case true  => getPagedStuff.totalPage
+                case false => currentPage
+            }
+
+            new FadeOut("inboxRow" + stuff.idField, 0, 500) &
+            onSwitchPage(newPaging, targetPage)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -86,36 +97,67 @@ trait StuffList extends JSImplicit
         ".showDesc [style+]" #> descIconVisibility
     }
 
+    def onSwitchPage(paging: Paging[Stuff], page: Int) = {
+
+        this.currentPage = page
+
+        JqSetHtml("inboxList", createStuffTable(paging(page))) &
+        JqSetHtml("inboxPageSelector", paging.pageSelector(page))
+    }
+
+    def getPagedStuff = 
+    {
+        def shouldDisplay(stuff: Stuff) = {
+            currentTopic.map(t => stuff.hasTopic(t.idField.is)).getOrElse(true) &&
+            currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
+        }
+
+        val currentStuffs = stuffs.filter(shouldDisplay)
+
+        new Paging(Full(currentStuffs), 10, 5, onSwitchPage _)
+    }
+
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
     {
-        val stuffs = this.stuffs.filter(_.topics.exists(_.idField.is == topic.idField.is))
-        val newTable = createStuffTable(stuffs)
+        this.currentTopic = Some(topic)
+        this.currentProject = None
 
-        println("stuffs of Topic(%d): %s" format(topic.idField.is, stuffs))
+        val paged = getPagedStuff
+        val newTable = createStuffTable(paged(1))
 
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", topic.title.is) &
+        JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
         JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
         JsRaw("""$('#inboxCurrent').attr("class", "btn btn-info")""")
     }
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
     {
-        val stuffs = this.stuffs.filter(_.projects.exists(_.idField.is == project.idField.is))
-        val newTable = createStuffTable(stuffs)
+        this.currentTopic = None
+        this.currentProject = Some(project)
 
-        println("stuffs of Project(%d): %s" format(project.idField.is, stuffs))
+        val paged = getPagedStuff
+        val newTable = createStuffTable(paged(1))
 
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", project.title.is) &
+        JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
         JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
         JsRaw("""$('#inboxCurrent').attr("class", "btn btn-success")""")
     }
 
     def showAllStuff() = 
     {
-        JqSetHtml("inboxList", completeStuffTable) & 
+        this.currentTopic = None
+        this.currentProject = None
+
+        val paged = getPagedStuff
+        val newTable = createStuffTable(paged(1))
+
+        JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", "全部") &
+        JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
         JsRaw("""$('#inboxShowAll').prop("disabled", true)""") &
         JsRaw("""$('#inboxCurrent').attr("class", "btn btn-inverse")""")
     }
@@ -145,7 +187,8 @@ trait StuffList extends JSImplicit
         def createNewStuff: Stuff = Stuff.createRecord.userID(userID)
 
         val editStuff = new EditStuffForm(createNewStuff, {stuff =>
-            AppendHtml("inboxList", createStuffRow(stuff))
+            val newPaging = getPagedStuff
+            onSwitchPage(newPaging, newPaging.totalPage)
         })
 
         """$('#stuffEdit').remove()""" &
@@ -173,8 +216,11 @@ trait StuffList extends JSImplicit
 
             stuff.saveTheRecord()
 
+            val newPaging = getPagedStuff
+
             """$('#inboxRapidStuff').val("")""" &
-            AppendHtml("inboxList", createStuffRow(stuff))
+            onSwitchPage(newPaging, newPaging.totalPage)
+
         } else {
             Noop
         }
@@ -182,11 +228,14 @@ trait StuffList extends JSImplicit
 
     def cssBinding = 
     {
+        val paging = getPagedStuff
+
         "#inboxShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#inboxAdd [onclick]" #> SHtml.onEvent(s => showInsertForm) &
         "#inboxRapidStuff" #> SHtml.text("", rapidTitle = _) &
         "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _) &
-        ".inboxRow" #> completeStuffTable
+        "#inboxPageSelector *" #> paging.pageSelector(1) &
+        ".inboxRow" #> createStuffTable(paging(1))
     }
 }
 
