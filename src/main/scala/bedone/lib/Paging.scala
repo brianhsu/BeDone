@@ -60,9 +60,9 @@ class Paging[T](query: Array[T], pageLength: Int, pageGroup: Int,
 
         cssBinding(
             <ul>
-               <li class={disablePrev} id="prevContactPage"><a href="#">&laquo;</a></li>
+               <li class={disablePrev} id="prevContactPage"><a href="javascript: void:(0)">&laquo;</a></li>
               {pageList}
-               <li class={disableNext} id="nextContactPage"><a href="#">&raquo;</a></li>
+               <li class={disableNext} id="nextContactPage"><a href="javascript: void:(0)">&raquo;</a></li>
             </ul>
         )
     }
