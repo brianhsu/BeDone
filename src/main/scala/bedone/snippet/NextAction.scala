@@ -85,13 +85,15 @@ class NextAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("action" + stuff.idField.is)
+            FadeOutAndRemove("action" + stuff.idField.is) &
+            updateList()
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("action" + stuff.idField.is)
+            FadeOutAndRemove("action" + stuff.idField.is) &
+            updateList()
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
@@ -275,6 +277,8 @@ class NextAction extends JSImplicit
 
         val contextTabID = ("actionTab" + context.idField.is)
         this.currentContext = Some(context)
+        this.currentDonePage = 1
+        this.currentActionPage = 1
 
         """$('.actionTab').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(contextTabID) &

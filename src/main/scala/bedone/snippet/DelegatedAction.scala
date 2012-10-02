@@ -106,13 +106,15 @@ class DelegatedAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("delegate" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField) &
+            updateList(currentTabID)
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("delegate" + stuff.idField.is)
+            FadeOutAndRemove("delegate" + stuff.idField.is) &
+            updateList(currentTabID)
         }
 
         def markDoneFlag(isDone: Boolean): JsCmd = 
