@@ -33,6 +33,7 @@ class MaybeList extends JSImplicit
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "maybeAllTab"
+    private var currentPage: Int = 1
 
     def shouldDisplay(maybeT: MaybeT) = 
     {
@@ -40,20 +41,32 @@ class MaybeList extends JSImplicit
         currentTopic.map(t => stuff.hasTopic(t.idField.is)).getOrElse(true) &&
         currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
     }
+    
+    def onSwitchPage(paging: Paging[MaybeT], page: Int): JsCmd = {
+        currentPage = page
+        updateList(currentTabID)
+    }
+
+    def getPagedMaybe(maybes: List[MaybeT]) = new Paging(maybes.toArray, 10, 5, onSwitchPage)
 
     def updateList(tabID: String) =
     {
+        if (tabID != currentTabID) {
+            currentPage = 1
+        }
+
         this.currentTabID = tabID
 
         val maybeTs = tabID match {
-            case "maybeAllTab"     => this.maybeTs
-            case "maybeTicklerTab" => this.maybeTs.filter(_.maybe.tickler.is.isDefined)
-            case "maybeStaredTab"  => this.maybeTs.filter(_.stuff.isStared.is)
+            case "maybeAllTab"     => getPagedMaybe(this.maybeTs.filter(shouldDisplay))
+            case "maybeTicklerTab" => getPagedMaybe(this.maybeTs.filter(_.maybe.tickler.is.isDefined).filter(shouldDisplay))
+            case "maybeStaredTab"  => getPagedMaybe(this.maybeTs.filter(_.stuff.isStared.is).filter(shouldDisplay))
         }
 
         """$('.maybeTab li').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("maybeList", maybeTs.filter(shouldDisplay).flatMap(createMaybeRow))
+        JqSetHtml("maybeList", maybeTs(currentPage).flatMap(createMaybeRow)) &
+        JqSetHtml("maybePageSelector", maybeTs.pageSelector(currentPage))
     }
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
@@ -185,10 +198,12 @@ class MaybeList extends JSImplicit
 
     def render = 
     {
+        val pagedMaybes = getPagedMaybe(maybeTs)
         "#maybeAllTab [onclick]" #> SHtml.onEvent(s => updateList("maybeAllTab")) &
         "#maybeTicklerTab [onclick]" #> SHtml.onEvent(s => updateList("maybeTicklerTab")) &
         "#maybeStaredTab [onclick]" #> SHtml.onEvent(s => updateList("maybeStaredTab")) &
         "#maybeShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#maybeList" #> (".row" #> maybeTs.map(createMaybeRow))
+        "#maybeList" #> (".row" #> pagedMaybes(currentPage).map(createMaybeRow)) &
+        "#maybePageSelector *" #> pagedMaybes.pageSelector(currentPage)
     }
 }

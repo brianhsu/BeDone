@@ -59,7 +59,7 @@ class DelegatedAction extends JSImplicit
         val actions = delegatedAction.filterNot(_.delegated.hasInformed.is)
                                      .filter(shouldDisplay)
 
-        new Paging(actions.toArray, 10, 10, onSwitchPage _)
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
     }
 
     def notRespondAction = {
@@ -67,12 +67,12 @@ class DelegatedAction extends JSImplicit
             x.delegated.hasInformed.is && !x.action.isDone.is
         }.filter(shouldDisplay)
 
-        new Paging(actions.toArray, 10, 10, onSwitchPage _)
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
     }
 
     def doneAction = {
         val actions = delegatedAction.filter(_.action.isDone.is).filter(shouldDisplay)
-        new Paging(actions.toArray, 10, 10, onSwitchPage _)
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
     }
 
     def formatDoneTime(action: Action) = 

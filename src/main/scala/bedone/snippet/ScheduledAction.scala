@@ -217,10 +217,10 @@ class ScheduledAction extends JSImplicit
             todayList.filter(_.action.isDone.is) ++ 
             intervalList.filter(_.action.isDone.is)
 
-        (new Paging(todayList.filterNot(_.action.isDone.is).toArray, 10, 10, onSwitchToday _),
-         new Paging(intervalList.filterNot(_.action.isDone.is).toArray, 10, 10, onSwitchInterval _),
-         new Paging(doneList.toArray, 10, 10, onSwitchDone _),
-         new Paging(outdatedList.toArray, 10, 10, onSwitchOutdated _))
+        (new Paging(todayList.filterNot(_.action.isDone.is).toArray, 10, 5, onSwitchToday _),
+         new Paging(intervalList.filterNot(_.action.isDone.is).toArray, 10, 5, onSwitchInterval _),
+         new Paging(doneList.toArray, 10, 5, onSwitchDone _),
+         new Paging(outdatedList.toArray, 10, 5, onSwitchOutdated _))
     }
 
     def updateList(tabID: String): JsCmd =
