@@ -114,7 +114,7 @@ trait StuffList extends JSImplicit
 
         val currentStuffs = stuffs.filter(shouldDisplay)
 
-        new Paging(Full(currentStuffs), 10, 5, onSwitchPage _)
+        new Paging(currentStuffs.toArray, 10, 5, onSwitchPage _)
     }
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 

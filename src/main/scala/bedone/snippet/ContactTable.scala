@@ -22,8 +22,11 @@ class ContactTable extends JSImplicit
     val currentUser = CurrentUser.is.get
 
     var selected: Set[Contact] = Set()
-    val contacts = new Paging(Contact.findByUser(currentUser), 10, 5, switchPage _)
     var currentPage: Int = 1
+
+    def contacts = new Paging(
+        Contact.findByUser(currentUser).openOr(Nil).toArray, 10, 5, switchPage _
+    )
 
     def switchPage(paging: Paging[Contact], page: Int): JsCmd = {
         val newTable = contacts(page).map(createContactRow).flatten

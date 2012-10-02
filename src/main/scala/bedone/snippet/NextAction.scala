@@ -4,6 +4,7 @@ import org.bedone.model._
 import org.bedone.lib._
 
 import net.liftweb.common.Box
+import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
@@ -38,6 +39,9 @@ class NextAction extends JSImplicit
     private def allActions = Action.findByUser(currentUser).openOr(Nil)
     private def projectAction = projectID.map(Action.findByProject(currentUser, _).openOr(Nil))
     private def topicAction = topicID.map(Action.findByTopic(currentUser, _).openOr(Nil))
+
+    private var currentActionPage = 1
+    private var currentDonePage = 1
 
     def formatDoneTime(action: Action) = 
     {
@@ -181,13 +185,25 @@ class NextAction extends JSImplicit
         currentContext.map(action.contexts.contains).getOrElse(true)
     }
 
-    def actions: (List[ActionT], List[ActionT]) = {
+    def onUndonePageSwitch(paging: Paging[ActionT], page: Int) = {
+        currentActionPage = page
+        updateList
+    }
+
+    def onDonePageSwitch(paging: Paging[ActionT], page: Int) = {
+        currentDonePage = page
+        updateList
+    }
+
+    def actions: (Paging[ActionT], Paging[ActionT]) = {
 
         val actions = (projectAction orElse topicAction).getOrElse(allActions)
-
         val (done, notDone) = actions.partition(_.action.isDone.is)
 
-        (done.filter(shouldDisplay), notDone.filter(shouldDisplay))
+        val actionPage = new Paging(done.filter(shouldDisplay).toArray, 10, 5, onDonePageSwitch _)
+        val donePage = new Paging(notDone.filter(shouldDisplay).toArray, 10, 5, onDonePageSwitch _)
+
+        (actionPage, donePage)
     }
 
     def deleteContext(context: Context)(): JsCmd = {
@@ -208,8 +224,12 @@ class NextAction extends JSImplicit
         )
 
         val (doneList, notDoneList) = actions
-        val doneHTML = doneList.map(createActionRow).flatten
-        val notDoneHTML = notDoneList.map(createActionRow).flatten
+
+        val doneHTML = doneList(currentDonePage).map(createActionRow).flatten
+        val notDoneHTML = notDoneList(currentActionPage).map(createActionRow).flatten
+        val doneSelector = doneList.pageSelector(currentDonePage)
+        val notDoneSelector = notDoneList.pageSelector(currentActionPage)
+
         val updateDeleteButton = currentContext match {
             case None => Hide("deleteContext")
             case Some(context) => 
@@ -223,6 +243,8 @@ class NextAction extends JSImplicit
         JqEmpty("actionNotDone") &
         JqSetHtml("actionIsDone", doneHTML) &
         JqSetHtml("actionNotDone", notDoneHTML) &
+        JqSetHtml("actionPageSelector", notDoneSelector) &
+        JqSetHtml("donePageSelector", doneSelector) &
         updateDeleteButton
     }
 
@@ -284,8 +306,10 @@ class NextAction extends JSImplicit
 
         ClearClearable &
         "#actionShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#actionIsDone"  #> (".row" #> doneActions.map(createActionRow)) &
-        "#actionNotDone" #> (".row" #> notDoneActions.map(createActionRow)) &
+        "#actionIsDone"  #> (".row" #> doneActions(currentDonePage).map(createActionRow)) &
+        "#actionNotDone" #> (".row" #> notDoneActions(currentActionPage).map(createActionRow)) &
+        "#actionPageSelector *" #> notDoneActions.pageSelector(currentActionPage) &
+        "#donePageSelector *" #> doneActions.pageSelector(currentDonePage) &
         "#allActionTab [onclick]" #> SHtml.onEvent(showAllAction _) &
         ".contextTab" #> contexts.map(createContextTab)
     }
