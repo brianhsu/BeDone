@@ -130,7 +130,8 @@ class DelegatedAction extends JSImplicit
                     delegated.action.isDone(false).doneTime(None).saveTheRecord()
             }
 
-            FadeOutAndRemove("delegate" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField) &
+            updateList(currentTabID)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {

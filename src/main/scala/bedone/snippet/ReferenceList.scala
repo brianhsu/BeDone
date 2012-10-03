@@ -6,6 +6,7 @@ import org.bedone.lib._
 import net.liftweb.common.Box
 
 import net.liftweb.util.Helpers._
+import net.liftweb.util.CssSel
 
 import net.liftweb.http.S
 import net.liftweb.http.SHtml
@@ -41,8 +42,9 @@ class ReferenceList extends JSImplicit
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "referenceAllTab"
+    private var currentPage: Int = 1
 
-    def actionBar(stuff: Stuff) = 
+    def actionBar(stuff: Stuff): CssSel = 
     {
         def starClass = stuff.isStared.is match {
             case true  => "myicon-starOn"
@@ -60,20 +62,23 @@ class ReferenceList extends JSImplicit
             }
 
             """$('#reference%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
-            fadeOutEffect
+            fadeOutEffect &
+            updateList(currentTabID)
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("reference" + stuff.idField.is)
+            FadeOutAndRemove("reference" + stuff.idField.is) &
+            updateList(currentTabID)
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("reference" + stuff.idField, 0, 500)
+            new FadeOut("reference" + stuff.idField, 0, 500) &
+            updateList(currentTabID)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -98,18 +103,32 @@ class ReferenceList extends JSImplicit
         hasTopic && hasProject
     }
 
+    def onSwitchPage(paging: Paging[Stuff], page: Int): JsCmd = {
+        currentPage = page
+        updateList(currentTabID)
+    }
+
+    def pagedReference(reference: List[Stuff]) = {
+        new Paging(reference.toArray, 10, 10, onSwitchPage _)
+    }
+
     def updateList(tabID: String) =
     {
+        if (this.currentTabID != tabID) {
+            currentPage = 1
+        }
+
         this.currentTabID = tabID
 
         val references = tabID match {
-            case "referenceAllTab"    => this.references
-            case "referenceStaredTab" => this.references.filter(_.isStared.is)
+            case "referenceAllTab"    => pagedReference(this.references.filter(shouldDisplay))
+            case "referenceStaredTab" => pagedReference(this.references.filter(_.isStared.is).filter(shouldDisplay))
         }
 
         """$('.referenceTab li').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("referenceList", references.filter(shouldDisplay).flatMap(createStuffRow))
+        JqSetHtml("referenceList", references(currentPage).flatMap(createStuffRow)) &
+        JqSetHtml("referencePageSelector", references.pageSelector(currentPage))
     }
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
@@ -181,9 +200,12 @@ class ReferenceList extends JSImplicit
 
     def render = 
     {
+        val paged = pagedReference(references)
+
         "#referenceAllTab [onclick]" #> SHtml.onEvent(s => updateList("referenceAllTab")) &
         "#referenceStaredTab [onclick]" #> SHtml.onEvent(s => updateList("referenceStaredTab")) &
         "#referenceShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
-        "#referenceList" #> (".row" #> references.map(createStuffRow))
+        "#referenceList" #> (".row" #> paged(currentPage).map(createStuffRow)) &
+        "#referencePageSelector *" #> paged.pageSelector(currentPage)
     }
 }
