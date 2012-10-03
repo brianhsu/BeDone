@@ -32,6 +32,11 @@ class ScheduledAction extends JSImplicit
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "scheduledWeekTab"
 
+    private var currentOutdatedPage: Int = 1
+    private var currentTodayPage: Int = 1
+    private var currentIntervalPage: Int = 1
+    private var currentDonePage: Int = 1
+
     private val projectID = S.attr("projectID").map(_.toInt)
     private val topicID = S.attr("topicID").map(_.toInt)
 
@@ -171,6 +176,38 @@ class ScheduledAction extends JSImplicit
         currentProject.map(p => stuff.hasProject(p.idField.is)).getOrElse(true)
     }
 
+    def onSwitchOutdated(paging: Paging[ScheduledT], page: Int) = {
+        currentOutdatedPage = page
+        currentTodayPage = 1
+        currentIntervalPage = 1
+        currentDonePage = 1
+        updateList()
+    }
+
+    def onSwitchToday(paging: Paging[ScheduledT], page: Int) = {
+        currentOutdatedPage = 1
+        currentTodayPage = page
+        currentIntervalPage = 1
+        currentDonePage = 1
+        updateList()
+    }
+
+    def onSwitchInterval(paging: Paging[ScheduledT], page: Int) = {
+        currentOutdatedPage = 1
+        currentTodayPage = 1
+        currentIntervalPage = page
+        currentDonePage = 1
+        updateList()
+    }
+
+    def onSwitchDone(paging: Paging[ScheduledT], page: Int) = {
+        currentOutdatedPage = 1
+        currentTodayPage = 1
+        currentIntervalPage = 1
+        currentDonePage = page
+        updateList()
+    }
+
     def createActionList(intervalAction: List[ScheduledT]) = 
     {
         val outdatedList = allAction.filter(isOutdated).filter(shouldDisplay)
@@ -180,7 +217,10 @@ class ScheduledAction extends JSImplicit
             todayList.filter(_.action.isDone.is) ++ 
             intervalList.filter(_.action.isDone.is)
 
-        (todayList.filterNot(_.action.isDone.is), intervalList.filterNot(_.action.isDone.is), doneList, outdatedList)
+        (new Paging(todayList.filterNot(_.action.isDone.is).toArray, 10, 5, onSwitchToday _),
+         new Paging(intervalList.filterNot(_.action.isDone.is).toArray, 10, 5, onSwitchInterval _),
+         new Paging(doneList.toArray, 10, 5, onSwitchDone _),
+         new Paging(outdatedList.toArray, 10, 5, onSwitchOutdated _))
     }
 
     def updateList(tabID: String): JsCmd =
@@ -209,14 +249,19 @@ class ScheduledAction extends JSImplicit
         """$('.intervalTab').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
         JqSetHtml("scheduledIntervalLabel", title)  &
-        JqSetHtml("scheduledIntervalList", intervalList.flatMap(createActionRow)) &
-        JqSetHtml("scheduledTodayList", todayList.flatMap(createActionRow)) &
-        JqSetHtml("scheduledDoneList", doneList.flatMap(createActionRow)) &
-        JqSetHtml("scheduledOutdatedList", outdatedList.flatMap(createActionRow)) &
-        JqSetVisible("scheduledOutdatedBlock", !outdatedList.isEmpty) &
-        JqSetVisible("scheduledIntervalBlock", !intervalList.isEmpty) &
-        JqSetVisible("scheduledTodayBlock", !todayList.isEmpty) &
-        JqSetVisible("scheduledDoneBlock", !doneList.isEmpty)
+        JqSetHtml("scheduledIntervalList", intervalList(currentIntervalPage).flatMap(createActionRow)) &
+        JqSetHtml("scheduledTodayList", todayList(currentTodayPage).flatMap(createActionRow)) &
+        JqSetHtml("scheduledDoneList", doneList(currentDonePage).flatMap(createActionRow)) &
+        JqSetHtml("scheduledOutdatedList", outdatedList(currentOutdatedPage).flatMap(createActionRow)) &
+        JqSetVisible("scheduledOutdatedBlock", !outdatedList(currentOutdatedPage).isEmpty) &
+        JqSetVisible("scheduledIntervalBlock", !intervalList(currentIntervalPage).isEmpty) &
+        JqSetVisible("scheduledTodayBlock", !todayList(currentTodayPage).isEmpty) &
+        JqSetVisible("scheduledDoneBlock", !doneList(currentDonePage).isEmpty) &
+        JqSetHtml("outdatedPageSelector", outdatedList.pageSelector(currentOutdatedPage)) &
+        JqSetHtml("intervalPageSelector", intervalList.pageSelector(currentIntervalPage)) &
+        JqSetHtml("todayPageSelector", todayList.pageSelector(currentTodayPage)) &
+        JqSetHtml("donePageSelector", doneList.pageSelector(currentDonePage))
+
     }
 
     def editPostAction(stuff: Stuff): JsCmd = {
@@ -252,13 +297,15 @@ class ScheduledAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("scheduled" + stuff.idField, 0, 500)
+            new FadeOut("scheduled" + stuff.idField, 0, 500) &
+            updateList(currentTabID)
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("scheduled" + stuff.idField.is)
+            FadeOutAndRemove("scheduled" + stuff.idField.is) &
+            updateList(currentTabID)
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
@@ -305,13 +352,18 @@ class ScheduledAction extends JSImplicit
         "#scheduledWeekTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledWeekTab")) &
         "#scheduledMonthTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledMonthTab")) &
         "#scheduledAllTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledAllTab")) &
-        "#scheduledTodayList *"    #> todayList.flatMap(createActionRow) &
-        "#scheduledIntervalList *" #> intervalList.flatMap(createActionRow) &
-        "#scheduledDoneList *" #> doneList.flatMap(createActionRow) &
-        "#scheduledOutdatedList *" #> outdatedList.flatMap(createActionRow) &
-        "#scheduledOutdatedBlock [style+]" #> (if (outdatedList.isEmpty) hidden else "") &
-        "#scheduledIntervalBlock [style+]" #> (if (intervalList.isEmpty) hidden else "") &
-        "#scheduledTodayBlock [style+]" #> (if (todayList.isEmpty) hidden else "") &
-        "#scheduledDoneBlock [style+]" #> (if (doneList.isEmpty) hidden else "")
+        "#scheduledTodayList *"    #> todayList(currentTodayPage).flatMap(createActionRow) &
+        "#scheduledIntervalList *" #> intervalList(currentIntervalPage).flatMap(createActionRow) &
+        "#scheduledDoneList *" #> doneList(currentDonePage).flatMap(createActionRow) &
+        "#scheduledOutdatedList *" #> outdatedList(currentOutdatedPage).flatMap(createActionRow) &
+        "#scheduledOutdatedBlock [style+]" #> (if (outdatedList(currentOutdatedPage).isEmpty) hidden else "") &
+        "#scheduledIntervalBlock [style+]" #> (if (intervalList(currentIntervalPage).isEmpty) hidden else "") &
+        "#scheduledTodayBlock [style+]" #> (if (todayList(currentTodayPage).isEmpty) hidden else "") &
+        "#scheduledDoneBlock [style+]" #> (if (doneList(currentDonePage).isEmpty) hidden else "") &
+        "#outdatedPageSelector *" #> outdatedList.pageSelector(currentOutdatedPage) &
+        "#intervalPageSelector *" #> intervalList.pageSelector(currentIntervalPage) &
+        "#todayPageSelector *"    #> todayList.pageSelector(currentTodayPage) &
+        "#donePageSelector *"     #> doneList.pageSelector(currentDonePage)
+
     }
 }

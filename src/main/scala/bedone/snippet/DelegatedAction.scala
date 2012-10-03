@@ -4,6 +4,7 @@ import org.bedone.model._
 import org.bedone.lib._
 
 import net.liftweb.common.Box
+import net.liftweb.common.Full
 
 import net.liftweb.util.Helpers._
 import net.liftweb.http.js.JsCmds._
@@ -29,6 +30,7 @@ class DelegatedAction extends JSImplicit
     private var currentTopic: Option[Topic] = None
     private var currentProject: Option[Project] = None
     private var currentTabID: String = "delegateInform"
+    private var currentPage: Int = 1
 
     private val projectID: Box[Int] = S.attr("projectID").map(_.toInt)
     private val topicID: Box[Int] = S.attr("topicID").map(_.toInt)
@@ -48,9 +50,30 @@ class DelegatedAction extends JSImplicit
         case Some(id) => allDelegatedAction.filter(_.delegated.contactID.is == id)
     }
 
-    def notInformedAction = delegatedAction.filterNot(_.delegated.hasInformed.is)
-    def notRespondAction = delegatedAction.filter(x => x.delegated.hasInformed.is && !x.action.isDone.is)
-    def doneAction = delegatedAction.filter(_.action.isDone.is)
+    def onSwitchPage(paging: Paging[DelegatedT], page: Int) = {
+        currentPage = page
+        updateList(currentTabID)
+    }
+
+    def notInformedAction = {
+        val actions = delegatedAction.filterNot(_.delegated.hasInformed.is)
+                                     .filter(shouldDisplay)
+
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
+    }
+
+    def notRespondAction = {
+        val actions = delegatedAction.filter { x => 
+            x.delegated.hasInformed.is && !x.action.isDone.is
+        }.filter(shouldDisplay)
+
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
+    }
+
+    def doneAction = {
+        val actions = delegatedAction.filter(_.action.isDone.is).filter(shouldDisplay)
+        new Paging(actions.toArray, 10, 5, onSwitchPage _)
+    }
 
     def formatDoneTime(action: Action) = 
     {
@@ -83,13 +106,15 @@ class DelegatedAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("delegate" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField) &
+            updateList(currentTabID)
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("delegate" + stuff.idField.is)
+            FadeOutAndRemove("delegate" + stuff.idField.is) &
+            updateList(currentTabID)
         }
 
         def markDoneFlag(isDone: Boolean): JsCmd = 
@@ -105,7 +130,8 @@ class DelegatedAction extends JSImplicit
                     delegated.action.isDone(false).doneTime(None).saveTheRecord()
             }
 
-            FadeOutAndRemove("delegate" + stuff.idField)
+            FadeOutAndRemove("delegate" + stuff.idField) &
+            updateList(currentTabID)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -185,6 +211,10 @@ class DelegatedAction extends JSImplicit
 
     def updateList(tabID: String): JsCmd = 
     {
+        if (currentTabID != tabID) {
+            currentPage = 1
+        }
+
         this.currentTabID = tabID
 
         var events = tabID match {
@@ -195,7 +225,8 @@ class DelegatedAction extends JSImplicit
 
         """$('.delegatedTab li').removeClass('active')""" &
         """$('#%s').addClass('active')""".format(tabID) &
-        JqSetHtml("delegateActions", events.filter(shouldDisplay).flatMap(createActionRow))
+        JqSetHtml("delegateActions", events(currentPage).flatMap(createActionRow)) &
+        JqSetHtml("delegatePaging", events.pageSelector(currentPage))
     }
 
     def createActionRow(delegatedT: DelegatedT) = 
@@ -224,11 +255,13 @@ class DelegatedAction extends JSImplicit
 
     def render = 
     {
+        val actions = notInformedAction
         ClearClearable &
-        "#delegateActions" #> (".row" #> notInformedAction.map(createActionRow)) &
+        "#delegateActions" #> (".row" #> actions(currentPage).map(createActionRow)) &
         "#delegateInform [onclick]" #> SHtml.onEvent(s => updateList("delegateInform")) &
         "#delegateResponse [onclick]"  #> SHtml.onEvent(s => updateList("delegateResponse")) &
         "#delegateDone [onclick]"      #> SHtml.onEvent(s => updateList("delegateDone")) &
-        "#delegateShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff())
+        "#delegateShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
+        "#delegatePaging *" #> actions.pageSelector(currentPage)
     }
 }

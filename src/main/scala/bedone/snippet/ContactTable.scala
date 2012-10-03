@@ -13,20 +13,28 @@ import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JsCmds._
-import net.liftweb.http.js.JE._
-import net.liftweb.http.js.jquery.JqJsCmds._
 
 import scala.xml.NodeSeq
-
-import java.text.SimpleDateFormat
 
 class ContactTable extends JSImplicit
 {
     val rowTemplate = Templates("templates-hidden" :: "contact" :: "item" :: Nil)
     val currentUser = CurrentUser.is.get
-    def contacts = Contact.findByUser(currentUser).openOr(Nil).filterNot(_.isTrash.is)
 
     var selected: Set[Contact] = Set()
+    var currentPage: Int = 1
+
+    def contacts = new Paging(
+        Contact.findByUser(currentUser).openOr(Nil).toArray, 10, 5, switchPage _
+    )
+
+    def switchPage(paging: Paging[Contact], page: Int): JsCmd = {
+        val newTable = contacts(page).map(createContactRow).flatten
+        this.currentPage = page
+
+        SetHtml("pageSelector", contacts.pageSelector(page)) &
+        SetHtml("contactList", newTable)
+    }
 
     def editContact(contact: Contact): JsCmd = {
 
@@ -49,10 +57,10 @@ class ContactTable extends JSImplicit
 
         def callback(contact: Contact) = {
             val rowID = "contact" + contact.idField.is
-            val contactList = NodeSeq.fromSeq(contacts.flatMap(createContactRow))
+            val contactList = NodeSeq.fromSeq(contacts(currentPage).flatMap(createContactRow))
 
             FadeOutAndRemove("editContactForm") &
-            SetHtml("contactList", contactList)
+            switchPage(contacts, currentPage)
         }
 
         val editForm = new EditContactForm(contact, callback)
@@ -79,7 +87,7 @@ class ContactTable extends JSImplicit
             case _ => """$('#deleteSelected').show()"""
         }
 
-        val updateSelectAll = (this.selected.size == this.contacts.size) match {
+        val updateSelectAll = (this.selected.size == contacts(1).size) match {
             case true  => """$('#selectAll').attr('checked', true)"""
             case false => """$('#selectAll').attr('checked', false)"""
         }
@@ -113,7 +121,7 @@ class ContactTable extends JSImplicit
     def toggleSelectAll(isChecked: Boolean): JsCmd = {
 
         this.selected = isChecked match {
-            case true  => contacts.toSet
+            case true  => contacts(1).toSet
             case false => Set()
         }
 
@@ -135,21 +143,24 @@ class ContactTable extends JSImplicit
     def deleteSelected(): JsCmd = {
 
         val deleteJS = selected.map { contact => 
-            contact.isTrash(true).saveTheRecord()
+            println(contact.isTrash(true).saveTheRecord())
             FadeOutAndRemove("contact" + contact.idField.is)
         }
 
+        deleteJS.toList &
+        switchPage(contacts, currentPage) &
         """
           $('#selectAll').attr('checked', false);
           $('#deleteSelected').hide();
-        """ & deleteJS.toList
+        """
     }
 
     def render = {
         "#selectAll" #> SHtml.ajaxCheckbox(false, toggleSelectAll _) &
         "#importContact [onclick]"  #> SHtml.onEvent(s => gmailAuth()) &
+        "#pageSelector *" #> contacts.pageSelector(1) &
         "#addContact [onclick]" #> SHtml.onEvent(s => showInsertForm) &
         "#deleteSelected [onclick]" #> SHtml.onEvent(s => deleteSelected()) &
-        "#contactList *" #> NodeSeq.fromSeq(contacts.flatMap(createContactRow))
+        "#contactList *" #> NodeSeq.fromSeq(contacts(1).flatMap(createContactRow))
     }
 }

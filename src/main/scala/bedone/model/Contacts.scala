@@ -32,9 +32,9 @@ object Contact extends Contact with MetaRecord[Contact]
         ).single
     }
 
-    def findByUser(user: User): Box[List[Contact]] = tryo {
+    def findByUser(user: User) = tryo {
         from(BeDoneSchema.contacts) { contact => 
-            where(contact.userID === user.idField).
+            where(contact.userID === user.idField and contact.isTrash === false).
             select(contact).
             orderBy(contact.name)
         }.toList
