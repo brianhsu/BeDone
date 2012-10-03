@@ -22,7 +22,19 @@ class Trash extends  JSImplicit
 {
 
     private val currentUser = CurrentUser.get.get
-    private def trashs = Trash.findByUser(currentUser).openOr(Nil)
+
+    private def stuffs = Trash.findByUser(currentUser).openOr(Nil)
+    private def trashs = new Paging(stuffs.filter(shouldDisplay).toArray, 10, 10, onSwitchPage)
+
+    private var currentTopic: Option[Topic] = None
+    private var currentProject: Option[Project] = None
+    private var currentPage: Int = 1
+
+
+    def onSwitchPage(paging: Paging[Stuff], page: Int) = {
+        currentPage = page
+        updateList
+    }
 
     def formatDeadline(stuff: Stuff) = 
     {
@@ -34,10 +46,10 @@ class Trash extends  JSImplicit
 
     def topicFilter(buttonID: String, topic: Topic): JsCmd = 
     {
-        val trashs = this.trashs.filter(_.topics.exists(_.idField.is == topic.idField.is))
-        val newTable = trashs.flatMap(createTrashRow)
+        currentTopic = Some(topic)
+        currentProject = None
 
-        JqSetHtml("trashList", newTable) &
+        updateList &
         JqSetHtml("trashCurrent", topic.title.is) &
         JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
         JsRaw("""$('#trashCurrent').attr("class", "btn btn-info")""")
@@ -45,10 +57,10 @@ class Trash extends  JSImplicit
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
     {
-        val trashs = this.trashs.filter(_.projects.exists(_.idField.is == project.idField.is))
-        val newTable = trashs.flatMap(createTrashRow)
+        currentTopic = None
+        currentProject = Some(project)
 
-        JqSetHtml("trashList", newTable) &
+        updateList &
         JqSetHtml("trashCurrent", project.title.is) &
         JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
         JsRaw("""$('#trashCurrent').attr("class", "btn btn-success")""")
@@ -56,10 +68,29 @@ class Trash extends  JSImplicit
 
     def showAllStuff() = 
     {
-        JqSetHtml("trashList", trashs.flatMap(createTrashRow)) & 
+        currentTopic = None
+        currentProject = None
+
+        updateList &
         JqSetHtml("trashCurrent", "全部") &
         JsRaw("""$('#trashShowAll').prop("disabled", true)""") &
         JsRaw("""$('#trashCurrent').attr("class", "btn btn-inverse")""")
+    }
+
+    def shouldDisplay(stuff: Stuff) = {
+        currentTopic.map(p => stuff.hasTopic(p.idField.is)).getOrElse(true) &&
+        currentProject.map(t => stuff.hasProject(t.idField.is)).getOrElse(true)
+    }
+
+    def updateList: JsCmd = {
+        val paged = trashs
+
+        if (currentPage > paged.totalPage) {
+            currentPage = 1
+        }
+
+        JqSetHtml("trashList", paged(currentPage).flatMap(createTrashRow)) &
+        JqSetHtml("trashPageSelector", paged.pageSelector(currentPage))
     }
 
     def actionBar(stuff: Stuff) = {
@@ -77,16 +108,18 @@ class Trash extends  JSImplicit
         }
 
         def undelete(): JsCmd = {
-            println("undelete " + stuff.idField.is)
             stuff.isTrash(false)
             stuff.saveTheRecord()
-            new FadeOut("trashRow" + stuff.idField, 0, 500)
+
+            new FadeOut("trashRow" + stuff.idField, 0, 500) &
+            updateList
         }
 
         def delete(): JsCmd = {
-            println("delete " + stuff.idField.is)
             Stuff.delete(stuff)
-            new FadeOut("trashRow" + stuff.idField, 0, 500)
+
+            new FadeOut("trashRow" + stuff.idField, 0, 500) &
+            updateList
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
@@ -122,15 +155,18 @@ class Trash extends  JSImplicit
     }
 
     def emptyTrash(): JsCmd = {
-        
-        trashs.foreach(Stuff.delete)
 
-        "$('.trashRow').fadeOut(500)"
+        trashs.data.foreach(Stuff.delete)
+
+        "$('.trashRow').fadeOut(500)" &
+        updateList
     }
    
     def render = {
+        val paged = trashs
         "#trashShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
         "#emptyTrash [onclick]" #> SHtml.onEvent(s => Confirm("確定清空垃圾桶嗎？", SHtml.ajaxInvoke(emptyTrash))) &
-        ".trashRow" #> trashs.flatMap(createTrashRow)
+        ".trashRow" #> paged(currentPage).flatMap(createTrashRow) &
+        "#trashPageSelector *" #> paged.pageSelector(currentPage)
     }
 }

@@ -1,7 +1,6 @@
 package org.bedone.lib
 
 import org.bedone.model._
-import org.squeryl.Query
 
 import net.liftweb.common._
 import net.liftweb.util.Helpers._
@@ -10,10 +9,10 @@ import net.liftweb.http.js.JsCmd
 
 import scala.xml.NodeSeq
 
-class Paging[T](query: Array[T], pageLength: Int, pageGroup: Int, 
+class Paging[T](val data: Array[T], pageLength: Int, pageGroup: Int, 
                 onSwitchPage: (Paging[T], Int) => JsCmd) 
 {
-    val size = query.size
+    val size = data.size
     val totalPage = (size % pageLength) match {
         case 0 => size / pageLength
         case _ => (size / pageLength) + 1
@@ -21,7 +20,7 @@ class Paging[T](query: Array[T], pageLength: Int, pageGroup: Int,
 
     def apply(page: Int) = {
         val offset = (page - 1) * pageLength
-        query.slice(offset, offset + pageLength).toList
+        data.slice(offset, offset + pageLength).toList
     }
 
     def pageSelector(currentPage: Int): NodeSeq = {
