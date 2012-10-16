@@ -83,11 +83,29 @@ class Topic extends Record[Topic] with KeyedRecord[Int]
     def addStuff(stuff: Stuff) = BeDoneSchema.stuffTopics.right(this).associate(stuff)
 
     def allStuffs = BeDoneSchema.stuffTopics.right(this)
-    def stuffs = allStuffs.filter(_.stuffType.is == StuffType.Stuff).toList
-    def nextActions = allStuffs.filter(_.stuffType.is == StuffType.Action).toList
-    def delegateds = allStuffs.filter(_.stuffType.is == StuffType.Delegated).toList
-    def scheduleds = allStuffs.filter(_.stuffType.is == StuffType.Scheduled).toList
-    def maybes = allStuffs.filter(_.stuffType.is == StuffType.Maybe).toList
-    def references = allStuffs.filter(_.stuffType.is == StuffType.Reference).toList
+
+    def stuffs = allStuffs.filter { x =>
+        x.stuffType.is == StuffType.Stuff && !x.isTrash.is
+    }.toList
+
+    def nextActions = allStuffs.filter { x => 
+        x.stuffType.is == StuffType.Action && !x.isTrash.is
+    }.toList
+
+    def delegateds = allStuffs.filter { x =>
+        x.stuffType.is == StuffType.Delegated && !x.isTrash.is
+    }.toList
+
+    def scheduleds = allStuffs.filter { x =>
+        x.stuffType.is == StuffType.Scheduled && !x.isTrash.is
+    }.toList
+
+    def maybes = allStuffs.filter { x =>
+        x.stuffType.is == StuffType.Maybe && !x.isTrash.is
+    }.toList
+
+    def references = allStuffs.filter { x => 
+        x.stuffType.is == StuffType.Reference && !x.isTrash.is
+    }.toList
 
 }
