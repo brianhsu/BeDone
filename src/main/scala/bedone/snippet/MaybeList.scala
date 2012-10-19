@@ -149,7 +149,7 @@ class MaybeList extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("maybe" + stuff.idField, 0, 500)
+            FadeOutAndRemove("maybe" + stuff.idField)
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {

@@ -25,9 +25,10 @@ class ProjectTable extends Table with JSImplicit
         val editForm = new EditProjectForm(project, project => {
             val rowID = "#project" + project.idField.is
 
-            FadeOutAndRemove("editProjectForm") &
-            "$('%s .name').text('%s')".format(rowID, project.title.is) &
-            "$('%s .name').attr('data-original-title', '%s')".format(rowID, project.description.is)
+            FadeOutWithCallback("editProjectForm") {
+                "$('%s .name').text('%s')".format(rowID, project.title.is) &
+                "$('%s .name').attr('data-original-title', '%s')".format(rowID, project.description.is)
+            }
         })
 
         JqSetHtml("editProjectHolder", editForm.toForm)

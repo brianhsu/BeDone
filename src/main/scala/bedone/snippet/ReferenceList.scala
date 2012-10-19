@@ -56,29 +56,34 @@ class ReferenceList extends JSImplicit
             stuff.isStared(!stuff.isStared.is)
             stuff.saveTheRecord()
 
-            val fadeOutEffect = currentTabID == "referenceStaredTab" match {
-                case true  => FadeOutAndRemove("reference" + stuff.idField) 
-                case false => Noop
-            }
+            if (currentTabID == "referenceStaredTab") {
 
-            """$('#reference%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
-            fadeOutEffect &
-            updateList(currentTabID)
+                """$('#reference%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
+                FadeOutWithCallback("reference" + stuff.idField) { 
+                    updateList(currentTabID)
+                }
+
+            } else {
+                """$('#reference%s .star i').attr('class', '%s')""".format(stuff.idField, starClass) &
+                updateList(currentTabID)
+            }
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("reference" + stuff.idField.is) &
-            updateList(currentTabID)
+            FadeOutWithCallback("reference" + stuff.idField.is) {
+                updateList(currentTabID)
+            }
         }
 
         def markAsTrash(): JsCmd = {
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("reference" + stuff.idField, 0, 500) &
-            updateList(currentTabID)
+            FadeOutWithCallback("reference" + stuff.idField) {
+                updateList(currentTabID)
+            }
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {

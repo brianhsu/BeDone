@@ -25,11 +25,12 @@ class TopicTable extends Table with JSImplicit
         def postAction(topic: Topic) = {
             val rowID = "#topic" + topic.idField.is
 
-            FadeOutAndRemove("editTopicForm") &
-            "$('%s .name').text('%s')".format(rowID, topic.title.is) &
-            "$('%s .name').attr('data-original-title', '%s')".format(
-                rowID, topic.description.is
-            )
+            FadeOutWithCallback("editTopicForm") {
+                "$('%s .name').text('%s')".format(rowID, topic.title.is) &
+                "$('%s .name').attr('data-original-title', '%s')".format(
+                    rowID, topic.description.is
+                )
+            }
         }
 
         JqSetHtml("editTopicHolder", new EditTopicForm(topic, postAction).toForm)

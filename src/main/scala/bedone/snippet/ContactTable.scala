@@ -41,8 +41,9 @@ class ContactTable extends JSImplicit
         def callback(contact: Contact) = {
             val rowID = "contact" + contact.idField.is
 
-            FadeOutAndRemove("editContactForm") &
-            Replace(rowID, createContactRow(contact))
+            FadeOutWithCallback("editContactForm") {
+                Replace(rowID, createContactRow(contact))
+            }
         }
 
         val editForm = new EditContactForm(contact, callback)
@@ -59,14 +60,16 @@ class ContactTable extends JSImplicit
             val rowID = "contact" + contact.idField.is
             val contactList = NodeSeq.fromSeq(contacts(currentPage).flatMap(createContactRow))
 
-            FadeOutAndRemove("editContactForm") &
-            switchPage(contacts, currentPage)
+            FadeOutWithCallback("editContactForm") {
+                switchPage(contacts, currentPage)
+            }
         }
 
         val editForm = new EditContactForm(contact, callback)
 
-        FadeOutAndRemove("editContactForm") &
-        SetHtml("editContactHolder", editForm.toForm)
+        FadeOutWithCallback("editContactForm") {
+            SetHtml("editContactHolder", editForm.toForm)
+        }
     }
 
     def deleteContact(contact: Contact) = {

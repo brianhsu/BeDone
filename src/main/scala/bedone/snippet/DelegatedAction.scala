@@ -106,15 +106,17 @@ class DelegatedAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("delegate" + stuff.idField) &
-            updateList(currentTabID)
+            FadeOutWithCallback("delegate" + stuff.idField) {
+                updateList(currentTabID)
+            }
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("delegate" + stuff.idField.is) &
-            updateList(currentTabID)
+            FadeOutWithCallback("delegate" + stuff.idField.is) {
+                updateList(currentTabID)
+            }
         }
 
         def markDoneFlag(isDone: Boolean): JsCmd = 
@@ -130,8 +132,9 @@ class DelegatedAction extends JSImplicit
                     delegated.action.isDone(false).doneTime(None).saveTheRecord()
             }
 
-            FadeOutAndRemove("delegate" + stuff.idField) &
-            updateList(currentTabID)
+            FadeOutWithCallback("delegate" + stuff.idField) {
+                updateList(currentTabID)
+            }
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {

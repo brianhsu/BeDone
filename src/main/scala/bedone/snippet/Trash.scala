@@ -111,15 +111,17 @@ class Trash extends  JSImplicit
             stuff.isTrash(false)
             stuff.saveTheRecord()
 
-            new FadeOut("trashRow" + stuff.idField, 0, 500) &
-            updateList
+            FadeOutWithCallback("trashRow" + stuff.idField) {
+                updateList
+            }
         }
 
         def delete(): JsCmd = {
             Stuff.delete(stuff)
 
-            new FadeOut("trashRow" + stuff.idField, 0, 500) &
-            updateList
+            FadeOutWithCallback("trashRow" + stuff.idField) {
+                updateList
+            }
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {

@@ -85,15 +85,17 @@ class NextAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            FadeOutAndRemove("action" + stuff.idField.is) &
-            updateList()
+            FadeOutWithCallback("action" + stuff.idField.is) {
+                updateList()
+            }
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("action" + stuff.idField.is) &
-            updateList()
+            FadeOutWithCallback("action" + stuff.idField.is) {
+                updateList()
+            }
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
@@ -214,8 +216,9 @@ class NextAction extends JSImplicit
 
         Context.delete(context)
 
-        FadeOutAndRemove("actionTab" + context.idField.is) &
-        showAllAction("")
+        FadeOutWithCallback("actionTab" + context.idField.is) {
+            showAllAction("")
+        }
     }
 
     def updateList(): JsCmd =

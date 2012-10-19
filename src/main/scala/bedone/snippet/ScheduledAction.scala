@@ -297,15 +297,18 @@ class ScheduledAction extends JSImplicit
             stuff.isTrash(true)
             stuff.saveTheRecord()
 
-            new FadeOut("scheduled" + stuff.idField, 0, 500) &
-            updateList(currentTabID)
+            FadeOutWithCallback("scheduled" + stuff.idField) {
+                updateList(currentTabID)
+            }
         }
 
         def reInbox(): JsCmd = 
         {
             stuff.reInbox()
-            FadeOutAndRemove("scheduled" + stuff.idField.is) &
-            updateList(currentTabID)
+
+            FadeOutWithCallback("scheduled" + stuff.idField.is) {
+                updateList(currentTabID)
+            }
         }
 
         def markDoneFlag(action: Action, isDone: Boolean): JsCmd = 
