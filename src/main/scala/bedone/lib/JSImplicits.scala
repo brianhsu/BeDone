@@ -23,6 +23,19 @@ trait JSImplicit
 
         def apply(id: String): JsCmd = """$('#%s').val('')""".format(id)
     }
+    
+    object FadeOutWithCallback
+    {
+        def apply(id: String)(callback: => JsCmd) = 
+        {
+            """
+                $('#%s').fadeOut(500, function() { 
+                    %s;
+                    $('#%s').remove();
+                })
+            """.format(id, callback.toJsCmd, id)
+        }
+    }
 
     object FadeOutAndRemove
     {
@@ -35,12 +48,13 @@ trait JSImplicit
             """.format(className, timespan, className)
         }
 
-        def apply(id: String, timespan: Int = 500): JsCmd = 
+        def apply(id: String, timespan: Int = 500): JsCmd = {
             """
                 $('#%s').fadeOut(%d, function() { 
                     $('#%s').remove() 
                 })
             """.format(id, timespan, id)
+        }
     }
 
     object ClearFieldError {

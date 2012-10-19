@@ -80,8 +80,9 @@ trait StuffList extends JSImplicit
                 case false => currentPage
             }
 
-            new FadeOut("inboxRow" + stuff.idField, 0, 500) &
-            onSwitchPage(newPaging, targetPage)
+            FadeOutWithCallback("inboxRow" + stuff.idField) {
+                onSwitchPage(newPaging, targetPage)
+            }
         }
 
         val descIconVisibility = stuff.description.is.isEmpty match {
