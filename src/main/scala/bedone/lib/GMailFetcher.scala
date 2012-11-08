@@ -150,8 +150,7 @@ class GMailFetcher(userID: Int, username: String, password: String)
                 val allParts = (0 until multipart.getCount).map(multipart.getBodyPart)
                 allParts.flatMap(getBodyText).headOption
 
-            case o => None
-
+            case o => Some("無純文字版信件")
         }
     }
 
@@ -167,7 +166,7 @@ class GMailFetcher(userID: Int, username: String, password: String)
         addBeDoneLabel(untouchedMail)
 
         transaction { 
-            stuffs.map(_.saveTheRecord()) 
+            stuffs.map(_.saveTheRecord())
         }
 
         store.close()
