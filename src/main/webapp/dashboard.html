@@ -12,6 +12,10 @@
       <div class="row-fluid" data-lift="DashBoard">
         <div class="span6">
           <div class="page-header"><h3>摘要</h3></div>
+          <div style="margin-bottom: 1.5em">
+            <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/inbox">收件匣</a></span>
+            <div><span class="label label-important" id="inboxCount">1</span></div>
+          </div>
           <div>
             <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/nextAction">儘快完成</a></span>
             <div class="progress"><div id="nextActionBar" class="bar"></div></div>
@@ -35,8 +39,11 @@
         <div class="span6">
           <div class="page-header"><h3>本日行程</h3></div>
         </div>
-
+        <div class="span6" id="todayScheduled"></div>
       </div>
+      <script type="text/javascript">
+        updateNotes();
+      </script>
     </div>
   </body>
 </html>

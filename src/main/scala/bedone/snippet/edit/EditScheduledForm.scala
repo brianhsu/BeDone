@@ -185,7 +185,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         "#scheduledProjectTags *" #> projectTags &
         "#scheduledStartTime" #> ("input" #> startTimeInput) &
         "#scheduledEndTime" #> ("input" #> endTimeInput) &
-        "#scheduleLocation" #> ("input" #> locationInput) &
+        "#scheduledLocation" #> ("input" #> locationInput) &
         "#scheduledCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("scheduledEdit")) &
         "#scheduledSave [onclick]" #> SHtml.onEvent(x => save()) &
         "#scheduledSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
