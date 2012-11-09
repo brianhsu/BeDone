@@ -2,31 +2,34 @@ package org.bedone.model
 
 import org.bedone.lib._
 
-import net.liftweb.common.{Box, Full, Empty, Failure}
+import org.squeryl.annotations.Column
 
-import net.liftweb.util.FieldError
-import net.liftweb.util.Helpers._
+import net.liftweb.common.{Box, Full, Empty, Failure}
 
 import net.liftweb.record.MetaRecord
 import net.liftweb.record.Record
-import net.liftweb.record.field.IntField
-import net.liftweb.record.field.StringField
-import net.liftweb.record.field.PasswordField
-import net.liftweb.record.field.EmailField
-import net.liftweb.record.field.DateTimeField
+import net.liftweb.record.field._
 
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 
-import org.squeryl.annotations.Column
-import scala.xml.Text
-
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
+
 import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.FieldError
+import net.liftweb.util.Helpers._
+
+import scala.xml.Text
+
+import java.util.Calendar
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
-
+object ActivationStatus extends Enumeration("Done", "Register", "Reset")
+{
+    type Status = Value
+    val Done, Register, Reset = Value
+}
 
 object User extends User with MetaRecord[User]
 {
@@ -91,7 +94,21 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         override def helpAsHtml = Full(Text("至少需要七個字元"))
     }
 
+    val activationStatus = new EnumField(this, ActivationStatus, ActivationStatus.Register)
+    val activationCode = new OptionalStringField(this, 40)
+    val activationDue = new OptionalDateTimeField(this)
+
     override def saveTheRecord() = tryo(BeDoneSchema.users.insert(this))
+
+    def resetActivationCode(status: ActivationStatus.Value)
+    {
+        val dueDate = Calendar.getInstance
+        dueDate.setTime((now:TimeSpan) + hours(24))
+
+        this.activationStatus(status)
+        this.activationCode(randomString(40))
+        this.activationDue(dueDate)
+    }
 
     def logout(postAction: => Any = ()) {
         CurrentUser.set(Empty)
