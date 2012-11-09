@@ -19,6 +19,8 @@ import net.liftweb.http.S
 import net.liftweb.util.Helpers.tryo
 import net.liftweb.util.FieldError
 import net.liftweb.util.Helpers._
+import net.liftweb.util.Mailer
+import net.liftweb.util.Mailer._
 
 import scala.xml.Text
 
@@ -100,6 +102,28 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
     override def saveTheRecord() = tryo(BeDoneSchema.users.insert(this))
 
+    def sendActivationCode()
+    {
+        val confirmURL = S.hostAndPath + "/confirmEMail?code=" + activationCode.is.getOrElse("")
+        val subject = Subject("[BeDone] 帳號註冊確認信")
+        val body = PlainMailBodyType("""
+            |%s 您好，
+            |
+            |感謝您在 BeDone 上註冊帳號，請使用下列的網址正式啟用：
+            |
+            |%s
+            |
+            |若您從未在 BeDone 上註冊過帳號，請直接勿略此信即可。
+            |
+            |謝謝！祝您使用愉快！
+        """.format(username.is, confirmURL).stripMargin)
+
+        println("email:" + email.is)
+        println("sendActivationCode:" + confirmURL)
+
+        Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
+    }
+
     def resetActivationCode(status: ActivationStatus.Value)
     {
         val dueDate = Calendar.getInstance
@@ -108,6 +132,12 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         this.activationStatus(status)
         this.activationCode(randomString(40))
         this.activationDue(dueDate)
+
+        status match {
+            case ActivationStatus.Register => sendActivationCode()
+            case ActivationStatus.Reset =>
+            case ActivationStatus.Done =>
+        }
     }
 
     def logout(postAction: => Any = ()) {
