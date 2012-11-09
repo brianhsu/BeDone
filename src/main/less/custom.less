@@ -1,6 +1,7 @@
 @sidebarBackground: #FAFAD2;
 @stuffBackground: #99C7BC;
 @dialogBackground: #CCF;
+@dashboardBackground: #CCF;
 
 body {
     /* 60px to make the container go all the way to the bottom of the topbar */
@@ -160,6 +161,12 @@ div.rapidEntry form {
 
 #gmail form {
     margin-left: -2em;
+}
+
+.dashboard {
+    .post-it(fade(@dashboardBackground, 50%));
+    .rounded-corners(5px);
+    .box-shadow(3px 3px 3px, 30%);
 }
 
 .dialog {

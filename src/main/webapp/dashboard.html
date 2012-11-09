@@ -9,12 +9,41 @@
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
-      <div class="hero-unit">
+      <div class="row-fluid" data-lift="DashBoard">
+        <div class="span6">
+          <div class="page-header"><h3>摘要</h3></div>
+          <div style="margin-bottom: 1.5em">
+            <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/inbox">收件匣</a></span>
+            <div><span class="label label-important" id="inboxCount">1</span></div>
+          </div>
+          <div>
+            <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/nextAction">儘快完成</a></span>
+            <div class="progress"><div id="nextActionBar" class="bar"></div></div>
+            <span id="nextActionProgress" class="pull-right" style="margin-top:-1em; margin-bottom:10px">10 / 20</span>
+            <div style="clear: both"></div>
+          </div>
+          <div>
+            <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/delegated">委派他人</a></span>
+            <div class="progress"><div id="delegatedBar" class="bar"></div></div>
+            <span id="delegatedProgress" class="pull-right" style="margin-top:-1em; margin-bottom:10px">10 / 20</span>
+            <div style="clear: both"></div>
+          </div>
+          <div>
+            <span class="pull-left" style="margin-right:0.5em; width:4em"><a href="/scheduled">行事曆</a></span>
+            <div class="progress"><div id="scheduledBar" class="bar"></div></div>
+            <span id="scheduledProgress" class="pull-right" style="margin-top:-1em; margin-bottom:10px">10 / 20</span>
+            <div style="clear: both"></div>
+          </div>
+        </div>
+
+        <div class="span6">
+          <div class="page-header"><h3>本日行程</h3></div>
+        </div>
+        <div class="span6" id="todayScheduled"></div>
       </div>
-      <div data-lift="DashBoard">
-        <input type="hidden" name="contactInput" />
-        <button id="clear">Clear</button>
-      </div>
+      <script type="text/javascript">
+        updateNotes();
+      </script>
     </div>
   </body>
 </html>
