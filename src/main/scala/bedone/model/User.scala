@@ -4,23 +4,20 @@ import org.bedone.lib._
 
 import org.squeryl.annotations.Column
 
-import net.liftweb.common.{Box, Full, Empty, Failure}
-
-import net.liftweb.record.MetaRecord
-import net.liftweb.record.Record
+import net.liftweb.actor.LiftActor
+import net.liftweb.common._
+import net.liftweb.record._
 import net.liftweb.record.field._
-
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
-
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
-
 import net.liftweb.util.Helpers.tryo
 import net.liftweb.util.FieldError
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Mailer
 import net.liftweb.util.Mailer._
+import net.liftweb.util.Schedule
 
 import scala.xml.Text
 
@@ -181,4 +178,6 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
     }
 
     def avatarURL = Gravatar.avatarURL(email.is)
+
+
 }
