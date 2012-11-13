@@ -100,11 +100,24 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
     val activationCode = new OptionalStringField(this, 40)
     val activationDue = new OptionalDateTimeField(this)
 
-    override def saveTheRecord() = tryo(BeDoneSchema.users.insert(this))
+    override def saveTheRecord() = tryo {
+        this.isPersisted match {
+            case true  => BeDoneSchema.users.update(this)
+            case false => BeDoneSchema.users.insert(this)
+        }
+
+        this
+    }
+
+    def activate()
+    {
+        this.activationCode(None)
+        this.activationStatus(ActivationStatus.Done)
+    }
 
     def sendActivationCode()
     {
-        val confirmURL = S.hostAndPath + "/confirmEMail?code=" + activationCode.is.getOrElse("")
+        val confirmURL = "%s/confirmEMail?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
         val subject = Subject("[BeDone] 帳號註冊確認信")
         val body = PlainMailBodyType("""
             |%s 您好，
@@ -117,9 +130,6 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
             |
             |謝謝！祝您使用愉快！
         """.format(username.is, confirmURL).stripMargin)
-
-        println("email:" + email.is)
-        println("sendActivationCode:" + confirmURL)
 
         Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
     }
