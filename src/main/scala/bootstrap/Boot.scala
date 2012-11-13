@@ -84,6 +84,8 @@ class Boot
             (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Trash") / "trash") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("ConfirmEMail") / "confirmEMail") >> Hidden,
+            (Menu.i("ForgetPassword") / "forgetPassword") >> Hidden,
+            (Menu.i("ResetPassword") / "resetPassword") >> Hidden,
             (Menu.i("Import Contacts") / "contact" / "import") >> If(User.isLoggedIn _, "請先登入"),
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),

@@ -134,6 +134,25 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
     }
 
+    def sendResetPassword()
+    {
+        val confirmURL = "%s/resetPassword?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
+        val subject = Subject("[BeDone] 重設密碼連結")
+        val body = PlainMailBodyType("""
+            |%s 您好，
+            |
+            |聽說您忘記自己的密碼了，您可以用以下的連結重新設定密碼：
+            |
+            |%s
+            |
+            |若您從未在 BeDone 上註冊過帳號，請直接勿略此信即可。
+            |
+            |謝謝！祝您使用愉快！
+        """.format(username.is, confirmURL).stripMargin)
+
+        Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
+    }
+
     def resetActivationCode(status: ActivationStatus.Value)
     {
         val dueDate = Calendar.getInstance
@@ -145,7 +164,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
         status match {
             case ActivationStatus.Register => sendActivationCode()
-            case ActivationStatus.Reset =>
+            case ActivationStatus.Reset => sendResetPassword()
             case ActivationStatus.Done =>
         }
     }
