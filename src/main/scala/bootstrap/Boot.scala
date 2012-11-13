@@ -22,10 +22,16 @@ import net.liftweb.sitemap.Menu
 import net.liftweb.sitemap.Loc._
 import net.liftweb.sitemap._
 import net.liftweb.http.S
+
+import net.liftweb.util.Props
 import net.liftweb.util.LoanWrapper
+import net.liftweb.util.Mailer
+import net.liftweb.util.Mailer._
+
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import net.liftmodules.combobox._
+import javax.mail.{Authenticator,PasswordAuthentication}
 
 class Boot 
 {
@@ -77,11 +83,31 @@ class Boot
             (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Trash") / "trash") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("ConfirmEMail") / "confirmEMail") >> Hidden,
+            (Menu.i("ForgetPassword") / "forgetPassword") >> Hidden,
+            (Menu.i("ResetPassword") / "resetPassword") >> Hidden,
             (Menu.i("Import Contacts") / "contact" / "import") >> If(User.isLoggedIn _, "請先登入"),
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (topicDetail >> Template(() => Templates("topic" :: "detail" :: Nil) openOr NodeSeq.Empty))
         )
+    }
+
+    def initMailer()
+    {
+        val isAuth = Props.getBool("mail.smtp.auth", false)
+
+        for (username <- Props.get("mail.user") if isAuth;
+             password <- Props.get("mail.password"))
+        {
+            println("init mail password")
+
+            Mailer.authenticator = Full(new Authenticator() {
+                override def getPasswordAuthentication = {
+                    new PasswordAuthentication(username, password)
+                }
+            })
+        }
     }
 
     def boot 
@@ -104,6 +130,7 @@ class Boot
             }
         })
 
+        initMailer()
         initAjaxLoader()
         DBSettings.initDB()
         ComboBox.init

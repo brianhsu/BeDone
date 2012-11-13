@@ -13,6 +13,8 @@ import net.liftweb.http.js.JE.JsRaw
 import scala.xml.NodeSeq
 import scala.xml.Text
 
+import java.util.Calendar
+
 class SignupDialog extends AjaxForm[User]
 {
     private var confirmPassword: String = _
@@ -21,7 +23,10 @@ class SignupDialog extends AjaxForm[User]
     override protected val fields = List(record.username, record.email, record.password)
 
     def saveAndClose(): JsCmd = {
+
+        record.resetActivationCode(ActivationStatus.Register)
         record.saveTheRecord() 
+
         """$('#signupModal').modal('hide')""" & resetButton
     }
 
@@ -67,10 +72,11 @@ class SignupDialog extends AjaxForm[User]
     override def cssBinding = super.cssBinding :+ confirmPasswordBinding
     override def reInitForm(): JsCmd = super.reInitForm & removeFieldError("confirmPassword")
 
-    def render = 
+    def render = {
         ".modal-body *" #> this.toForm &
         ".close" #> SHtml.ajaxButton("×", reInitForm _) &
         ".close-link" #> SHtml.a(reInitForm _, Text("取消"), "href" -> "javascript:void(0)") &
         "#signupButton" #> SHtml.ajaxButton(Text("註冊"), signup _)
+    }
 }
 

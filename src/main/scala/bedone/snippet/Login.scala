@@ -25,6 +25,9 @@ class Login
 
     def login() = {
 
+        def isRegister(user: User) = user.activationStatus.value == ActivationStatus.Register
+        def isReset(user: User) = user.activationStatus.value == ActivationStatus.Reset
+
         val authUser = for {
             username <- this.username
             password <- this.password
@@ -32,6 +35,8 @@ class Login
         } yield user
 
         authUser match {
+            case Full(user) if isRegister(user) => S.error("請先使用 EMail 認證你的帳號")
+            case Full(user) if isReset(user) => S.error("已將密碼重設郵件寄至您的 EMail，請檢查並重設密碼")
             case Full(user) => user.login(S.redirectTo("/dashboard"))
             case _          => S.error("帳號密碼錯誤")
         }
