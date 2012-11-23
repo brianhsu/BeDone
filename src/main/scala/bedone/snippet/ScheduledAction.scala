@@ -291,17 +291,24 @@ class ScheduledAction extends JSImplicit with ScheduledPredicate
 
     def render = 
     {
+        import scala.xml.NodeSeq
+
         val (todayList, intervalList, doneList, outdatedList) = createActionList(weekAction)
         val hidden = "display: none;";
+
+        val todayListHTML: NodeSeq = todayList(currentTodayPage).flatMap(createActionRow)
+        val intervalListHTML: NodeSeq = intervalList(currentIntervalPage).flatMap(createActionRow)
+        val doneListHTML: NodeSeq = doneList(currentDonePage).flatMap(createActionRow)
+        val outdatedListHTML: NodeSeq = outdatedList(currentOutdatedPage).flatMap(createActionRow)
 
         "#scheduledShowAll [onclick]" #> SHtml.onEvent(s => showAllStuff()) &
         "#scheduledWeekTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledWeekTab")) &
         "#scheduledMonthTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledMonthTab")) &
         "#scheduledAllTab [onclick]" #> SHtml.onEvent(s => updateList("scheduledAllTab")) &
-        "#scheduledTodayList *"    #> todayList(currentTodayPage).flatMap(createActionRow) &
-        "#scheduledIntervalList *" #> intervalList(currentIntervalPage).flatMap(createActionRow) &
-        "#scheduledDoneList *" #> doneList(currentDonePage).flatMap(createActionRow) &
-        "#scheduledOutdatedList *" #> outdatedList(currentOutdatedPage).flatMap(createActionRow) &
+        "#scheduledTodayList *"    #> todayListHTML &
+        "#scheduledIntervalList *" #> intervalListHTML &
+        "#scheduledDoneList *" #> doneListHTML &
+        "#scheduledOutdatedList *" #> outdatedListHTML &
         "#scheduledOutdatedBlock [style+]" #> (if (outdatedList(currentOutdatedPage).isEmpty) hidden else "") &
         "#scheduledIntervalBlock [style+]" #> (if (intervalList(currentIntervalPage).isEmpty) hidden else "") &
         "#scheduledTodayBlock [style+]" #> (if (todayList(currentTodayPage).isEmpty) hidden else "") &
