@@ -50,7 +50,7 @@ class ContactsImport extends JSImplicit
             contact.userID(currentUser.idField.is).isTrash(false).saveTheRecord()
         }
 
-        S.redirectTo("/contact", () => S.notice("已匯入 GMail 通訊錄"))
+        S.redirectTo("/contact/", () => S.notice("已匯入 GMail 通訊錄"))
     }
 
     def toogleAll(isChecked: Boolean): JsCmd = {
@@ -70,7 +70,7 @@ class ContactsImport extends JSImplicit
 
 
         "#selectAll" #> SHtml.ajaxCheckbox(true, toogleAll _) &
-        ".backButton [onclick]" #> SHtml.onEvent(s => S.redirectTo("/contact")) &
+        ".backButton [onclick]" #> SHtml.onEvent(s => S.redirectTo("/contact/")) &
         ".confirmButton [onclick]" #> SHtml.onEvent(s => importContacts()) &
         ".contactRow" #> contacts.map { contact =>
             ".save" #> SHtml.ajaxCheckbox(true, updateImportSet(contact, _)) &
