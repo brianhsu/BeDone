@@ -114,7 +114,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
     def sendActivationCode()
     {
-        val confirmURL = "%s/confirmEMail?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
+        val confirmURL = "%s/account/confirmEMail?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
         val subject = Subject("[BeDone] 帳號註冊確認信")
         val body = PlainMailBodyType("""
             |%s 您好，
@@ -133,7 +133,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
     def sendResetPassword()
     {
-        val confirmURL = "%s/resetPassword?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
+        val confirmURL = "%s/account/resetPassword?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
         val subject = Subject("[BeDone] 重設密碼連結")
         val body = PlainMailBodyType("""
             |%s 您好，
