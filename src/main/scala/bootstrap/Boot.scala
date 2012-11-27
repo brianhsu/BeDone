@@ -70,6 +70,11 @@ class Boot
 
         SiteMap(
             Menu.i("Index") / "index",
+
+            (Menu.i("ConfirmEMail") / "account" / "confirmEMail") >> Hidden,
+            (Menu.i("ForgetPassword") / "account" / "forgetPassword") >> Hidden,
+            (Menu.i("ResetPassword") / "account" / "resetPassword") >> Hidden,
+
             (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Inbox") / "inbox") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Action") / "nextAction") >> If(User.isLoggedIn _, "請先登入"),
@@ -83,9 +88,6 @@ class Boot
             (Menu.i("Project") / "project") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Topic") / "topic") >> If(User.isLoggedIn _, "請先登入"),
             (Menu.i("Trash") / "trash") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("ConfirmEMail") / "confirmEMail") >> Hidden,
-            (Menu.i("ForgetPassword") / "forgetPassword") >> Hidden,
-            (Menu.i("ResetPassword") / "resetPassword") >> Hidden,
             (Menu.i("Import Contacts") / "contact" / "import") >> If(User.isLoggedIn _, "請先登入"),
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
