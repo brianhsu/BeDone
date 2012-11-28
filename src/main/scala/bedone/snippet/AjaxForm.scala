@@ -33,7 +33,7 @@ abstract class AjaxForm[T <: Record[T]] extends JSImplicit
     protected def fields: List[BaseField] = record.allFields.filter(_.name != "idField")
     protected def formID: Option[String] = None
 
-    private def template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
+    private def template = Templates("templates-hidden" :: "misc" :: "ajaxForm" :: Nil)
 
     def resetForm: JsCmd = formID.map{ id => 
         JsRaw("""$('#%s').get(0).reset();""".format(id)).cmd
