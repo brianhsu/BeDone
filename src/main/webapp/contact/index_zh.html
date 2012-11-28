@@ -12,12 +12,12 @@
       <div data-lift="ContactTable">
         <div class="pull-right">
           <div class="btn-group inline">
-            <a class="btn btn-danger hide" href="#" id="deleteSelected">Delete Selected</a>
+            <a class="btn btn-danger hide" href="#" id="deleteSelected">刪除選取的連絡人</a>
           </div>
 
           <div class="btn-group inline">
-            <a class="btn btn-inverse" href="#" id="importContact">Import GMail's Contacts</a>
-            <a class="btn btn-primary" href="#" id="addContact">Add New Contact</a>
+            <a class="btn btn-inverse" href="#" id="importContact">匯入 GMail 通訊錄</a>
+            <a class="btn btn-primary" href="#" id="addContact">新增連絡人</a>
           </div>
         </div>
 
@@ -28,16 +28,17 @@
           <thead>
             <tr>
               <th><input type="checkbox" id="selectAll"></input></th>
-              <th>Name</th>
+              <th>名稱</th>
               <th>EMail</th>
-              <th>Phone</th>
-              <th>Address</th>
+              <th>電話</th>
+              <th>地址</th>
             </tr>
           </thead>
           <tbody id="contactList">
           </tbody>
         </table>
         <div id="pageSelector" class="pagination pull-right"></div>
+
       </div>
     </div>
   </body>

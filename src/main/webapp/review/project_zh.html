@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div>
+        <div id="editProjectHolder"></div>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>名稱</th>
+              <th class="center">收件匣</th>
+              <th class="center">儘快完成</th>
+              <th class="center">委派他人</th>
+              <th class="center">行事曆</th>
+              <th class="center">也許 / 有一天</th>
+              <th class="center">參考資料</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody data-lift="ProjectTable">
+            <tr>
+              <td><a href="#" rel="tooltip" data-placement="right" data-original-title="Name" class="name">Name</a></td>
+              <td class="center"><a href="#" class="inbox"><span>收件匣</span></a></td>
+              <td class="center"><a href="#" class="nextAction">儘快完成</a></td>
+              <td class="center"><a href="#" class="delegated">委派他人</a></td>
+              <td class="center"><a href="#" class="scheduled">行事曆</a></td>
+              <td class="center"><a href="#" class="maybe">也許</a></td>
+              <td class="center"><a href="#" class="reference">參考資料</a></td>
+              <td>
+                <div class="dropdown">
+                  <a data-toggle="dropdown" class="dropdown-toggle" role="button" href="#"><b class="caret"></b></a>
+                  <ul role="menu" class="dropdown-menu pull-right">
+                    <li role="menuitem"><a href="#" class="edit">編輯</a></li>
+                    <li role="menuitem"><a href="#" class="delete">刪除</a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <script type="text/javascript">
+          $('.name').tooltip();
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
+

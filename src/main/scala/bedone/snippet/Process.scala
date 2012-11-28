@@ -117,7 +117,8 @@ class Process extends JSImplicit
                                          .saveTheRecord()
                 
                 S.redirectTo(
-                    "/process", () => S.notice("已將「%s」加入指派清單" format(stuff.title.is))
+                    "/todo/process", 
+                    () => S.notice("已將「%s」加入指派清單" format(stuff.title.is))
                 )
                
         }
@@ -128,14 +129,18 @@ class Process extends JSImplicit
         updateStuff(stuff, StuffType.Reference)
 
         S.redirectTo(
-            "/process", () => S.notice("已將「%s」加入參考資料" format(stuff.title.is))
+            "/todo/process", 
+            () => S.notice("已將「%s」加入參考資料" format(stuff.title.is))
         )
     }
 
     def markAsTrash(stuff: Stuff)(valueAttr: String) = {
 
         stuff.isTrash(true).saveTheRecord()
-        S.redirectTo("/process", () => S.notice("已刪除「%s」" format(stuff.title.is)))
+        S.redirectTo(
+            "/todo/process", 
+            () => S.notice("已刪除「%s」" format(stuff.title.is))
+        )
     }
 
     def markAsDone(stuff: Stuff)(valueAttr: String) = {
@@ -146,7 +151,10 @@ class Process extends JSImplicit
               .isDone(true).doneTime(Calendar.getInstance)
               .saveTheRecord()
 
-        S.redirectTo("/process", () => S.notice("已將「%s」標記為完成" format(stuff.title.is)))
+        S.redirectTo(
+            "/todo/process", 
+            () => S.notice("已將「%s」標記為完成" format(stuff.title.is))
+        )
     }
 
     def createTopicTags(containerID: String) =
@@ -277,7 +285,7 @@ class Process extends JSImplicit
         action.setContexts(currentContexts)
 
         S.redirectTo(
-            "/process", 
+            "/todo/process", 
              () => S.notice("已將「%s」放入儘快完成清單" format(stuff.title.is))
         )
     }
@@ -292,7 +300,7 @@ class Process extends JSImplicit
         maybe.saveTheRecord()
 
         S.redirectTo(
-            "/process", 
+            "/todo/process", 
              () => S.notice("已將「%s」放入也許 / 有一天清單" format(stuff.title.is))
         )
     }
@@ -312,7 +320,7 @@ class Process extends JSImplicit
                 action.saveTheRecord()
                 scheduled.saveTheRecord()
                 S.redirectTo(
-                    "/process", 
+                    "/todo/process", 
                     () => S.notice("已將「%s」放入行事曆" format(stuff.title.is))
                 )
 
