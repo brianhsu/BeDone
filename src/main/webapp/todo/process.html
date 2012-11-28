@@ -108,7 +108,7 @@
               <div style="margin-bottom:1em">When should I put it back to your BeDone inbox?</div>
               <div>Remind me at <input type="text" id="ticklerDate" />
                 <span class="control-group error hide" id="tickler_error">
-                  <span class="help-inline" id="tickler_error_msg">The date must be later than today.</span>
+                  <span class="help-inline" id="tickler_error_msg">Reminder must later than today.</span>
                 </span>
               </div>
             </div>
@@ -128,13 +128,14 @@
               </div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
-              <div class="input-prepend input-append">
+              <div class="input-prepend input-append pull-left">
                 <span class="add-on">Deadline</span><input class="input-large" id="deadline" type="text" />
-                <span class="control-group error hide" id="deadline_error">
-                  <span class="help-inline" id="deadline_error_msg">Deadline must be later than today.</span>
-                </span>
-
               </div>
+              <span class="control-group error hide" id="deadline_error">
+                <span class="help-inline" id="deadline_error_msg" style="margin-top:3px">Deadline must later than today.</span>
+              </span>
+              <div class="clearfix" />
+
             </div>
             <div>
               <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">Previous</button>

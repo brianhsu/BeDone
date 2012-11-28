@@ -400,9 +400,16 @@ class Process extends JSImplicit
         this.startDateTime = dateTime.toOption
 
         dateTime match {
-            case Full(date) => "$('#saveScheduled').attr('disabled', false)"
-            case Empty => "$('#saveScheduled').attr('disabled', true)"
-            case Failure(msg, _, _) => "$('#saveScheduled').attr('disabled', true)"
+            case Full(date) => 
+                "$('#deadline_error').fadeOut()" &
+                "$('#saveScheduled').attr('disabled', false)"
+            case Empty => 
+                "$('#deadline_error').fadeOut()" &
+                "$('#saveScheduled').attr('disabled', true)"
+            case Failure(msg, _, _) => 
+                "$('#deadline_error').fadeIn()" &
+                "$('#deadline_error_msg').text('%s')".format("SSSS") &
+                "$('#saveScheduled').attr('disabled', true)"
         }
     }
 
