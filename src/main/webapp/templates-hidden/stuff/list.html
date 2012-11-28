@@ -1,25 +1,25 @@
 <div data-lift="Inbox">
   <div class="pull-right">
     <div class="btn-group inline">
-      <a class="btn btn-primary" href="#" id="inboxAdd">新增雜事</a>
-      <a class="btn" id="inboxProcess" href="/todo/process">處理雜事</a>
+      <a class="btn btn-primary" href="#" id="inboxAdd">Add Stuff</a>
+      <a class="btn" id="inboxProcess" href="/todo/process">Process Stuffs</a>
     </div>
     <div class="btn-group inline">
-      <button class="btn btn-inverse" id="inboxCurrent" disabled="disabled">全部</button>
-      <button class="btn btn-inverse" id="inboxShowAll" disabled="disabled">顯示全部</button>
+      <button class="btn btn-inverse" id="inboxCurrent" disabled="disabled">All</button>
+      <button class="btn btn-inverse" id="inboxShowAll" disabled="disabled">Show All</button>
     </div>
   </div>
 
   <div class="pull-right" class="rapidEntry">
     <form data-lift="lift:Form.ajax">
-      <input id="inboxRapidStuff" type="text" placeholder="快速新增"/>
+      <input id="inboxRapidStuff" type="text" placeholder="Quick Add"/>
       <input id="inboxRapidTitle" type="hidden" />
     </form>
   </div>
 
   <ul class="nav nav-tabs">
     <li class="active">
-      <a href="#">全部</a>
+      <a href="#">All</a>
     </li>
   </ul>
 

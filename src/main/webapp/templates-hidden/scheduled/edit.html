@@ -7,9 +7,9 @@
     </span>
     <fieldset id="scheduledTitle" class="inline control-group">
       <div class="input-prepend" style="margin-left: 0.5em">
-        <span title="標題" class="add-on">
+        <span title="Title" class="add-on">
           <i class="icon-th-list"></i>
-        </span><input class="input-xlarge" type="text" placeholder="標題" />
+        </span><input class="input-xlarge" type="text" placeholder="Title" />
         <span id="scheduledTitle_msg" class="help-inline"></span>
       </div>
     </fieldset>
@@ -29,7 +29,7 @@
 
   <fieldset id="scheduledStartTime" class="control-group" style="float: left">
     <div style="margin-right:0.5em;">
-      <label class="help-inline">開始時間：</label>
+      <label class="help-inline">Start Time:</label>
       <input class="input-medium" type="text" />
       <label id="scheduledStartTime_msg" class="help-inline"></label>
     </div>
@@ -37,7 +37,7 @@
 
   <fieldset id="scheduledEndTime" class="control-group" style="float: left">
     <div style="margin-right:0.5em;">
-      <label class="help-inline">預計結束時間：</label>
+      <label class="help-inline">End Time:</label>
       <input class="input-medium" type="text" />
       <label id="scheduledEndTime_msg" class="help-inline"></label>
     </div>
@@ -45,7 +45,7 @@
 
   <fieldset id="scheduledLocation" class="control-group" style="float: left">
     <div style="margin-right:0.5em;">
-      <label class="help-inline">地點：</label>
+      <label class="help-inline">Location:</label>
       <input class="input-medium" type="text" />
       <label id="scheduledLocation_msg" class="help-inline"></label>
     </div>
@@ -53,8 +53,8 @@
 
 
   <div style="text-align: right; margin-right: 0.5em">
-      <button type="reset" id="scheduledCancel" class="btn" style="margin-right:0.5em">取消</button>
-      <button id="scheduledSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
+      <button type="reset" id="scheduledCancel" class="btn" style="margin-right:0.5em">Cancel</button>
+      <button id="scheduledSave" data-loading-text="Saving..." class="btn btn-primary">Save</button>
   </div>
   <script type="text/javascript">
       $( "#scheduledStartTime input" ).datetimepicker({
