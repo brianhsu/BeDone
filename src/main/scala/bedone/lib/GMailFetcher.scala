@@ -4,6 +4,7 @@ import org.bedone.model.Stuff
 import org.bedone.model.User
 import org.bedone.model.GMailPreference
 
+import net.liftweb.http.S
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import com.google.code.com.sun.mail.imap.IMAPFolder
@@ -58,9 +59,9 @@ class GMailFetcher(userID: Int, username: String, password: String)
         def convertException(error: Throwable) = {
             val errorMessage = error.getMessage
             val reason = if (errorMessage.contains("Invalid credentials")) {
-                "帳號密碼有誤，請檢查帳號密碼後重新設定"
+                S.?("Username or password is invalid, please check your setting.")
             } else if (errorMessage.contains("Your account is not enabled for IMAP use.")) {
-                "尚未在 GMail 中開啟 IMAP 選項"
+                S.?("GMail IMAP support is not enabled.")
             } else {
                 errorMessage
             }
@@ -106,14 +107,17 @@ class GMailFetcher(userID: Int, username: String, password: String)
 
     def decodeSubject(subject: String) = {
         subject.contains("=?") match {
-            case true  => MimeUtility.decodeText(subject.replaceAll("(?i)\\=\\?GB2312", "=?GBK"))
-            case false => new String(subject.getBytes("iso8859-1"), "utf-8")
+            case true  => 
+                MimeUtility.decodeText(subject.replaceAll("(?i)\\=\\?GB2312", "=?GBK"))
+            case false => 
+                new String(subject.getBytes("iso8859-1"), "utf-8")
         }
     }
+
     def createStuff(message: IMAPMessage) = 
     {
         val title = message.getHeader("subject").map(decodeSubject)
-                           .headOption.getOrElse("無標題")
+                           .headOption.getOrElse(S.?("No Title"))
 
         val gmailID = message.getGoogleMessageId
         val desc = getBodyText(message).map(_.take(10000))
@@ -150,7 +154,7 @@ class GMailFetcher(userID: Int, username: String, password: String)
                 val allParts = (0 until multipart.getCount).map(multipart.getBodyPart)
                 allParts.flatMap(getBodyText).headOption
 
-            case o => Some("無純文字版信件")
+            case o => Some("No plain-text message.")
         }
     }
 

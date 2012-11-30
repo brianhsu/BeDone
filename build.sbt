@@ -30,7 +30,8 @@ libraryDependencies ++= Seq(
     "mysql" % "mysql-connector-java" % "5.1.6",
     "org.eclipse.jetty" % "jetty-webapp" % "8.0.1.v20110908" % "container",
     "org.tautua.markdownpapers" % "markdownpapers-core" % "1.2.7",
-    "org.scribe" % "scribe" % "1.3.2"
+    "org.scribe" % "scribe" % "1.3.2",
+    "org.slf4j" % "slf4j-nop" % "1.6.6"
 )
 
 libraryDependencies ++= Seq(

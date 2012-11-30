@@ -1,6 +1,8 @@
 package org.bedone.model
 
 import net.liftweb.common.Box
+
+import net.liftweb.http.S
 import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
@@ -98,7 +100,8 @@ class Scheduled extends Record[Scheduled] with KeyedRecord[Int]
         {
             endTime.forall(x => x.getTime.getTime > startTime.is.getTime.getTime) match {
                 case true  => Nil
-                case false => new FieldError(this, Text("結束時間必須在開始時間後")) :: Nil
+                case false => 
+                    new FieldError(this, Text(S.?("Deadline must later than today."))) :: Nil
             }
         }
 
