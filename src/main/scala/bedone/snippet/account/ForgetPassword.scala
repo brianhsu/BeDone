@@ -33,10 +33,10 @@ class ForgetPassword extends JSImplicit
             case Full(user) => 
                 user.resetActivationCode(ActivationStatus.Reset)
                 user.saveTheRecord()
-                S.notice("已將重設密碼的的連結寄至您的信箱，請使用信內的連結重設密碼") 
+                S.notice(S.?("We've send you an EMail with a password reset link, please check your email inbox and follow the instruction in it."))
                 FadeOutAndRemove("forgetForm")
             case _ => 
-                S.error("抱歉，無法找到此 Email 的帳號")
+                S.error(S.?("Sorry, we can't find this email in our system."))
                 Noop
         }
 
@@ -44,6 +44,6 @@ class ForgetPassword extends JSImplicit
 
     def render = {
         "name=email" #> SHtml.text("", email = _) &
-        "type=submit" #> SHtml.ajaxSubmit("送出", process _)
+        "type=submit" #> SHtml.ajaxSubmit(S.?("Submit"), process _)
     }
 }

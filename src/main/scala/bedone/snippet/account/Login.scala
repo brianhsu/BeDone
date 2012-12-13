@@ -35,10 +35,10 @@ class Login
         } yield user
 
         authUser match {
-            case Full(user) if isRegister(user) => S.error("請先使用 EMail 認證你的帳號")
-            case Full(user) if isReset(user) => S.error("已將密碼重設郵件寄至您的 EMail，請檢查並重設密碼")
+            case Full(user) if isRegister(user) => S.error(S.?("Please activate your account first."))
+            case Full(user) if isReset(user) => S.error(S.?("We have send reset password mail to your email address, please check your email and reset your password first."))
             case Full(user) => user.login(S.redirectTo("/dashboard"))
-            case _          => S.error("帳號密碼錯誤")
+            case _          => S.error(S.?("Username / Password is incorrect."))
         }
     }
 
@@ -52,7 +52,7 @@ class Login
         case false =>
             "name=username" #> SHtml.text("", username = _) &
             "name=password" #> SHtml.password("", password = _) &
-            "type=submit" #> SHtml.submit("Sign in", login _)
+            "type=submit" #> SHtml.submit(S.?("Sign in"), login _)
     }
 
     def logout(eventData: String) = {
