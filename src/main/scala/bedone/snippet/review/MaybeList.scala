@@ -96,7 +96,7 @@ class MaybeList extends JSImplicit
         this.currentTopic = None
         this.currentProject = None
 
-        JqSetHtml("maybeCurrent", "全部") &
+        JqSetHtml("maybeCurrent", S.?("Show All")) &
         JqSetHtml("maybeList", maybeTs.flatMap(createMaybeRow)) &
         JsRaw("""$('#maybeShowAll').prop("disabled", true)""") &
         JsRaw("""$('#maybeCurrent').attr("class", "btn btn-inverse")""") &

@@ -38,7 +38,7 @@ class TopicTable extends Table with JSImplicit
 
     def deleteTopic(topic: Topic)() = {
         Topic.delete(topic)
-        S.notice("已刪除「%s」" format(topic.title.is))
+        S.notice(S.?("Topic '%s' is deleted.") format(topic.title.is))
         FadeOutAndRemove("topic" + topic.idField.is)
     }
 
@@ -63,7 +63,7 @@ class TopicTable extends Table with JSImplicit
         ".name [data-original-title]" #> topic.description.is &
         ".edit [onclick]" #> SHtml.onEvent(editTopic(topic)) &
         ".delete [onclick]" #> Confirm(
-            "確定刪除「%s」嗎？這個動作無法還原喲！" format(topic.title.is), 
+            S.?("Are you sure to delete topic '%s' permanently?") format(topic.title.is), 
             SHtml.ajaxInvoke(deleteTopic(topic))
         )
     }

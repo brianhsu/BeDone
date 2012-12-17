@@ -36,7 +36,7 @@ class ProjectTable extends Table with JSImplicit
 
     def deleteProject(project: Project)(): JsCmd = {
         Project.delete(project)
-        S.notice("已刪除「%s」" format(project.title.is))
+        S.notice(S.?("Project '%s' is deleted.") format(project.title.is))
         FadeOutAndRemove("project" + project.idField.is)
     }
 
@@ -60,7 +60,7 @@ class ProjectTable extends Table with JSImplicit
         ".reference *"  #> stripZero(references.size) &
         ".name [data-original-title]" #> project.description.is &
         ".delete [onclick]" #> Confirm(
-            "確定刪除「%s」嗎？這個動作無法還原喲！" format(project.title.is), 
+            S.?("Are you sure to delete project '%s' permanently?") format(project.title.is), 
             SHtml.ajaxInvoke(deleteProject(project))
         ) &
         ".edit [onclick]" #> SHtml.onEvent(editProject(project))
