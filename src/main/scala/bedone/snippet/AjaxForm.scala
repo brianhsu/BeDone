@@ -10,6 +10,7 @@ import net.liftweb.record.field._
 import net.liftweb.record.BaseField
 import net.liftweb.record.Record
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.SHtml.ElemAttr
 import net.liftweb.http.Templates
@@ -33,7 +34,7 @@ abstract class AjaxForm[T <: Record[T]] extends JSImplicit
     protected def fields: List[BaseField] = record.allFields.filter(_.name != "idField")
     protected def formID: Option[String] = None
 
-    private def template = Templates("templates-hidden" :: "ajaxForm" :: Nil)
+    private def template = Templates("templates-hidden" :: "misc" :: "ajaxForm" :: Nil)
 
     def resetForm: JsCmd = formID.map{ id => 
         JsRaw("""$('#%s').get(0).reset();""".format(id)).cmd
@@ -224,7 +225,7 @@ abstract class AjaxForm[T <: Record[T]] extends JSImplicit
         ".control-group *" #> (
             ".control-label *" #> title &
             ".help-inline [id]" #> messageID &
-            ".help-inline *" #> "使用逗號分隔，按下 Enter 確認" &
+            ".help-inline *" #> S.?("Separate by comma, hit Enter to confirm.") &
             "input" #> (
                 SHtml.textAjaxTest("", doNothing _, ajaxTest, "id" -> tagID) ++
                 <script type="text/javascript">{tagItJS}</script>

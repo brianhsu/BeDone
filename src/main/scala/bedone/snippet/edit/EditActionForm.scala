@@ -93,7 +93,7 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
 
     def onContextRemove(buttonID: String, context: Context) = {
         (currentContexts.size - 1)  match {
-            case 0 => Alert("至少需要一個 Context")
+            case 0 => Alert(S.?("Need at leaset one context."))
             case _ =>
                 currentContexts = currentContexts.filterNot(_ == context)
                 FadeOutAndRemove(buttonID)
@@ -124,7 +124,7 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
                 calendar.setTime(dateFormatter.parse(x))
                 Full(calendar)
             } catch {
-                case e: ParseException => Failure("日期格式錯誤")
+                case e: ParseException => Failure(S.?("Date / time format is incorrect."))
             }
         }
 
@@ -180,7 +180,7 @@ class EditActionForm(action: Action, postAction: Stuff => JsCmd) extends JSImpli
         "#actionProjectTags *" #> projectTags &
         "#actionCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("actionEdit")) &
         "#actionSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#actionSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#actionSave *" #> (if (stuff.isPersisted) S.?("Save") else S.?("Add"))
     }
 
     def toForm = {

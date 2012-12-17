@@ -1,5 +1,6 @@
 package org.bedone.model
 
+import net.liftweb.http.S
 import net.liftweb.util.FieldError
 import net.liftweb.record.BaseField
 
@@ -14,7 +15,9 @@ trait MyValidation
 
         isOK match {
             case true  => Nil
-            case false => List(FieldError(field, "只能使用英文字母、數字和底線"))
+            case false => List(
+                FieldError(field, S.?("Only alphanumeric characters and underscore allowed."))
+            )
         }
     }
 }

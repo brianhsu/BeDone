@@ -4,6 +4,7 @@ import org.bedone.model._
 
 import net.liftmodules.combobox._
 
+import net.liftweb.http.S
 import net.liftweb.http.js.JE.Str
 import net.liftweb.http.js.JsExp
 import net.liftweb.http.js.JsCmds._
@@ -11,7 +12,9 @@ import net.liftweb.http.js.JsCmd
 
 object ContactComboBox {
     val defaultOptions = List(
-        "placeholder" -> Str("""<i class="icon-user"></i> 請選擇負責人"""),
+        "placeholder" -> Str(
+            """<i class="icon-user"></i> """ + S.?("Who should work on this?")
+        ),
         "width" -> Str("500px")
     )
 }
@@ -52,6 +55,5 @@ abstract class ContactComboBox(options: List[(String, JsExp)] = ContactComboBox.
         val newContact = Contact.createRecord.name(name).userID(currentUser.idField.is)
         setContact(Some(newContact))
     }
-
 }
 

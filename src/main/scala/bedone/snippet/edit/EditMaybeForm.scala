@@ -101,7 +101,7 @@ class EditMaybeForm(maybeT: MaybeT, postAction: Stuff => JsCmd) extends JSImplic
                 calendar.setTime(dateFormatter.parse(x))
                 Full(calendar)
             } catch {
-                case e: ParseException => Failure("日期格式錯誤")
+                case e: ParseException => Failure(S.?("Date / time format is incorrect."))
             }
         }
 
@@ -165,7 +165,7 @@ class EditMaybeForm(maybeT: MaybeT, postAction: Stuff => JsCmd) extends JSImplic
         "#maybeTicklerDate"   #> ("input" #> ticklerInput) &
         "#maybeCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("maybeEdit")) &
         "#maybeSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#maybeSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#maybeSave *" #> (if (stuff.isPersisted) S.?("儲存") else S.?("新增"))
     }
 
     def toForm = {

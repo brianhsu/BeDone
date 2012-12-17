@@ -2,6 +2,8 @@ package org.bedone.model
 
 import net.liftweb.common.Box
 
+import net.liftweb.http.S
+
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Helpers.today
 import net.liftweb.util.FieldError
@@ -93,7 +95,7 @@ class Maybe extends Record[Maybe] with KeyedRecord[Int]
     val tickler = new OptionalDateTimeField(this) {
 
         def afterToday(calendar: Option[Calendar]): List[FieldError] = {
-            val error = FieldError(this, "提醒時間要比今天晚")
+            val error = FieldError(this, S.?("Tickler must later than today."))
             val tomorrow = ((new DateMidnight) plus (1 day)).toDate
 
             calendar.filter(_.getTime.before(tomorrow)).map(x => error).toList

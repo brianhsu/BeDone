@@ -47,7 +47,7 @@ class SignupDialog extends AjaxForm[User]
 
          isPasswordConfirmed match {
             case true  => removeFieldError(fieldID)
-            case false => showFieldError(fieldID, Text("密碼不一致"))
+            case false => showFieldError(fieldID, Text(S.?("Two passwords are not identical")))
         }
     }
 
@@ -63,7 +63,7 @@ class SignupDialog extends AjaxForm[User]
 
         ".control-group [id]" #> fieldID &
         ".control-group *" #> (
-            ".control-label *" #> "Confirm Password" &
+            ".control-label *" #> S.?("Confirm Password") &
             ".help-inline [id]" #> messageID &
             "input" #> SHtml.textAjaxTest("", doNothing _, ajaxTest _, "type" -> "password")
         )
@@ -75,8 +75,8 @@ class SignupDialog extends AjaxForm[User]
     def render = {
         ".modal-body *" #> this.toForm &
         ".close" #> SHtml.ajaxButton("×", reInitForm _) &
-        ".close-link" #> SHtml.a(reInitForm _, Text("取消"), "href" -> "javascript:void(0)") &
-        "#signupButton" #> SHtml.ajaxButton(Text("註冊"), signup _)
+        ".close-link" #> SHtml.a(reInitForm _, Text(S.?("Cancel")), "href" -> "javascript:void(0)") &
+        "#signupButton" #> SHtml.ajaxButton(Text(S.?("Sign up")), signup _)
     }
 }
 

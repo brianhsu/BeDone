@@ -5,21 +5,21 @@
     <title>BeDone</title>
   </head>
   <body class="lift:content_id=main">
-    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+    <div id="main" data-lift="lift:surround?with=misc/fluid;at=contentArea">
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
       <div data-lift="Preference">
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#basic" data-toggle="tab">基本設定</a></li>
-          <li><a href="#gmail" data-toggle="tab">GMail 收件匣</a></li>
+          <li class="active"><a href="#basic" data-toggle="tab">Basic</a></li>
+          <li><a href="#gmail" data-toggle="tab">GMail Inbox</a></li>
         </ul>
         <div class="tab-content" style="margin-left: 0.5em; margin-right: 0.5em">
           <div class="tab-pane active" id="basic">
             <div class="pull-right" style="text-align: center">
               <img id="avatar" src="http://www.gravatar.com/avatar/0?d=mm" />
               <div style="margin-top:0.5em">
-                <a href="https://en.gravatar.com/emails/">更換大頭貼</a>
+                <a href="https://en.gravatar.com/emails/">Change Avatar</a>
               </div>
             </div>
           </div>
@@ -27,27 +27,27 @@
             <form data-lift="lift:Form.ajax?class=form-horizontal">
 
               <div class="btn-group pull-right">
-                <input type="reset" class="btn btn-inverse">重設</input>
-                <input id="saveGMail" class="btn btn-primary">儲存設定</input>
+                <input type="reset" class="btn btn-inverse">Reset</input>
+                <input id="saveGMail" class="btn btn-primary">Save</input>
               </div>
 
               <div class="control-group">
-                <label class="control-label" for="gmailAccount">GMail 狀態：</label>
-                <div data-lift="lift:LazyLoad?template=gmailLoad">
+                <label class="control-label" for="gmailAccount">GMail Status:</label>
+                <div data-lift="lift:LazyLoad?template=misc/gmailLoad">
                   <div class="controls" data-lift="GMailStatus">
-                    <span class="label" id="gmailStatus">尚未驗證</span>
+                    <span class="label" id="gmailStatus">Not tested.</span>
                   </div>
                 </div>
               </div>
 
               <div class="control-group">
-                <label class="control-label" for="gmailAccount">GMail 信箱：</label>
+                <label class="control-label" for="gmailAccount">GMail Address：</label>
                 <div class="controls">
                   <input type="text" id="gmailAccount"/>
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label" for="gmailPassword">GMail 密碼：</label>
+                <label class="control-label" for="gmailPassword">GMail Password:</label>
                 <div class="controls">
                   <input type="password" id="gmailPassword"/>
                 </div>
@@ -55,7 +55,7 @@
               <div style="margin-left:3em">
                 <label class="checkbox">
                   <input type="checkbox" style="margin-right: 0.5em" id="usingGMail"/> 
-                  將 GMail 收到的信件放入 BeDone 中處理
+                  Link GMail's inbox to BeDon.
                 </label>
               </div>
             </form>

@@ -21,8 +21,8 @@ class ConfirmEMail
 {
     val user = {
         for (
-            username <- S.param("username") ~> "無使用者名稱";
-            code <- S.param("code") ~> "無驗證碼";
+            username <- S.param("username") ~> S.?("Username is required.");
+            code <- S.param("code") ~> S.?("Activation code is required.");
             user <- User.findByUsername(username) if user.activationCode.is == Some(code) 
         ) yield user
     }
@@ -33,10 +33,10 @@ class ConfirmEMail
             case Full(user) => {
                 user.activate()
                 println(user.saveTheRecord())
-                S.notice("已啟用您的帳號，您可以使用您的帳號登入 BeDone 囉！")
+                S.notice(S.?("This account is activated. You could login to BeDone with your username and password now!"))
             }
-            case Empty => S.error("驗證碼錯誤，請再次檢查您的驗證網址")
-            case Failure(_, _, msg) => S.error("無法驗證此帳號：" + msg)
+            case Empty => S.error(S.?("Activation code is incorrect, please check your activation URL again."))
+            case Failure(_, _, msg) => S.error(S.?("Cannot activate this account:") + msg)
         }
 
         PassThru

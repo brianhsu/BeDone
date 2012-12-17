@@ -5,20 +5,20 @@
     <title>BeDone</title>
   </head>
   <body class="lift:content_id=main">
-    <div id="main" data-lift="lift:surround?with=fluid;at=contentArea">
+    <div id="main" data-lift="lift:surround?with=misc/fluid;at=contentArea">
       <div data-lift="lift:withParam?name=sideBarArea">
         <div data-lift="lift:embed?what=menu"></div>
       </div>
 
       <div data-lift="Process?eager_eval=true">
-        <div id="noStuffAlert" class="alert alert-success"><h3>耶！沒有雜事需要整理耶！</h3></div>
+        <div id="noStuffAlert" class="alert alert-success"><h3>Great! There is no stuffs to distract you.</h3></div>
         <div id="processEdit" class="editForm">
           <div>
             <fieldset id="processTitle" class="inline control-group">
               <div class="input-prepend" style="margin-left: 0.5em">
-                <span title="標題" class="add-on">
+                <span title="Title" class="add-on">
                   <i class="icon-th-list"></i>
-                </span><input class="input-xxlarge" type="text" placeholder="標題" />
+                </span><input class="input-xxlarge" type="text" placeholder="Title" />
                 <span id="processTitle_msg" class="help-inline"></span>
               </div>
             </fieldset>
@@ -44,12 +44,12 @@
         </div>
         <div class="dialog" id="isThisActionable">
           <div class="messageBox">
-            <div class="message">請問是否可以針對這件事採取具體的行動？</div>
+            <div class="message">Could you take some actions about this TODO?</div>
             <div>
-              <button class="btn btn-info pull-left" disabled="disabled">上一步</button>
+              <button class="btn btn-info pull-left" disabled="disabled">Previous</button>
               <div class="answers">
-                <button class="btn btn-inverse" onclick="showDialog('itIsNotActionable')">沒辦法</button>
-                <button class="btn btn-primary" onclick="showDialog('whatIsNextAction')">可以</button>
+                <button class="btn btn-inverse" onclick="showDialog('itIsNotActionable')">No</button>
+                <button class="btn btn-primary" onclick="showDialog('whatIsNextAction')">Yes</button>
               </div>
             </div>
           </div>
@@ -57,13 +57,13 @@
 
         <div class="dialog hide" id="itIsNotActionable">
           <div class="messageBox">
-            <div class="message">那你覺得這件事情是……？</div>
+            <div class="message">What kind of stuff do you think it is?</div>
             <div>
-              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-danger" id="isTrash">垃圾</button>
-                <button class="btn btn-inverse" onclick="showDialog('itIsReference')">參考資料</button>
-                <button class="btn btn-primary" onclick="showDialog('itIsMaybe')">也許有一天……</button>
+                <button class="btn btn-danger" id="isTrash">Trash</button>
+                <button class="btn btn-inverse" onclick="showDialog('itIsReference')">Reference</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybe')">Maybe / Someday……</button>
               </div>
             </div>
           </div>
@@ -72,14 +72,14 @@
         <div class="dialog hide" id="itIsReference">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:1em">這份參考資料屬於哪個專案或主題嗎？</div>
+              <div style="margin-bottom:1em">Does it belongs to any topic or project?</div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
             </div>
             <div>
-              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveReference">搞定！</button>
+                <button class="btn btn-success" id="saveReference">Done!</button>
               </div>
             </div>
           </div>
@@ -88,15 +88,15 @@
         <div class="dialog hide" id="itIsMaybe">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:1em">這件事是屬於某個專案或主題嗎？</div>
+              <div style="margin-bottom:1em">Does it belongs to any topic or project?</div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
             </div>
             <div>
-              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-primary" onclick="showDialog('itIsMaybeTickler')">記得提醒我……</button>
-                <button class="btn btn-success" id="saveMaybe">搞定！</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybeTickler')">Remind me at...</button>
+                <button class="btn btn-success" id="saveMaybe">Done!</button>
               </div>
             </div>
           </div>
@@ -105,17 +105,17 @@
         <div class="dialog hide" id="itIsMaybeTickler">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:1em">請問要在什麼時候把這件事放回收件匣呢？</div>
-              <div>在這個一天提醒我：<input type="text" id="ticklerDate" />
+              <div style="margin-bottom:1em">When should I put it back to your BeDone inbox?</div>
+              <div>Remind me at <input type="text" id="ticklerDate" />
                 <span class="control-group error hide" id="tickler_error">
-                  <span class="help-inline" id="tickler_error_msg">提醒時間要比今天晚</span>
+                  <span class="help-inline" id="tickler_error_msg">Reminder must later than today.</span>
                 </span>
               </div>
             </div>
             <div>
-              <button onclick="showDialog('itIsMaybe')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('itIsMaybe')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveMaybeTickler">搞定！</button>
+                <button class="btn btn-success" id="saveMaybeTickler">Done!</button>
               </div>
             </div>
           </div>
@@ -124,22 +124,23 @@
         <div class="dialog hide" id="whatIsNextAction">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">要解決這件事，下一步應該要：<input name="nextActionTitle" class="input-xxlarge" id="nextActionTitle" type="text" />
+              <div style="margin-bottom:0.5em">To solve this, I should do <input name="nextActionTitle" class="input-xxlarge" id="nextActionTitle" type="text" /> next.
               </div>
               <div data-lift="lift:embed?what=process/projectInput"></div>
               <div data-lift="lift:embed?what=process/topicInput"></div>
-              <div class="input-prepend input-append">
-                <span class="add-on">完成期限：</span><input class="input-large" id="deadline" type="text" />
-                <span class="control-group error hide" id="deadline_error">
-                  <span class="help-inline" id="deadline_error_msg">完成期限要比今天晚</span>
-                </span>
-
+              <div class="input-prepend input-append pull-left">
+                <span class="add-on">Deadline</span><input class="input-large" id="deadline" type="text" />
               </div>
+              <span class="control-group error hide" id="deadline_error">
+                <span class="help-inline" id="deadline_error_msg" style="margin-top:3px">Deadline must later than today.</span>
+              </span>
+              <div class="clearfix" />
+
             </div>
             <div>
-              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-primary" id="goToActionType" onclick="showDialog('isThisTwoMiniuteWork')">下一步</button>
+                <button class="btn btn-primary" id="goToActionType" onclick="showDialog('isThisTwoMiniuteWork')">Next</button>
               </div>
             </div>
           </div>
@@ -148,13 +149,13 @@
         <div class="dialog hide" id="isThisTwoMiniuteWork">
           <div class="messageBox">
             <div class="message">
-              <div>這件事可以在兩分鐘之內完成嗎？</div>
+              <div>Could this be done in less than two minutes?</div>
             </div>
             <div>
-              <button onclick="showDialog('whatIsNextAction')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('whatIsNextAction')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-inverse" onclick="showDialog('whatActionType')">不行</button>
-                <button class="btn btn-primary" onclick="showDialog('itIsTwoMiniuteWork')">可以</button>
+                <button class="btn btn-inverse" onclick="showDialog('whatActionType')">No</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsTwoMiniuteWork')">Yes</button>
               </div>
             </div>
           </div>
@@ -163,12 +164,12 @@
         <div class="dialog hide" id="itIsTwoMiniuteWork">
           <div class="messageBox">
             <div class="message">
-              <div>那還等什麼，現在就去把它解決掉唄！</div>
+              <div>Then don't wait, do it right now!</div>
             </div>
             <div>
-              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="markAsDone">搞定！</button>
+                <button class="btn btn-success" id="markAsDone">Done!</button>
               </div>
             </div>
           </div>
@@ -177,14 +178,14 @@
         <div class="dialog hide" id="whatActionType">
           <div class="messageBox">
             <div class="message">
-              <div>我覺得這件事情應該……</div>
+              <div>I think this TODO should...</div>
             </div>
             <div>
-              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-primary" onclick="showDialog('isDelegated')">交給別人做</button>
-                <button class="btn btn-primary" onclick="showDialog('isScheduled')">放到行事曆上</button>
-                <button class="btn btn-primary" onclick="showDialog('isNextAction')">盡快自己完成</button>
+                <button class="btn btn-primary" onclick="showDialog('isDelegated')">Delegated to others</button>
+                <button class="btn btn-primary" onclick="showDialog('isScheduled')">Put it on calendar</button>
+                <button class="btn btn-primary" onclick="showDialog('isNextAction')">Do it myself ASAP</button>
               </div>
             </div>
           </div>
@@ -193,13 +194,13 @@
         <div class="dialog hide" id="isDelegated">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">請問這件事要交由誰來負責呢？</div>
+              <div style="margin-bottom:0.5em">Who should work on this TODO?</div>
               <div id="contactCombo"></div>
             </div>
             <div>
-              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveDelegated" disabled="disabled">搞定！</button>
+                <button class="btn btn-success" id="saveDelegated" disabled="disabled">Done!</button>
               </div>
             </div>
           </div>
@@ -208,15 +209,15 @@
         <div class="dialog hide" id="isScheduled">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">請問這件事情在行事曆上要如何記載？</div>
-              <div class="inline" style="margin-right:1em">開始時間：<input id="startDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">結束時間：<input id="endDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">地點：<input id="location" type="text"/></div>
+              <div style="margin-bottom:0.5em">What's the date and time?</div>
+              <div class="inline" style="margin-right:1em">Start Time:<input id="startDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">End Time:<input id="endDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">Location:<input id="location" type="text"/></div>
             </div>
             <div>
-              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveScheduled" disabled="disabled">搞定！</button>
+                <button class="btn btn-success" id="saveScheduled" disabled="disabled">Done!</button>
               </div>
             </div>
           </div>
@@ -225,13 +226,13 @@
         <div class="dialog hide" id="isNextAction">
           <div class="messageBox">
             <div class="message">
-              <div style="margin-bottom:0.5em">請問這件事情適合在哪種情境下執行呢？</div>
+              <div style="margin-bottom:0.5em">What context is best to solve this TODO?</div>
               <div data-lift="lift:embed?what=process/contextInput"></div>
             </div>
             <div>
-              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">上一步</button>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
               <div class="answers">
-                <button class="btn btn-success" id="saveNextAction">搞定！</button>
+                <button class="btn btn-success" id="saveNextAction">Done!</button>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ package org.bedone.model
 import net.liftweb.common.Box
 import net.liftweb.common.Full
 
+import net.liftweb.http.S
 import net.liftweb.util.Helpers.tryo
 import net.liftweb.util.Helpers.today
 
@@ -151,22 +152,23 @@ class Stuff extends Record[Stuff] with KeyedRecord[Int]
     val isStared = new BooleanField(this, false)
 
     val title = new StringField(this, "") {
-        override def displayName = "標題"
-        override def validations = valMinLen(1, "此為必填欄位")_ :: super.validations
+        override def displayName = S.?("Title")
+        override def validations = 
+            valMinLen(1, S.?("This field is required."))_ :: super.validations
     }
     val description = new TextareaField(this, 10000) {
-        override def displayName = "描述"
+        override def displayName = S.?("Description")
     }
 
     val deadline = new OptionalDateTimeField(this) {
 
         def afterToday(calendar: Option[Calendar]): List[FieldError] = {
-            val error = FieldError(this, "完成期限要比今天晚")
+            val error = FieldError(this, S.?("Deadline must later than today."))
             calendar.filter(_.before(today)).map(x => error).toList
         }
 
-        override def displayName = "完成期限"
-        override def helpAsHtml = Full(scala.xml.Text("格式為 yyyy-MM-dd"))
+        override def displayName = S.?("Deadline")
+        override def helpAsHtml = Full(Text(S.?("Format should be yyyy-MM-dd.")))
         override def validations = afterToday _ :: super.validations
     }
 

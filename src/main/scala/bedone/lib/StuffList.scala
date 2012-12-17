@@ -14,6 +14,7 @@ import net.liftweb.util.Helpers._
 import net.liftweb.util.Schedule
 import net.liftweb.util.CssSel
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -157,7 +158,7 @@ trait StuffList extends JSImplicit
         val newTable = createStuffTable(paged(1))
 
         JqSetHtml("inboxList", newTable) &
-        JqSetHtml("inboxCurrent", "全部") &
+        JqSetHtml("inboxCurrent", S.?("All")) &
         JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
         JsRaw("""$('#inboxShowAll').prop("disabled", true)""") &
         JsRaw("""$('#inboxCurrent').attr("class", "btn btn-inverse")""")
@@ -231,7 +232,7 @@ trait StuffList extends JSImplicit
     {
         val paging = getPagedStuff
 
-        "#inboxShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#inboxShowAll" #> SHtml.ajaxButton(S.?("Show All"), showAllStuff _) &
         "#inboxAdd [onclick]" #> SHtml.onEvent(s => showInsertForm) &
         "#inboxRapidStuff" #> SHtml.text("", rapidTitle = _) &
         "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _) &

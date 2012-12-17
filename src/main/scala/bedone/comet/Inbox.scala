@@ -23,7 +23,7 @@ class GMailListener extends LiftActor
     
     def messageHandler = {
         case FetchGMail(user, comet) => 
-            println("FetchMail:(%s, %s)" format(comet.hashCode, user))
+            println("Send FetchMail request:(%s, %s)" format(comet.hashCode, user))
             comet ! NewStuffs(getMails(user))
             Schedule.schedule(this, FetchGMail(user, comet), 5 minutes)
     }
@@ -40,10 +40,10 @@ class Inbox extends CometActor with StuffList
 
     override def lowPriority = {
         case NewStuffs(mails) => 
-            println("new mail of %s: %s".format(this, mails))
+            println("Got new mail of %s: %s".format(this, mails))
             partialUpdate(AppendHtml("inboxList", mails.flatMap(createStuffRow)))
     }
 
-    println("send init mail fetcher request")
+    println("Send init mail fetcher request...")
     gmailListener ! FetchGMail(currentUser, this)
 }

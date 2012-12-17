@@ -68,6 +68,8 @@ class Boot
             encoder = _.idField.is.toString
         ) / "topic" / *
 
+        def needLogin = If(User.isLoggedIn _, S.?("Please login first."))
+
         SiteMap(
             Menu.i("Index") / "index",
 
@@ -75,24 +77,24 @@ class Boot
             (Menu.i("ForgetPassword") / "account" / "forgetPassword") >> Hidden,
             (Menu.i("ResetPassword") / "account" / "resetPassword") >> Hidden,
 
-            (Menu.i("Preference") / "preference") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Preference") / "preference") >> needLogin,
 
-            (Menu.i("Dashboard") / "dashboard") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Dashboard") / "dashboard") >> needLogin,
 
-            (Menu.i("Inbox") / "todo" / "inbox") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Action") / "todo" / "nextAction") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Delegated") / "todo" / "delegated") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Scheduled") / "todo" / "scheduled") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Process") / "todo" / "process") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Inbox") / "todo" / "inbox")         >> needLogin,
+            (Menu.i("Action") / "todo" / "nextAction")   >> needLogin,
+            (Menu.i("Delegated") / "todo" / "delegated") >> needLogin,
+            (Menu.i("Scheduled") / "todo" / "scheduled") >> needLogin,
+            (Menu.i("Process") / "todo" / "process")     >> needLogin,
 
-            (Menu.i("Project") / "review" / "project") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Topic") / "review" / "topic") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Maybe") / "review" / "maybe") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Project") / "review" / "project")  >> needLogin,
+            (Menu.i("Topic") / "review" / "topic")      >> needLogin,
+            (Menu.i("Maybe") / "review" / "maybe")      >> needLogin,
 
-            (Menu.i("Trash") / "other" / "trash") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Reference") / "other" / "reference") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Contacts") / "contact" / "index") >> If(User.isLoggedIn _, "請先登入"),
-            (Menu.i("Import Contacts") / "contact" / "import") >> If(User.isLoggedIn _, "請先登入"),
+            (Menu.i("Trash") / "other" / "trash")         >> needLogin,
+            (Menu.i("Reference") / "other" / "reference") >> needLogin,
+            (Menu.i("Contacts") / "contact" / "index")    >> needLogin,
+            (Menu.i("Import Contacts") / "contact" / "import") >> needLogin,
             (contactDetail >> Template(() => Templates("contact" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (projectDetail >> Template(() => Templates("project" :: "detail" :: Nil) openOr NodeSeq.Empty)),
             (topicDetail >> Template(() => Templates("topic" :: "detail" :: Nil) openOr NodeSeq.Empty))
@@ -106,7 +108,7 @@ class Boot
         for (username <- Props.get("mail.user") if isAuth;
              password <- Props.get("mail.password"))
         {
-            println("init mail password")
+            println("Set SMTP login password...")
 
             Mailer.authenticator = Full(new Authenticator() {
                 override def getPasswordAuthentication = {

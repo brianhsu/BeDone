@@ -1,0 +1,40 @@
+<div data-lift="NextAction">
+
+  <div class="btn-group" style="float:right">
+    <button class="btn btn-inverse" id="actionCurrent" disabled="disabled">全部</button>
+    <button class="btn btn-inverse" id="actionShowAll" disabled="disabled">顯示全部</button>
+  </div>
+
+  <div class="btn-group" style="float:right; margin-right:5px">
+    <button class="btn btn-danger" id="deleteContext" style="display: none">刪除此情境</button>
+  </div>
+
+  <ul class="nav nav-tabs" id="actionTabFolder">
+    <li class="actionTab active" id="allActionTab"><a href="#">全部</a></li>
+    <li class="actionTab contextTab"><a href="#">@ Home</a></li>
+  </ul>
+  <div>
+    <div id="actionEditHolder"></div>
+    <div style="margin-bottom:2em">
+      <h3 style="display: inline">儘快去做</h3>
+      <div class="pull-right">
+        <div class="pagination" id="actionPageSelector" style="display: inline"></div>
+      </div>
+      <div class="clearfix"></div>
+      <div id="actionNotDone">
+        <div class="row"></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="display: inline">已完成</h3>
+      <div class="pull-right">
+        <div class="pagination" id="donePageSelector" style="display: inline"></div>
+      </div>
+      <div class="clearfix"></div>
+      <div id="actionIsDone">
+        <div class="row"></div>
+      </div>
+    </div>
+  </div>
+</div>
+

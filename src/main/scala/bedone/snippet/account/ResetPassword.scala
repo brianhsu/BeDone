@@ -26,17 +26,17 @@ class ResetPassword extends JSImplicit
 
     val userBox = {
         for (
-            username <- S.param("username") ~> "無使用者名稱";
-            code <- S.param("code") ~> "無驗證碼";
+            username <- S.param("username") ~> S.?("Username is required.");
+            code <- S.param("code") ~> S.?("Verification code is required.:");
             user <- User.findByUsername(username) if user.activationCode.is == Some(code) 
         ) yield user
     }
 
     def process(): JsCmd = {
         if (newPassword.length < 7) {
-            S.error("密碼至少要七個字元")
+            S.error(S.?("Password need at least 7 characters"))
         } else if (newPassword != confirmPassword) {
-            S.error("新密碼和確認密碼不符")
+            S.error(S.?("Two passwords are not identical"))
         } else {
 
             userBox.foreach { user =>
@@ -45,7 +45,7 @@ class ResetPassword extends JSImplicit
                 user.saveTheRecord()
             }
 
-            S.notice("已更改密碼，請使用新密碼登入")
+            S.notice(S.?("Your password is changed successfully, please login using your new password."))
             FadeOutAndRemove("resetForm")
         }
     }
@@ -53,7 +53,7 @@ class ResetPassword extends JSImplicit
     def cssBinding = {
         "#newPassword" #> SHtml.password("", newPassword = _) &
         "#confirmPassword" #> SHtml.password("", confirmPassword = _) &
-        "type=submit" #> SHtml.ajaxSubmit("更改密碼", process _)
+        "type=submit" #> SHtml.ajaxSubmit(S.?("Change Password"), process _)
     }
 
     def render = userBox match {
@@ -61,7 +61,7 @@ class ResetPassword extends JSImplicit
         case _ => 
             S.redirectTo(
                 "/forgetPassword",
-                () => S.error("驗證碼錯誤，請再次檢查您的驗證網址")
+                () => S.error(S.?("Verification code is incorrect, please check your URL again."))
             )
     }
 

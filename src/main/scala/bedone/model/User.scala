@@ -64,14 +64,14 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
         def alreadyTaken(username: String) = {
             User.findByUsername(username).isDefined match {
-                case true  => List(FieldError(this, "已經有人註冊了這個使用者名稱"))
+                case true  => List(FieldError(this, S.?("This username is already taken.")))
                 case false => Nil
             }
         }
 
-        override def displayName = "Username"
+        override def displayName = S.?("Username")
         override def validations = 
-            valMinLen(1, "此為必填欄位") _ :: isAlphaNumeric(this)_ ::
+            valMinLen(1, S.?("This field is required.")) _ :: isAlphaNumeric(this)_ ::
             alreadyTaken _ :: super.validations
     }
 
@@ -79,18 +79,18 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
         def alreadyTaken(email: String) = {
             User.findByEmail(email).isDefined match {
-                case true  => List(FieldError(this, "已經有人註冊過這個電子郵件了"))
+                case true  => List(FieldError(this, S.?("This EMail is already registered.")))
                 case false => Nil
             }
         }
 
-        override def displayName = "EMail"
+        override def displayName = S.?("EMail")
         override def validations = alreadyTaken _ :: super.validations
     }
 
     val password = new PasswordField(this) {
-        override def displayName = "Password"
-        override def helpAsHtml = Full(Text("至少需要七個字元"))
+        override def displayName = S.?("Password")
+        override def helpAsHtml = Full(Text(S.?("Password need at least 7 characters")))
     }
 
     val activationStatus = new EnumField(this, ActivationStatus, ActivationStatus.Register)
@@ -114,38 +114,58 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
 
     def sendActivationCode()
     {
-        val confirmURL = "%s/account/confirmEMail?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
-        val subject = Subject("[BeDone] 帳號註冊確認信")
-        val body = PlainMailBodyType("""
-            |%s 您好，
+        val subject = Subject(S.?("[BeDone] Sign-up confirmation"))
+
+        val confirmURL = {
+            "%s/account/confirmEMail?username=%s&code=%s".format(
+                S.hostAndPath, username.is, activationCode.is.getOrElse("")
+            )
+        }
+
+        val message = S.loc("ConfirmEMailBody").map(_.text).openOr("""
+            |Hello %s,
             |
-            |感謝您在 BeDone 上註冊帳號，請使用下列的網址正式啟用：
+            |Thanks for your registeration, please use the following URL
+            |link to active your BeDone account:
             |
             |%s
             |
-            |若您從未在 BeDone 上註冊過帳號，請直接勿略此信即可。
+            |If you never sing-up on BeDone, you could simply ignore this
+            |message.
             |
-            |謝謝！祝您使用愉快！
+            |Tanks, have a nice day!
         """.format(username.is, confirmURL).stripMargin)
+
+        val body = PlainMailBodyType(message)
 
         Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
     }
 
     def sendResetPassword()
     {
-        val confirmURL = "%s/account/resetPassword?username=%s&code=%s".format(S.hostAndPath, username.is, activationCode.is.getOrElse(""))
-        val subject = Subject("[BeDone] 重設密碼連結")
-        val body = PlainMailBodyType("""
-            |%s 您好，
+        val subject = Subject(S.?("[BeDone] Password reset URL"))
+
+        val confirmURL = {
+            "%s/account/resetPassword?username=%s&code=%s".format(
+                S.hostAndPath, username.is, activationCode.is.getOrElse("")
+            )
+        }
+
+        val message = S.loc("ResetPasswordEMailBody").map(_.text).openOr("""
+            |Hello %s,
             |
-            |聽說您忘記自己的密碼了，您可以用以下的連結重新設定密碼：
+            |Lost your password? Don't worry, you could use the following link
+            |to reset your BeDone password:
             |
             |%s
             |
-            |若您從未在 BeDone 上註冊過帳號，請直接勿略此信即可。
+            |If you never sing-up on BeDone, you could simply ignore this
+            |message.
             |
-            |謝謝！祝您使用愉快！
+            |Tanks, have a nice day!
         """.format(username.is, confirmURL).stripMargin)
+
+        val body = PlainMailBodyType(message)
 
         Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
     }
