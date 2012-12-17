@@ -140,7 +140,7 @@ class EditDelegatedForm(user: User, delegated: Delegated,
         "#delegateContactCombo" #> contactCombobox.comboBox &
         "#delegateCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("delegateEdit")) &
         "#delegateSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#delegateSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#delegateSave *" #> (if (stuff.isPersisted) S.?("儲存") else S.?("新增"))
     }
 
     def toForm = {

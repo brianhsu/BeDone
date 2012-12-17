@@ -102,7 +102,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
                 calendar.setTime(dateTimeFormatter.parse(x))
                 Full(calendar)
             } catch {
-                case e: ParseException => Failure("日期格式錯誤")
+                case e: ParseException => Failure(S.?("Date / time format is incorrect."))
             }
         }
 
@@ -118,7 +118,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
 
     def setStartTime(startTimeStr: String): JsCmd = 
     {
-        val startTime = dateTimeFromStr(startTimeStr, Failure("此為必填欄位"))
+        val startTime = dateTimeFromStr(startTimeStr, Failure(S.?("This field is required.")))
 
         scheduled.startTime.setBox(startTime)
 
@@ -188,7 +188,7 @@ class EditScheduledForm(scheduled: Scheduled, postAction: Stuff => JsCmd) extend
         "#scheduledLocation" #> ("input" #> locationInput) &
         "#scheduledCancel [onclick]" #> SHtml.onEvent(x => FadeOutAndRemove("scheduledEdit")) &
         "#scheduledSave [onclick]" #> SHtml.onEvent(x => save()) &
-        "#scheduledSave *" #> (if (stuff.isPersisted) "儲存" else "新增")
+        "#scheduledSave *" #> (if (stuff.isPersisted) S.?("儲存") else S.?("新增"))
     }
 
     def toForm = {
