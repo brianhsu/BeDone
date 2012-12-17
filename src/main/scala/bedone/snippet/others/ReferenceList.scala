@@ -91,13 +91,13 @@ class ReferenceList extends JSImplicit
             case false => "visibility:visible"
         }
 
-        ".edit [onclick]" #> SHtml.onEvent(s => showEditForm(stuff)) &
+        ".edit [onclick]"    #> SHtml.onEvent(s => showEditForm(stuff)) &
         ".reinbox [onclick]" #> SHtml.onEvent(s => reInbox) &
-        ".remove [onclick]" #> SHtml.onEvent(s => markAsTrash) &
-        ".star [onclick]" #> SHtml.onEvent(s => toogleStar) &
-        ".star" #> ("i [class]" #> starClass) &
+        ".remove [onclick]"  #> SHtml.onEvent(s => markAsTrash) &
+        ".star [onclick]"    #> SHtml.onEvent(s => toogleStar) &
+        ".star"              #> ("i [class]" #> starClass) &
         ".showDesc [data-target]" #> ("#referenceDesc" + stuff.idField) &
-        ".showDesc [style+]" #> descIconVisibility
+        ".showDesc [style+]"      #> descIconVisibility
     }
 
     def shouldDisplay(stuff: Stuff) = 
@@ -163,7 +163,7 @@ class ReferenceList extends JSImplicit
         this.currentTopic = None
         this.currentProject = None
 
-        JqSetHtml("referenceCurrent", "全部") &
+        JqSetHtml("referenceCurrent", S.?("All")) &
         JqSetHtml("referenceList", references.flatMap(createStuffRow)) &
         JsRaw("""$('#referenceShowAll').prop("disabled", true)""") &
         JsRaw("""$('#referenceCurrent').attr("class", "btn btn-inverse")""") &

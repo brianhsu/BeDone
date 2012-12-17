@@ -75,7 +75,7 @@ class ContactTable extends JSImplicit
     def deleteContact(contact: Contact) = {
         contact.isTrash(true).saveTheRecord()
 
-        S.notice("已將「%s」放入垃圾桶" format(contact.name.is))
+        S.notice(S.?("%s is in recycle bin now.") format (contact.name.is))
         FadeOutAndRemove("contact" + contact.idField.is)
     }
 

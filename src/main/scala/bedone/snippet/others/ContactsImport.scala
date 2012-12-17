@@ -50,7 +50,7 @@ class ContactsImport extends JSImplicit
             contact.userID(currentUser.idField.is).isTrash(false).saveTheRecord()
         }
 
-        S.redirectTo("/contact/", () => S.notice("已匯入 GMail 通訊錄"))
+        S.redirectTo("/contact/", () => S.notice(S.?("GMail contacts imported successfully.")))
     }
 
     def toogleAll(isChecked: Boolean): JsCmd = {

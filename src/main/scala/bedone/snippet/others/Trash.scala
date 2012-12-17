@@ -72,7 +72,7 @@ class Trash extends  JSImplicit
         currentProject = None
 
         updateList &
-        JqSetHtml("trashCurrent", "全部") &
+        JqSetHtml("trashCurrent", S.?("All")) &
         JsRaw("""$('#trashShowAll').prop("disabled", true)""") &
         JsRaw("""$('#trashCurrent').attr("class", "btn btn-inverse")""")
     }
@@ -165,9 +165,16 @@ class Trash extends  JSImplicit
     }
    
     def render = {
+
         val paged = trashs
-        "#trashShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
-        "#emptyTrash [onclick]" #> SHtml.onEvent(s => Confirm("確定清空垃圾桶嗎？", SHtml.ajaxInvoke(emptyTrash))) &
+
+        "#trashShowAll" #> SHtml.ajaxButton(S.?("Show All"), showAllStuff _) &
+        "#emptyTrash [onclick]" #> SHtml.onEvent { s => 
+            Confirm(
+                S.?("Are you sure to delete all items permanently?"), 
+                SHtml.ajaxInvoke(emptyTrash)
+            )
+        } &
         ".trashRow" #> paged(currentPage).flatMap(createTrashRow) &
         "#trashPageSelector *" #> paged.pageSelector(currentPage)
     }
