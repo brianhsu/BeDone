@@ -5,6 +5,7 @@ import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -21,16 +22,16 @@ class GMailStatus extends JSImplicit
 
     def formatMessage(error: Option[Throwable]) = error match {
         case None => 
-            "#gmailStatus *" #> "連線成功" & 
+            "#gmailStatus *"       #> S.?("Connected successfully.") & 
             "#gmailStatus [class]" #> "label label-success"
         case Some(error) =>
-            "#gmailStatus *" #> "連線失敗，%s".format(error.getMessage) &
+            "#gmailStatus *"       #> S.?("Connection failed: %s").format(error.getMessage) &
             "#gmailStatus [class]" #> "label label-important"
     }
 
     def render = {
         gmailFetcher match {
-            case None          => "#gmailStatus *" #> "尚未設定"
+            case None          => "#gmailStatus *" #> S.?("Not set yet")
             case Some(fetcher) => formatMessage(fetcher.validate)
         }
     }

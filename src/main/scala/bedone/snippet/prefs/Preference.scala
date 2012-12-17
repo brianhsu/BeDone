@@ -5,6 +5,7 @@ import org.bedone.lib._
 
 import net.liftweb.util.Helpers._
 
+import net.liftweb.http.S
 import net.liftweb.http.SHtml
 import net.liftweb.http.Templates
 import net.liftweb.http.js.JsCmd
@@ -35,8 +36,10 @@ class Preference extends JSImplicit
 
         def updateStatusFailed(error: Throwable): JsCmd = 
         {
+            val errorMessage = S.?("Connection failed: %s")
+
             """$('#gmailStatus').attr('class', 'label label-important')""" &
-            """$('#gmailStatus').text('連線失敗，%s')""".format(error.getMessage)
+            "$('#gmailStatus').text('" + errorMessage + "')"
         }
 
         def updateStatusOK: JsCmd =
@@ -51,8 +54,10 @@ class Preference extends JSImplicit
                       .usingGMail(usingGMail)
                       .saveTheRecord()
 
+            val successMessage = S.?("Connected successfully, setting is saved.")
+
             """$('#gmailStatus').attr('class', 'label label-success')""" &
-            """$('#gmailStatus').text('連線成功，已儲存設定')"""
+            "$('#gmailStatus').text('" + successMessage + "')"
         }
 
         val fetcher = new GMailFetcher(currentUser.idField.is, gmailAccount, getGMailPassword)
@@ -69,6 +74,6 @@ class Preference extends JSImplicit
         "#gmailAccount" #> SHtml.text(gmailAccount, gmailAccount = _) &
         "#gmailPassword" #> SHtml.text(gmailPassword, gmailPassword = _, "type" -> "password") &
         "#usingGMail" #> SHtml.checkbox(usingGMail, usingGMail = _) &
-        "#saveGMail" #> SHtml.ajaxSubmit("儲存設定", saveGMail _)
+        "#saveGMail" #> SHtml.ajaxSubmit(S.?("Save Setting"), saveGMail _)
     }
 }
