@@ -101,7 +101,7 @@ class Process extends JSImplicit
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
 
         currentContact match {
-            case None => Alert("負責人為必填欄位")
+            case None => Alert(S.?("This field is required."))
             case Some(contact) =>
                 stuff.setTopics(currentTopics)
                 stuff.setProjects(currentProjects)
@@ -118,7 +118,7 @@ class Process extends JSImplicit
                 
                 S.redirectTo(
                     "/todo/process", 
-                    () => S.notice("已將「%s」加入指派清單" format(stuff.title.is))
+                    () => S.notice(S.?("'%s' is in delegated list now.") format(stuff.title.is))
                 )
                
         }
@@ -130,7 +130,7 @@ class Process extends JSImplicit
 
         S.redirectTo(
             "/todo/process", 
-            () => S.notice("已將「%s」加入參考資料" format(stuff.title.is))
+            () => S.notice(S.?("'%s' is in reference list now.") format(stuff.title.is))
         )
     }
 
@@ -139,7 +139,7 @@ class Process extends JSImplicit
         stuff.isTrash(true).saveTheRecord()
         S.redirectTo(
             "/todo/process", 
-            () => S.notice("已刪除「%s」" format(stuff.title.is))
+            () => S.notice(S.?("'%s' is deleted.") format(stuff.title.is))
         )
     }
 
@@ -153,7 +153,7 @@ class Process extends JSImplicit
 
         S.redirectTo(
             "/todo/process", 
-            () => S.notice("已將「%s」標記為完成" format(stuff.title.is))
+            () => S.notice(S.?("'%s' is marked as done.") format(stuff.title.is))
         )
     }
 
@@ -286,7 +286,7 @@ class Process extends JSImplicit
 
         S.redirectTo(
             "/todo/process", 
-             () => S.notice("已將「%s」放入儘快完成清單" format(stuff.title.is))
+             () => S.notice(S.?("'%s' is in do it ASAP list now.") format(stuff.title.is))
         )
     }
 
@@ -301,7 +301,7 @@ class Process extends JSImplicit
 
         S.redirectTo(
             "/todo/process", 
-             () => S.notice("已將「%s」放入也許 / 有一天清單" format(stuff.title.is))
+             () => S.notice(S.?("'%s' is in Maybe / Someday list now.") format(stuff.title.is))
         )
     }
 
@@ -321,7 +321,7 @@ class Process extends JSImplicit
                 scheduled.saveTheRecord()
                 S.redirectTo(
                     "/todo/process", 
-                    () => S.notice("已將「%s」放入行事曆" format(stuff.title.is))
+                    () => S.notice(S.?("'%s' is in schedule now.") format(stuff.title.is))
                 )
 
                 Noop
@@ -387,7 +387,7 @@ class Process extends JSImplicit
         
 
         val dateTime = tryo {
-            require(optFromStr(dateTimeString).isDefined, "此為必填欄位")
+            require(optFromStr(dateTimeString).isDefined, S.?("This field is required."))
 
             dateTimeFormatter.setLenient(false)
 

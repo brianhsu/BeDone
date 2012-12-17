@@ -139,7 +139,7 @@ class NextAction extends JSImplicit
         this.currentProject = None
 
         updateList() &
-        JqSetHtml("actionCurrent", "全部") &
+        JqSetHtml("actionCurrent", S.?("All")) &
         """$('#actionShowAll').prop("disabled", true)""" &
         """$('#actionCurrent').attr("class", "btn btn-inverse")"""
     }
@@ -224,7 +224,7 @@ class NextAction extends JSImplicit
     def updateList(): JsCmd =
     {
         def deleteJS(context: Context) = Confirm(
-            "確定要刪除「%s」嗎？" format(context.title.is), 
+            S.?("Are you sure to delete context '%s'?") format(context.title.is), 
             SHtml.ajaxInvoke(deleteContext(context))
         )
 
@@ -312,7 +312,7 @@ class NextAction extends JSImplicit
         val (doneActions, notDoneActions) = actions
 
         ClearClearable &
-        "#actionShowAll" #> SHtml.ajaxButton("顯示全部", showAllStuff _) &
+        "#actionShowAll" #> SHtml.ajaxButton(S.?("Show All"), showAllStuff _) &
         "#actionIsDone"  #> (".row" #> doneActions(currentDonePage).map(createActionRow)) &
         "#actionNotDone" #> (".row" #> notDoneActions(currentActionPage).map(createActionRow)) &
         "#actionPageSelector *" #> notDoneActions.pageSelector(currentActionPage) &

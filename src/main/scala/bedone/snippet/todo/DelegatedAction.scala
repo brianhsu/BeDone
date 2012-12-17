@@ -193,7 +193,7 @@ class DelegatedAction extends JSImplicit
         this.currentProject = None
 
         updateList(currentTabID) &
-        JqSetHtml("delegateCurrent", "全部") &
+        JqSetHtml("delegateCurrent", S.?("All")) &
         """$('#delegateShowAll').prop("disabled", true)""" &
         """$('#delegateCurrent').attr("class", "btn btn-inverse")"""
     }

@@ -56,7 +56,7 @@ class ScheduledAction extends JSImplicit with ScheduledPredicate
         this.currentProject = None
 
         updateList() &
-        JqSetHtml("scheduledCurrent", "全部") &
+        JqSetHtml("scheduledCurrent", S.?("All")) &
         """$('#scheduledShowAll').prop("disabled", true)""" &
         """$('#scheduledCurrent').attr("class", "btn btn-inverse")"""
     }
@@ -170,15 +170,15 @@ class ScheduledAction extends JSImplicit with ScheduledPredicate
         this.currentTabID = tabID
 
         val title = tabID match {
-            case "scheduledWeekTab"  => "本週"
-            case "scheduledMonthTab" => "本月"
-            case "scheduledAllTab" => "全部"
+            case "scheduledWeekTab"  => S.?("This Week")
+            case "scheduledMonthTab" => S.?("This Month")
+            case "scheduledAllTab"   => S.?("All")
         }
 
         val intervalAction = tabID match {
             case "scheduledWeekTab"  => weekAction
             case "scheduledMonthTab" => monthAction
-            case "scheduledAllTab" => allAction
+            case "scheduledAllTab"   => allAction
         }
 
         updateList(tabID, title, intervalAction)

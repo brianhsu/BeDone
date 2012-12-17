@@ -3,6 +3,7 @@ package org.bedone.snippet
 import org.bedone.model._
 import org.bedone.lib._
 
+import net.liftweb.http.S
 import net.liftweb.util.Helpers._
 
 import java.util.Calendar
@@ -67,9 +68,9 @@ trait ScheduledPredicate
     def createTooltip(scheduled: Scheduled) = 
     {
         val endTime = scheduled.endTime.is.map { x => 
-            "結束時間：<br>" + dateTimeFormatter.format(x.getTime) + "<br>"
+            S.?("End Time:") + "<br>" + dateTimeFormatter.format(x.getTime) + "<br>"
         }
-        val location = scheduled.location.is.map(x => "地點：<br>" + x)
+        val location = scheduled.location.is.map(x => S.?("Location:") + "<br>" + x)
 
         endTime.getOrElse("") + location.getOrElse("")
     }
