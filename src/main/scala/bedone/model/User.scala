@@ -10,8 +10,11 @@ import net.liftweb.record._
 import net.liftweb.record.field._
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
+
 import net.liftweb.http.SessionVar
 import net.liftweb.http.S
+import net.liftweb.http.LiftSession
+
 import net.liftweb.util.Helpers.tryo
 import net.liftweb.util.FieldError
 import net.liftweb.util.Helpers._
@@ -187,9 +190,8 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
     }
 
     def logout(postAction: => Any = ()) {
-        CurrentUser.set(Empty)
-        postAction
         S.session.foreach(_.destroySession)
+        postAction
     }
 
     def login(postAction: => Any = ()) {
