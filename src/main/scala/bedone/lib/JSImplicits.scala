@@ -24,8 +24,27 @@ trait JSImplicit
         def apply(id: String): JsCmd = """$('#%s').val('')""".format(id)
     }
     
+    object FadeIn
+    {
+        def apply(id: String) = {
+            """$('#%s').fadeIn(500, function() {
+                $(this).show()
+            })""" format(id)
+        }
+    }
+
     object FadeOutWithCallback
     {
+        def noRemove(id: String)(callback: => JsCmd) = 
+        {
+            """
+                $('#%s').fadeOut(500, function() { 
+                    %s;
+                })
+            """.format(id, callback.toJsCmd)
+
+        }
+
         def apply(id: String)(callback: => JsCmd) = 
         {
             """

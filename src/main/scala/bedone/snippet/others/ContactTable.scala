@@ -67,8 +67,9 @@ class ContactTable extends JSImplicit
 
         val editForm = new EditContactForm(contact, callback)
 
-        FadeOutWithCallback("editContactForm") {
-            SetHtml("editContactHolder", editForm.toForm)
+        FadeOutWithCallback.noRemove("editContactHolder") {
+            SetHtml("editContactHolder", editForm.toForm) &
+            FadeIn("editContactHolder")
         }
     }
 
