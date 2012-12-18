@@ -5,9 +5,11 @@ import org.bedone.model.Contact
 import net.liftweb.common.Box
 import net.liftweb.common.Empty
 
-import net.liftweb.http.SessionVar
-import net.liftweb.util.Helpers.tryo
 import net.liftweb.http.S
+import net.liftweb.http.SessionVar
+
+import net.liftweb.util.Helpers.tryo
+import net.liftweb.util.Props
 
 import org.scribe.builder._
 import org.scribe.builder.api._
@@ -17,9 +19,17 @@ import scala.xml.XML
 
 class GMailContacts
 {
+    val clientID = Props.get(
+        "googleAPI.clientID",
+        "32168263492-s20ia0f4pl30cu60dnbu099rdqj6uieu.apps.googleusercontent.com"
+    )
+
+    val clientSecret = Props.get(
+        "googleAPI.clientSecret",
+        "Uo3VizoTG4yBGTVp-Q8XrhOT"
+    )
+
     val scope = "https://www.google.com/m8/feeds/"
-    val clientID = "32168263492-s20ia0f4pl30cu60dnbu099rdqj6uieu.apps.googleusercontent.com"
-    val clientSecret = "Uo3VizoTG4yBGTVp-Q8XrhOT"
     val callbackURL = "%s/contact/import" format(S.hostAndPath)
     val apiURL = scope + "contacts/default/full?max-results=10000"
 
