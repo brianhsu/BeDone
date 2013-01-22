@@ -7,7 +7,7 @@ import java.io.FileWriter
 import jline.ConsoleReader
 import net.liftweb.util.StringHelpers
 
-object DBCreateor
+object DBCreator
 {
     val consoleReader = new ConsoleReader
 
