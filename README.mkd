@@ -22,10 +22,23 @@ Installation
 
     ```
     $ cd BeDone
-    $ sbt "run org.bedone.installer.Installer"
+    [info] Loading project definition from /home/brianhsu/ss/BeDone/project
+    [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
+    > run-main org.bedone.installer.Insteller
+    > exit
     ```
 
-4. Run SBT, and enter ``container:start`` to start Jetty server.
+5. Create DB schema.
+
+    ```
+    $ cd BeDone
+    [info] Loading project definition from /home/brianhsu/ss/BeDone/project
+    [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
+    > run-main org.bedone.installer.DBCreator
+    > exit
+    ```
+
+6. Run SBT, and enter ``container:start`` to start Jetty server.
 
     ```
     $ sbt
@@ -34,7 +47,7 @@ Installation
     > container:start
     ```
 
-5. Visit [http://localhost:8081/](http://localhost:8081/)
+7. Visit [http://localhost:8081/](http://localhost:8081/)
 
 [01]: http://en.wikipedia.org/wiki/Getting_Things_Done
 [02]: http://www.scala-sbt.org/

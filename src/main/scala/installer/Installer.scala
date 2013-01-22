@@ -7,6 +7,48 @@ import java.io.FileWriter
 import jline.ConsoleReader
 import net.liftweb.util.StringHelpers
 
+object DBCreateor
+{
+    val consoleReader = new ConsoleReader
+
+    consoleReader.setBellEnabled(false)
+
+    def getYesOrNo(prompt: String): String =
+    {
+        val line = Option(consoleReader.readLine(prompt, '\0'))
+
+        line.filter(x => x == "yes" || x == "no" ) match {
+            case Some(text) => text
+            case None => getYesOrNo(prompt)
+        }
+    }
+
+    def createDBSchema()
+    {
+        import bootstrap.liftweb.Boot
+        import org.bedone.model.BeDoneSchema
+        import net.liftweb.squerylrecord.RecordTypeMode._
+        import net.liftweb.squerylrecord.SquerylRecord._
+
+        (new Boot).boot
+
+        print("Create DB schema...")
+        inTransaction { BeDoneSchema.drop }
+        inTransaction { BeDoneSchema.create }
+        println("Done")
+    }
+
+    def main(args: Array[String])
+    {
+        val shouldCreateDB = getYesOrNo("Do you want create empty BeDone DB schema? (yes/no)")
+
+        shouldCreateDB match {
+            case "true" => createDBSchema()
+            case _      => println("No action")
+        }
+    }
+}
+
 object Insteller
 {
     val consoleReader = new ConsoleReader
@@ -141,21 +183,6 @@ object Insteller
         printWriter.close()
     }
 
-    def createDBSchema()
-    {
-        import bootstrap.liftweb.Boot
-        import org.bedone.model.BeDoneSchema
-        import net.liftweb.squerylrecord.RecordTypeMode._
-        import net.liftweb.squerylrecord.SquerylRecord._
-
-        (new Boot).boot
-
-        print("Create DB schema...")
-        inTransaction { BeDoneSchema.drop }
-        inTransaction { BeDoneSchema.create }
-        println("Done")
-    }
-
     def main(args: Array[String])
     {
         val configFile = new File("src/main/resources/default.props")
@@ -169,12 +196,5 @@ object Insteller
             case false => 
                 buildConfigFile(configFile)
         }
-
-        val shouldCreateDB = getLine("Do you want create empty BeDone DB schema? (yes/no)")
-
-        if (shouldCreateDB == "yes") {
-            createDBSchema()
-        }
-
     }
 }
