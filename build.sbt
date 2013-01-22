@@ -37,8 +37,7 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
     "net.liftweb" %% "lift-webkit" % "2.5-M1" % "compile->default",
-    "net.liftweb" %% "lift-squeryl-record" % "2.5-M1",
-    "net.liftmodules" %% "combobox" % "2.5-SNAPSHOT-0.1"
+    "net.liftweb" %% "lift-squeryl-record" % "2.5-M1"
 )
 
 
