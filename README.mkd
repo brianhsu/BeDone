@@ -34,7 +34,7 @@ Installation
     > container:start
     ```
 
-5. Visit http://localhost:8081/
+5. Visit [http://localhost:8081/](http://localhost:8081/)
 
 [01]: http://en.wikipedia.org/wiki/Getting_Things_Done
 [02]: http://www.scala-sbt.org/
