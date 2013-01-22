@@ -14,19 +14,25 @@ Installation
 
 2. Clone this project from GitHub.
 
+    ```
     $ git clone git://github.com/brianhsu/BeDone.git BeDone
+    ```
 
 3. Configure your BeDone MySQL / SMTP / GMail OAuth settings by the following commands:
 
+    ```
     $ cd BeDone
     $ sbt "run org.bedone.installer.Installer"
+    ```
 
 4. Run SBT, and enter ``container:start`` to start Jetty server.
 
+    ```
     $ sbt
     [info] Loading project definition from /home/brianhsu/BeDone/project
     [info] Set current project to BeDone (in build file:/home/brianhsu/BeDone/)
     > container:start
+    ```
 
 [01]: http://en.wikipedia.org/wiki/Getting_Things_Done
 [02]: http://www.scala-sbt.org/
