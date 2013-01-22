@@ -1,34 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>BeDone</title>
   </head>
-
   <body class="lift:content_id=main">
 
-    <div id="main" class="main lift:surround?with=default;at=content">
+    <div id="main" data-lift="lift:surround?with=misc/fixed;at=fixedContainer">
+      <div data-lift="Login.redirectToHome"></div>
       <div class="hero-unit">
         <h1>Be Done!</h1>
         <p class="heroText">BeDone is a GTD style TODO list.</p>
-        <p><a class="btn btn-primary btn-large" data-toggle="modal" href="#signupModal">Sign Up &raquo;</a></p>
+        <p class="pull-right"><a class="btn btn-primary btn-large" data-toggle="modal" href="#signupModal">Sign Up &raquo;</a></p>
       </div>
-
       <div class="row">
-        <div class="span6">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
+        <div class="span4">
+          <h3>Getting Things Done</h3>
+          <p><img src="/img/icon/notepadIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>BeDone is based on GTD method promoted by David Allen. It provides a clear workflow to organize your task!</p>
         </div>
-        <div class="span6">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
+        <div class="span4">
+          <h3>GMail as GTD Inbox</h3>
+          <p><img src="/img/icon/gmailIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>You could use GMail as your GTD inbox in BeDone. Every e-mail sent to your GMail mailbox will become a GTD task!</p>
+        </div>
+        <div class="span4">
+          <h3>Easy to Use</h3>
+          <p><img src="/img/icon/easyIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>Don't know what is GTD and how to use? Don't worry, we have step-by-step wizard to help you decide what to do!</p>
         </div>
       </div>
-      <div data-lift="lift:embed?what=signup"></div>
+      <div class="modal hide" id="signupModal" data-lift="SignupDialog">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <h3>Signup</h3>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <img src="/img/ajax-loader-modal.gif" id="ajax-loader-signup" class="ajax-loader-modal" alt="" />
+          <a href="#" class="btn close-link" data-dismiss="modal">Cancel</a>
+          <button class="btn btn-primary" data-loading-text="Saving..." id="signupButton">Signup</button>
+          <script type="text/javascript">
+          //<![CDATA[
+            $('#signupButton').click(function() {
+                $(this).button('loading');
+            });
+          //]]>
+          </script>
+        </div>
+      </div>
     </div>
-
   </body>
 </html>
 

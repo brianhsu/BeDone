@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+
+    <div id="main" data-lift="lift:surround?with=misc/fixed;at=fixedContainer">
+      <div data-lift="Login.redirectToHome"></div>
+      <div class="hero-unit">
+        <h1>Be Done!</h1>
+        <p class="heroText">GTD 待辦事項管理系統</p>
+        <p class="pull-right"><a class="btn btn-primary btn-large" data-toggle="modal" href="#signupModal">立即註冊 &raquo;</a></p>
+      </div>
+      <div class="row">
+        <div class="span4">
+          <h3>搞定他！</h3>
+          <p><img src="/img/icon/notepadIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>BeDone 使用 David Allen 所提出的 <a href="http://zh.wikipedia.org/wiki/GTD">Getting Things Done</a> 方法，提供一個清楚流程來幫你管理您待辦的工作！</p>
+        </div>
+        <div class="span4">
+          <h3>GMail 收件匣</h3>
+          <p><img src="/img/icon/gmailIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>您可以使用 GMail 做為您的 GTD 待辦事項收件匣，任何寄送到您 GMail 信箱的工作都會出現在 BeDone 裡方便您管理和追蹤。</p>
+        </div>
+        <div class="span4">
+          <h3>簡單易懂</h3>
+          <p><img src="/img/icon/easyIcon.png" width="60px" class="pull-left" style="margin-right: 10px"/>從來沒聽過什麼是 GTD？不知道該怎麼應用 GTD？別擔心，我們有精靈一步一步引導您該如何管理您的待辦事項！</p>
+        </div>
+      </div>
+      <div class="modal hide" id="signupModal" data-lift="SignupDialog">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <h3>註冊新帳號</h3>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <img src="/img/ajax-loader-modal.gif" id="ajax-loader-signup" class="ajax-loader-modal" alt="" />
+          <a href="#" class="btn close-link" data-dismiss="modal">取消</a>
+          <button class="btn btn-primary" data-loading-text="儲存中……" id="signupButton">註冊</button>
+          <script type="text/javascript">
+          //<![CDATA[
+            $('#signupButton').click(function() {
+                $(this).button('loading');
+            });
+          //]]>
+          </script>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

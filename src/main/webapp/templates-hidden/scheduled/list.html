@@ -1,0 +1,46 @@
+<div data-lift="ScheduledAction">
+  <div style="float: right">
+    <div class="btn-group inline">
+      <button class="btn btn-inverse" id="scheduledCurrent" disabled="disabled">All</button>
+      <button class="btn btn-inverse" id="scheduledShowAll" disabled="disabled">Show All</button>
+    </div>
+  </div>
+  <ul class="nav nav-tabs">
+    <li class="intervalTab active" id="scheduledWeekTab"><a href="#">This Week</a></li>
+    <li class="intervalTab" id="scheduledMonthTab"><a href="#">This Month</a></li>
+    <li class="intervalTab" id="scheduledAllTab"><a href="#">All</a></li>
+  </ul>
+  <div id="scheduledEditHolder"></div>
+  <div id="scheduledOutdatedBlock">
+    <h3 style="display: inline">Outdated</h3>
+    <div class="pull-right">
+      <div class="pagination" id="outdatedPageSelector" style="display:inline"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="scheduledOutdatedList" class="outdatedList" style="margin-bottom:2em"></div>
+  </div>
+  <div id="scheduledTodayBlock">
+    <h3 style="display:inline">Today</h3>
+    <div class="pull-right">
+      <div class="pagination" id="todayPageSelector" style="display: inline"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="scheduledTodayList" class="actionList" style="margin-bottom:2em"></div>
+  </div>
+  <div id="scheduledIntervalBlock">
+    <h3 style="display:inline" id="scheduledIntervalLabel">This Week</h3>
+    <div class="pull-right">
+      <div class="pagination" id="intervalPageSelector" style="display: inline"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="scheduledIntervalList" class="actionList" style="margin-bottom:2em"></div>
+  </div>
+  <div id="scheduledDoneBlock">
+    <h3 style="display:inline">Done</h3>
+    <div class="pull-right">
+      <div class="pagination" id="donePageSelector" style="display: inline"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="scheduledDoneList" class="actionList" style="margin-bottom:2em"></div>
+  </div>
+</div>

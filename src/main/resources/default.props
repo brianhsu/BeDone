@@ -1,0 +1,29 @@
+
+# Database Setting
+DatabaseURL = jdbc:mysql://localhost:3306/BeDone
+DatabaseUsername = root
+DatabasePassword = test1234
+
+# This is used to encrypt the GMail password in database
+EncKey=p9iu23fdjaslkjadkfljaloi2eqd
+
+# SMTP mail server setting
+mail.transport.protocol=smtp
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.starttls.enable=true
+mail.smtp.auth=true
+mail.user=brianhsu.hsu@gmail.com
+mail.password=12345678
+
+# Google OAuth API setting used by GMail contacts import.
+#
+# You need add the callback URI to your Authorized Redirect URIs 
+# in Google API console.
+#
+# The URI should look like the following:
+#
+#   http://your.bedone.host/contact/import
+#
+googleAPI.clientID = 32168263492-s20ia0f4pl30cu60dnbu099rdqj6uieu.apps.googleusercontent.com
+googleAPI.clientSecret = Uo3VizoTG4yBGTVp-Q8XrhOT

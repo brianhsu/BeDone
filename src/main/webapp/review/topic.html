@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=misc/fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div>
+        <div id="editTopicHolder"></div>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th class="center">Inbox</th>
+              <th class="center">Do ASAP</th>
+              <th class="center">Delegated</th>
+              <th class="center">Scheduled</th>
+              <th class="center">Maybe</th>
+              <th class="center">Reference</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody data-lift="TopicTable">
+            <tr>
+              <td><a href="#" rel="tooltip" data-placement="right" data-original-title="Name" class="name">Title</a></td>
+              <td class="center"><a href="#" class="inbox"><span>Inbox</span></a></td>
+              <td class="center"><a href="#" class="nextAction">Do ASAP</a></td>
+              <td class="center"><a href="#" class="delegated">Delegated</a></td>
+              <td class="center"><a href="#" class="scheduled">Scheduled</a></td>
+              <td class="center"><a href="#" class="maybe">Maybe</a></td>
+              <td class="center"><a href="#" class="reference">Reference</a></td>
+              <td>
+                <div class="dropdown">
+                  <a data-toggle="dropdown" class="dropdown-toggle" role="button" href="#"><b class="caret"></b></a>
+                  <ul role="menu" class="dropdown-menu pull-right">
+                    <li role="menuitem"><a href="#" class="edit">Edit</a></li>
+                    <li role="menuitem"><a href="#" class="delete">Remove</a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <script type="text/javascript">
+          $('.name').tooltip();
+        </script>
+      </div>
+    </div>
+  </body>
+</html>

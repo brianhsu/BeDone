@@ -1,0 +1,16 @@
+<div class="editForm" id="editProjectForm">
+  <form action="." data-lift="Form.ajax" >
+    <div class="input-prepend" style="margin-left:0.2em">
+      <span class="add-on">Title</span><input id="projectEditTitle" type="text" class="input-xlarge" placeholder="Required" />
+    </div>
+    <div style="width: 100%">
+      <textarea rows="3" id="projectEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+    </div>
+    <div style="text-align: right; margin-right: 0.5em; margin-bottom:-1em; padding: 0px;">
+        <button type="reset" id="projectEditCancel" class="btn" style="margin-right:0.5em">Cancel</button>
+        <button id="projectEditSave" data-loading-text="Saving..." class="btn btn-primary">Save</button>
+    </div>
+    <input type="hidden" id="projectHidden"/>
+  </form>
+</div>
+

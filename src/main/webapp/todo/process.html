@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=misc/fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+
+      <div data-lift="Process?eager_eval=true">
+        <div id="noStuffAlert" class="alert alert-success"><h3>Great! There is no stuffs to distract you.</h3></div>
+        <div id="processEdit" class="editForm">
+          <div>
+            <fieldset id="processTitle" class="inline control-group">
+              <div class="input-prepend" style="margin-left: 0.5em">
+                <span title="Title" class="add-on">
+                  <i class="icon-th-list"></i>
+                </span><input class="input-xxlarge" type="text" placeholder="Title" />
+                <span id="processTitle_msg" class="help-inline"></span>
+              </div>
+            </fieldset>
+        
+            <div class="pull-right form-inline">
+              <div class="topicCombo"></div>
+              <div class="projectCombo"></div>
+            </div>
+          </div>
+  
+          <div style="margin: 0.5em; display: table; width: 98%">
+            <div class="projectTags inline pull-right">
+              <span class="inline">Tag1</span>
+            </div>
+            <div class="topicTags inline pull-right">
+              <span class="inline">Tag1</span>
+            </div>
+          </div>
+        
+          <div style="width: 100%">
+            <textarea rows="5" id="processEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+          </div>
+        </div>
+        <div class="dialog" id="isThisActionable">
+          <div class="messageBox">
+            <div class="message">Could you take some actions about this TODO?</div>
+            <div>
+              <button class="btn btn-info pull-left" disabled="disabled">Previous</button>
+              <div class="answers">
+                <button class="btn btn-inverse" onclick="showDialog('itIsNotActionable')">No</button>
+                <button class="btn btn-primary" onclick="showDialog('whatIsNextAction')">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsNotActionable">
+          <div class="messageBox">
+            <div class="message">What kind of stuff do you think it is?</div>
+            <div>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-danger" id="isTrash">Trash</button>
+                <button class="btn btn-inverse" onclick="showDialog('itIsReference')">Reference</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybe')">Maybe / Someday……</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsReference">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">Does it belongs to any topic or project?</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveReference">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsMaybe">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">Does it belongs to any topic or project?</div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsNotActionable')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-primary" onclick="showDialog('itIsMaybeTickler')">Remind me at...</button>
+                <button class="btn btn-success" id="saveMaybe">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsMaybeTickler">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:1em">When should I put it back to your BeDone inbox?</div>
+              <div>Remind me at <input type="text" id="ticklerDate" />
+                <span class="control-group error hide" id="tickler_error">
+                  <span class="help-inline" id="tickler_error_msg">Reminder must later than today.</span>
+                </span>
+              </div>
+            </div>
+            <div>
+              <button onclick="showDialog('itIsMaybe')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveMaybeTickler">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="whatIsNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">To solve this, I should do <input name="nextActionTitle" class="input-xxlarge" id="nextActionTitle" type="text" /> next.
+              </div>
+              <div data-lift="lift:embed?what=process/projectInput"></div>
+              <div data-lift="lift:embed?what=process/topicInput"></div>
+              <div class="input-prepend input-append pull-left">
+                <span class="add-on">Deadline</span><input class="input-large" id="deadline" type="text" />
+              </div>
+              <span class="control-group error hide" id="deadline_error">
+                <span class="help-inline" id="deadline_error_msg" style="margin-top:3px">Deadline must later than today.</span>
+              </span>
+              <div class="clearfix" />
+
+            </div>
+            <div>
+              <button onclick="showDialog('isThisActionable')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-primary" id="goToActionType" onclick="showDialog('isThisTwoMiniuteWork')">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isThisTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>Could this be done in less than two minutes?</div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatIsNextAction')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-inverse" onclick="showDialog('whatActionType')">No</button>
+                <button class="btn btn-primary" onclick="showDialog('itIsTwoMiniuteWork')">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="itIsTwoMiniuteWork">
+          <div class="messageBox">
+            <div class="message">
+              <div>Then don't wait, do it right now!</div>
+            </div>
+            <div>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="markAsDone">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="whatActionType">
+          <div class="messageBox">
+            <div class="message">
+              <div>I think this TODO should...</div>
+            </div>
+            <div>
+              <button onclick="showDialog('isThisTwoMiniuteWork')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-primary" onclick="showDialog('isDelegated')">Delegated to others</button>
+                <button class="btn btn-primary" onclick="showDialog('isScheduled')">Put it on calendar</button>
+                <button class="btn btn-primary" onclick="showDialog('isNextAction')">Do it myself ASAP</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isDelegated">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">Who should work on this TODO?</div>
+              <div id="contactCombo"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveDelegated" disabled="disabled">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isScheduled">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">What's the date and time?</div>
+              <div class="inline" style="margin-right:1em">Start Time:<input id="startDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">End Time:<input id="endDateTime" type="text"/></div>
+              <div class="inline" style="margin-right:1em">Location:<input id="location" type="text"/></div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveScheduled" disabled="disabled">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog hide" id="isNextAction">
+          <div class="messageBox">
+            <div class="message">
+              <div style="margin-bottom:0.5em">What context is best to solve this TODO?</div>
+              <div data-lift="lift:embed?what=process/contextInput"></div>
+            </div>
+            <div>
+              <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
+              <div class="answers">
+                <button class="btn btn-success" id="saveNextAction">Done!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        
+          $( "#startDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#startDateTime").val(dateText)
+                  $("#startDateTime").blur()
+              }
+          });
+
+          $( "#endDateTime" ).datetimepicker({
+              dateFormat: "yy-mm-dd",
+              timeFormat: 'hh:mm',
+              onClose: function(dateText) {
+                  $("#endDateTime").val(dateText)
+                  $("#endDateTime").blur()
+              }
+          });
+
+          $( "#deadline" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#deadline").val(dateText)
+                  $("#deadline").blur()
+              }
+          });
+
+          $( "#ticklerDate" ).datepicker({
+              dateFormat: "yy-mm-dd",
+              onClose: function(dateText) {
+                  $("#ticklerDate").val(dateText)
+                  $("#ticklerDate").blur()
+              }
+          });
+
+          function showDialog(id) {
+              $('.dialog').hide()
+              $('#' + id).show()
+          }
+
+      </script>
+    </div>
+  </body>
+</html>
+

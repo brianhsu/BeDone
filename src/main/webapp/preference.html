@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BeDone</title>
+  </head>
+  <body class="lift:content_id=main">
+    <div id="main" data-lift="lift:surround?with=misc/fluid;at=contentArea">
+      <div data-lift="lift:withParam?name=sideBarArea">
+        <div data-lift="lift:embed?what=menu"></div>
+      </div>
+      <div data-lift="Preference">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#basic" data-toggle="tab">Basic</a></li>
+          <li><a href="#gmail" data-toggle="tab">GMail Inbox</a></li>
+        </ul>
+        <div class="tab-content" style="margin-left: 0.5em; margin-right: 0.5em">
+          <div class="tab-pane active" id="basic">
+            <div class="pull-right" style="text-align: center">
+              <img id="avatar" src="http://www.gravatar.com/avatar/0?d=mm" />
+              <div style="margin-top:0.5em">
+                <a href="https://en.gravatar.com/emails/">Change Avatar</a>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="gmail">
+            <form data-lift="lift:Form.ajax?class=form-horizontal">
+
+              <div class="btn-group pull-right">
+                <input type="reset" class="btn btn-inverse">Reset</input>
+                <input id="saveGMail" class="btn btn-primary">Save</input>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="gmailAccount">GMail Status:</label>
+                <div data-lift="lift:LazyLoad?template=misc/gmailLoad">
+                  <div class="controls" data-lift="GMailStatus">
+                    <span class="label" id="gmailStatus">Not tested.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="gmailAccount">GMail Address：</label>
+                <div class="controls">
+                  <input type="text" id="gmailAccount"/>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="gmailPassword">GMail Password:</label>
+                <div class="controls">
+                  <input type="password" id="gmailPassword"/>
+                </div>
+              </div>
+              <div style="margin-left:3em">
+                <label class="checkbox">
+                  <input type="checkbox" style="margin-right: 0.5em" id="usingGMail"/> 
+                  Link GMail's inbox to BeDon.
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

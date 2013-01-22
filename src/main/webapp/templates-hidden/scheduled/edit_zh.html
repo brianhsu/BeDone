@@ -1,0 +1,79 @@
+<div id="scheduledEdit" class="editForm">
+  <div>
+    <span class="actionBar">
+      <i class="icon-white icon-ok"></i>
+      <i class="icon-white icon-remove"></i>
+      <i class="icon-white icon-star"></i>
+    </span>
+    <fieldset id="scheduledTitle" class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題" />
+        <span id="scheduledTitle_msg" class="help-inline"></span>
+      </div>
+    </fieldset>
+    <div class="pull-right form-inline">
+      <div id="scheduledTopicCombo"></div>
+      <div id="scheduledProjectCombo"></div>
+    </div>
+  </div>
+  <div style="margin: 0.5em; display: table; width: 98%">
+    <div id="scheduledProjectTags" class="inline" style="float:right"></div>
+    <div id="scheduledTopicTags" class="inline" style="float:right"></div>
+  </div>
+
+  <div style="width: 100%">
+    <textarea rows="5" id="scheduledEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+  </div>
+
+  <fieldset id="scheduledStartTime" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">開始時間：</label>
+      <input class="input-medium" type="text" />
+      <label id="scheduledStartTime_msg" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+  <fieldset id="scheduledEndTime" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">預計結束時間：</label>
+      <input class="input-medium" type="text" />
+      <label id="scheduledEndTime_msg" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+  <fieldset id="scheduledLocation" class="control-group" style="float: left">
+    <div style="margin-right:0.5em;">
+      <label class="help-inline">地點：</label>
+      <input class="input-medium" type="text" />
+      <label id="scheduledLocation_msg" class="help-inline"></label>
+    </div>
+  </fieldset>
+
+
+  <div style="text-align: right; margin-right: 0.5em">
+      <button type="reset" id="scheduledCancel" class="btn" style="margin-right:0.5em">取消</button>
+      <button id="scheduledSave" data-loading-text="儲存中..." class="btn btn-primary">儲存</button>
+  </div>
+  <script type="text/javascript">
+      $( "#scheduledStartTime input" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#scheduledStartTime input").val(dateText)
+              $("#scheduledStartTime input").blur()
+          }
+      });
+  
+      $( "#scheduledEndTime input" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#scheduledEndTime input").val(dateText)
+              $("#scheduledEndTime input").blur()
+          }
+      });
+  </script>
+
+</div>

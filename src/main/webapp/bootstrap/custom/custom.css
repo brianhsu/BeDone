@@ -1,0 +1,196 @@
+body {
+  /* 60px to make the container go all the way to the bottom of the topbar */
+
+  padding-top: 60px;
+}
+.alert ul {
+  list-style: none;
+  margin-top: 0.4em;
+}
+.ajax-loader {
+  margin-top: 0.3%;
+  display: none;
+}
+.ajax-loader-modal {
+  float: left;
+  display: none;
+}
+.sidebar {
+  background: #fafad2;
+  padding: 5px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.sidebarIcon {
+  margin-top: 3px;
+  padding-right: 5px;
+}
+div.btn-tag {
+  margin-left: 0.2em;
+}
+div.btn-group a i[class^="icon-"] {
+  position: relative;
+  top: -10px;
+  margin-right: 5px;
+}
+i.myicon-starOn {
+  background-image: url('/img/star_on.png');
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  vertical-align: text-middle;
+  position: relative;
+  top: 4px;
+  margin-right: 5px;
+}
+i.myicon-starOff {
+  background-image: url('/img/star_off.png');
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  position: relative;
+  top: 4px;
+  margin-right: 5px;
+}
+div.editForm {
+  margin-bottom: 0.8em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: #fafad2;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+div.editForm div.desc {
+  margin: 1em;
+}
+div.editForm .showDesc {
+  margin-left: 0.5em;
+}
+div.listRow {
+  background: rgba(153, 199, 188, 0.5);
+  margin-bottom: 0.5em;
+  padding-top: 0.6em;
+  padding-bottom: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+div.listRow div.desc {
+  margin: 1em;
+}
+div.listRow .showDesc {
+  margin-left: 0.5em;
+}
+.inline {
+  display: inline-block;
+}
+.topic {
+  margin-right: 0.2em;
+}
+.project {
+  margin-right: 0.2em;
+}
+.doneTime {
+  margin-right: 0.5em;
+}
+.deadline {
+  margin-right: 0.5em;
+}
+div.rapidEntry form {
+  float: right;
+  margin-top: 0.2em;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0.5em;
+}
+#gmail form {
+  margin-left: -2em;
+}
+.dashboard {
+  background: rgba(204, 204, 255, 0.5);
+  margin-bottom: 0.5em;
+  padding-top: 0.6em;
+  padding-bottom: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+}
+.dialog {
+  background: rgba(204, 204, 255, 0.5);
+  margin-bottom: 0.5em;
+  padding-top: 0.6em;
+  padding-bottom: 0.7em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+}
+.dialog .answers {
+  text-align: right;
+  width: 100%;
+}
+.dialog .message {
+  margin-bottom: 1em;
+}
+.dialog .message form {
+  margin: 0em;
+}
+.dialog .messageBox {
+  margin: 0.5em;
+}
+.contactTable th {
+  width: 25%;
+}
+th.center {
+  text-align: center;
+}
+td.center {
+  text-align: center;
+}
+button.msgClose {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+  float: right;
+  color: rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 0 #ffffff;
+}
+button.msgClose:hover {
+  color: #000000;
+  font-weight: bold;
+}
+.well-mini {
+  width: 60%;
+  margin-left: 170px;
+}
