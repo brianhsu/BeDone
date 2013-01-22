@@ -22,6 +22,7 @@ Installation
 
     ```
     $ cd BeDone
+    $ sbt
     [info] Loading project definition from /home/brianhsu/ss/BeDone/project
     [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
     > run-main org.bedone.installer.Insteller
@@ -31,7 +32,7 @@ Installation
 5. Create DB schema.
 
     ```
-    $ cd BeDone
+    $ sbt
     [info] Loading project definition from /home/brianhsu/ss/BeDone/project
     [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
     > run-main org.bedone.installer.DBCreator
