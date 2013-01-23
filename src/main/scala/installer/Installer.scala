@@ -43,8 +43,8 @@ object DBCreator
         val shouldCreateDB = getYesOrNo("Do you want create empty BeDone DB schema? (yes/no)")
 
         shouldCreateDB match {
-            case "true" => createDBSchema()
-            case _      => println("No action")
+            case "yes" => createDBSchema()
+            case _     => println("No action")
         }
     }
 }

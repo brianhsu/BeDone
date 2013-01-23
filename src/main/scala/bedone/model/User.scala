@@ -137,7 +137,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
             |message.
             |
             |Tanks, have a nice day!
-        """.format(username.is, confirmURL).stripMargin)
+        """).format(username.is, confirmURL).stripMargin
 
         val body = PlainMailBodyType(message)
 
@@ -166,7 +166,7 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
             |message.
             |
             |Tanks, have a nice day!
-        """.format(username.is, confirmURL).stripMargin)
+        """).format(username.is, confirmURL).stripMargin
 
         val body = PlainMailBodyType(message)
 

@@ -194,3 +194,12 @@ button.msgClose:hover {
   width: 60%;
   margin-left: 170px;
 }
+.dropHover {
+  background: #000055;
+  font-weight: bold;
+  font-color: #FFFFFF;
+}
+.dropActive {
+  font-weight: bold;
+  font-color: #FFFFFF;
+}

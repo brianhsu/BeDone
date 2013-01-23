@@ -178,7 +178,8 @@ trait StuffList extends JSImplicit
             ".desc *"        #> stuff.descriptionHTML &
             ".topic *"       #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"     #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
-            ".deadline"      #> formatDeadline(stuff)
+            ".deadline"      #> formatDeadline(stuff) &
+            ".listRow [data-stuffID]" #> stuff.idField.is
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }
