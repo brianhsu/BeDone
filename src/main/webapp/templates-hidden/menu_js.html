@@ -1,0 +1,77 @@
+<div>
+  <script type="text/javascript">
+
+    function addDroppable()
+    {
+        $("#nextAction").droppable({
+            accept: ".listRow",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                showNextActionDialog(stuffID);
+            }
+        })
+
+        $("#delegated").droppable({
+            accept: ".listRow",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                showDelegatedDialog(stuffID);
+            }
+        })
+
+        $("#scheduled").droppable({
+            accept: ".listRow",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                showScheduledDialog(stuffID);
+            }
+        })
+
+        $("#reference").droppable({
+            accept: ".listRow",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                showReferenceDialog(stuffID);
+            }
+        })
+
+        $("#trash").droppable({
+            accept: ".listRow",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                markAsTrash(stuffID);
+            }
+        })
+
+    }
+
+    function addDraggable()
+    {
+        $('.listRow').draggable({
+            revert: 'invalid'
+        });
+    }
+
+    $(document).ready(function() {
+        addDraggable();
+        addDroppable();
+    });
+  </script>
+  <script id="menuAjaxJS">
+  </script>
+</div>

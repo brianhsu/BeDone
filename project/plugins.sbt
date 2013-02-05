@@ -1,5 +1,9 @@
 // BeDone/project/plugins.scala
 
+resolvers += "Jawsy.fi M2 releases" at "http://oss.jawsy.fi/maven2/releases"
+
+addSbtPlugin("fi.jawsy.sbtplugins" %% "sbt-jrebel-plugin" % "0.9.0")
+
 libraryDependencies <+= sbtVersion(v => v match {
     case "0.11.0" => "com.github.siasia" %% "xsbt-web-plugin" % "0.11.0-0.2.8"
     case "0.11.1" => "com.github.siasia" %% "xsbt-web-plugin" % "0.11.1-0.2.10"

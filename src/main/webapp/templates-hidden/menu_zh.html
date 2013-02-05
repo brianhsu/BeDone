@@ -1,4 +1,4 @@
-<div class="sidebar" data-lift="ActionMenu">
+<div class="sidebar" data-lift="ActionMenu?eager_eval=true">
   <ul class="nav nav-list">
     <li class="nav-header">TODO</li>
     <li id="dashboard"><a href="/dashboard"><i class="icon-home sidebarIcon"></i>儀表板</a></li>
@@ -17,15 +17,5 @@
     <li id="contact"><a href="/contact/"><i class="icon-user sidebarIcon"></i>通訊錄</a></li>
     <li id="trash"><a href="/other/trash"><i class="icon-trash sidebarIcon"></i>垃圾桶</a></li>
   </ul>
-  <script type="text/javascript">
-    $("#nextAction").droppable({
-        accept: ".listRow",
-        tolerance: "pointer",
-        activeClass: "dropActive",
-        hoverClass: "dropHover",
-        drop: function(event, ui) {
-            console.log(ui.draggable.data("stuffid"))
-        }
-    })
-  </script>
+  <div data-lift="lift:embed?what=menu_js"/>
 </div>

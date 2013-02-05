@@ -76,8 +76,8 @@ trait StuffList extends JSImplicit
             stuff.saveTheRecord()
 
             val newPaging = getPagedStuff
-            val targetPage = (getPagedStuff.totalPage < currentPage) match {
-                case true  => getPagedStuff.totalPage
+            val targetPage = (newPaging.totalPage < currentPage) match {
+                case true  => newPaging.totalPage
                 case false => currentPage
             }
 
@@ -99,12 +99,26 @@ trait StuffList extends JSImplicit
         ".showDesc [style+]" #> descIconVisibility
     }
 
+    val updateInboxJS = Function(
+        "updatePaging", Nil, 
+        SHtml.ajaxCall("", s => {
+            val newPaging = getPagedStuff
+            val targetPage = (newPaging.totalPage < currentPage) match {
+                case true  => newPaging.totalPage
+                case false => currentPage
+            }
+
+            onSwitchPage(newPaging, targetPage)
+        })
+    )
+
     def onSwitchPage(paging: Paging[Stuff], page: Int) = {
 
         this.currentPage = page
 
         JqSetHtml("inboxList", createStuffTable(paging(page))) &
-        JqSetHtml("inboxPageSelector", paging.pageSelector(page))
+        JqSetHtml("inboxPageSelector", paging.pageSelector(page)) &
+        """addDraggable()"""
     }
 
     def getPagedStuff = 
@@ -238,7 +252,8 @@ trait StuffList extends JSImplicit
         "#inboxRapidStuff" #> SHtml.text("", rapidTitle = _) &
         "#inboxRapidTitle" #> SHtml.hidden(addRapidStuff _) &
         "#inboxPageSelector *" #> paging.pageSelector(1) &
-        ".inboxRow" #> createStuffTable(paging(1))
+        ".inboxRow" #> createStuffTable(paging(1)) &
+        "#updateInboxJS" #> Script(updateInboxJS)
     }
 }
 

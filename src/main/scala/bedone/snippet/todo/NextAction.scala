@@ -271,7 +271,8 @@ class NextAction extends JSImplicit
             ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
             ".deadline"       #> formatDeadline(action) &
-            ".doneTime"       #> formatDoneTime(action)
+            ".doneTime"       #> formatDoneTime(action) &
+            ".listRow [data-stuffID]" #> stuff.idField.is
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
     }

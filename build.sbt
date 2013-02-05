@@ -43,3 +43,6 @@ libraryDependencies ++= Seq(
 
 port in container.Configuration := 8081
 
+seq(jrebelSettings: _*)
+
+jrebel.webLinks <++= webappResources in Compile
