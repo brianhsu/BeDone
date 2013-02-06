@@ -189,7 +189,7 @@ class NextAction extends JSImplicit
         currentContext.map(action.contexts.contains).getOrElse(true)
     }
 
-    def onUndonePageSwitch(paging: Paging[ActionT], page: Int) = {
+    def onActionPageSwitch(paging: Paging[ActionT], page: Int) = {
         currentActionPage = page
         updateList
     }
@@ -203,9 +203,15 @@ class NextAction extends JSImplicit
 
         val actions = (projectAction orElse topicAction).getOrElse(allActions)
         val (done, notDone) = actions.partition(_.action.isDone.is)
+        val actionPage = new Paging(
+            notDone.filter(shouldDisplay).toArray, 10, 5, 
+            onActionPageSwitch _
+        )
 
-        val actionPage = new Paging(done.filter(shouldDisplay).toArray, 10, 5, onDonePageSwitch _)
-        val donePage = new Paging(notDone.filter(shouldDisplay).toArray, 10, 5, onDonePageSwitch _)
+        val donePage = new Paging(
+            done.filter(shouldDisplay).toArray, 10, 5, 
+            onDonePageSwitch _
+        )
 
         (actionPage, donePage)
     }
@@ -228,7 +234,7 @@ class NextAction extends JSImplicit
             SHtml.ajaxInvoke(deleteContext(context))
         )
 
-        val (doneList, notDoneList) = actions
+        val (notDoneList, doneList) = actions
 
         val doneHTML = doneList(currentDonePage).map(createActionRow).flatten
         val notDoneHTML = notDoneList(currentActionPage).map(createActionRow).flatten
@@ -310,7 +316,7 @@ class NextAction extends JSImplicit
 
     def render = 
     {
-        val (doneActions, notDoneActions) = actions
+        val (notDoneActions, doneActions) = actions
 
         ClearClearable &
         "#actionShowAll" #> SHtml.ajaxButton(S.?("Show All"), showAllStuff _) &
