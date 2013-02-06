@@ -1,11 +1,34 @@
-<div class="modal hide" id="nextActionModal" data-lift="NextActionModal">
+<div class="modal hide" id="nextActionModal" data-lift="NextActionModal?eager_eval=true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h3>儘快完成</h3>
   </div>
   <div class="modal-body">
-    <div id="stuffID"></div>
-    <p>One fine body…</p>
+
+    <fieldset id="processTitle" class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題" />
+        <span id="processTitle_msg" class="help-inline"></span>
+      </div>
+    </fieldset>
+
+    <div style="width: 100%">
+       <textarea rows="3" id="processEditDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+    </div>
+    <div>
+      <div data-lift="lift:embed?what=/process/projectInput"></div>
+      <div data-lift="lift:embed?what=/process/topicInput"></div>
+      <div data-lift="lift:embed?what=/process/contextInput"></div>
+    </div>
+    <div class="input-prepend input-append pull-left">
+      <span class="add-on">完成期限：</span><input class="input-large" id="deadline" type="text" />
+    </div>
+    <span class="control-group error hide" id="deadline_error">
+      <span class="help-inline" id="deadline_error_msg" style="margin-top:3px">完成期限要比今天晚</span>
+    </span>
+
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">取消</a>
