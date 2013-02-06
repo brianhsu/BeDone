@@ -3,6 +3,7 @@
 
     function addDroppable()
     {
+        /*
         $("#nextAction").droppable({
             accept: ".listRow",
             tolerance: "pointer",
@@ -46,6 +47,7 @@
                 showReferenceDialog(stuffID);
             }
         })
+        */
 
         $("#trash").droppable({
             accept: ".listRow",
@@ -63,7 +65,7 @@
     function addDraggable()
     {
         $('.listRow').draggable({
-            revert: 'invalid'
+            revert: true
         });
     }
 
