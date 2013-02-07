@@ -12,21 +12,13 @@ import net.liftweb.util.Helpers._
 import net.liftweb.http.S
 import scala.xml.NodeSeq
 
+
 object DragDropHandler extends JSImplicit
 {
-    def removeRow(stuffID: String): JsCmd = JsRaw(
-    """
-        $('div[data-stuffid="%s"]').fadeOut(500, function() {
-            $('div[data-stuffid="%s"]').remove();
-        })
-    """.format(stuffID, stuffID)
-    )
 
     val showNextActionDialog = {
 
         def showModal (stuffID: String) = {
-            println("ShowModa:" + stuffID)
-
             val snippet = "lift:embed?what=modal/NextActionModal;stuffID=" + stuffID
             JqSetHtml("modalBox", <div data-lift={snippet} />)
         }
@@ -44,8 +36,9 @@ object DragDropHandler extends JSImplicit
             Stuff.findByID(stuffID.toInt)
                  .foreach(_.isTrash(true).saveTheRecord)
 
-            removeRow(stuffID) &
-            """updatePaging()"""
+            RemoveInboxRow(stuffID) &
+            """updatePaging()""" &
+            """addDraggable()"""
         }
         
         Function(

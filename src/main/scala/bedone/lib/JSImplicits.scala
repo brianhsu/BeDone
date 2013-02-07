@@ -114,7 +114,15 @@ trait JSImplicit
         }
     }
 
-
+    object RemoveInboxRow {
+        def apply(stuffID: String): JsCmd = JsRaw(
+        """
+            $('div[data-stuffid="%s"]').fadeOut(500, function() {
+                $('div[data-stuffid="%s"]').remove();
+            })
+        """.format(stuffID, stuffID)
+        )
+    }
 }
 
 

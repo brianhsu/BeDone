@@ -4,7 +4,7 @@
     function addDroppable()
     {
         $("#nextAction").droppable({
-            accept: ".listRow",
+            accept: ".stuffs",
             tolerance: "pointer",
             activeClass: "dropActive",
             hoverClass: "dropHover",
@@ -16,7 +16,7 @@
 
         /*
         $("#delegated").droppable({
-            accept: ".listRow",
+            accept: ".stuffs",
             tolerance: "pointer",
             activeClass: "dropActive",
             hoverClass: "dropHover",
@@ -27,7 +27,7 @@
         })
 
         $("#scheduled").droppable({
-            accept: ".listRow",
+            accept: ".stuffs",
             tolerance: "pointer",
             activeClass: "dropActive",
             hoverClass: "dropHover",
@@ -38,7 +38,7 @@
         })
 
         $("#reference").droppable({
-            accept: ".listRow",
+            accept: ".stuffs",
             tolerance: "pointer",
             activeClass: "dropActive",
             hoverClass: "dropHover",
@@ -50,7 +50,7 @@
         */
 
         $("#trash").droppable({
-            accept: ".listRow",
+            accept: ".stuffs",
             tolerance: "pointer",
             activeClass: "dropActive",
             hoverClass: "dropHover",
@@ -64,7 +64,7 @@
 
     function addDraggable()
     {
-        $('.listRow').draggable({
+        $('.stuffs').draggable({
             revert: true
         });
     }

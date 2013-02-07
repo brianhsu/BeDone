@@ -56,10 +56,7 @@ class Process extends ProjectTagger with TopicTagger with ContextTagger with JSI
 
     // Stuff attirbute
     private var description: Option[String] = stuff.map(_.description.is)
-
-    // Action attribute
     private var actionTitle: Option[String] = stuff.map(_.title.is)
-    private var contextTitle: Option[String] = None
 
     // Delegated attribute
     private var currentContact: Option[Contact] = None
