@@ -36,7 +36,7 @@ class Preference extends JSImplicit
 
         def updateStatusFailed(error: Throwable): JsCmd = 
         {
-            val errorMessage = S.?("Connection failed: %s")
+            val errorMessage = S.?("Connection failed: %s").format(error.getMessage)
 
             """$('#gmailStatus').attr('class', 'label label-important')""" &
             "$('#gmailStatus').text('" + errorMessage + "')"
