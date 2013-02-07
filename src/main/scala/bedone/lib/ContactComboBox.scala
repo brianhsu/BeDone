@@ -11,7 +11,7 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 
 object ContactComboBox {
-    val defaultOptions = List(
+    def defaultOptions = List(
         "placeholder" -> Str(
             """<i class="icon-user"></i> """ + S.?("Who should work on this?")
         ),

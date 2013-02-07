@@ -11,7 +11,7 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 
 object ProjectComboBox {
-    val defaultOptions = List(
+    def defaultOptions = List(
         "placeholder" -> Str(
             """<i class="icon-folder-open"></i> """ +
             S.?("Select project")
