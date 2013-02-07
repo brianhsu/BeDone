@@ -30,8 +30,7 @@ import java.util.Calendar
 import java.text.SimpleDateFormat
 
 
-
-class Process extends ProjectTagger with TopicTagger 
+class Process extends ProjectTagger with TopicTagger with ContactTagger
               with ContextTagger with DeadlinePicker with HasStuff with JSImplicit
 {
     val currentUser = CurrentUser.is.get
@@ -41,6 +40,7 @@ class Process extends ProjectTagger with TopicTagger
     override var currentProjects = stuff.map(_.projects).getOrElse(Nil)
     override var currentTopics = stuff.map(_.topics).getOrElse(Nil)
     override var currentContexts: List[Context] = Nil
+    override var currentContact: Option[Contact] = None
 
     override val contextTagContainers = List("nextActionContext")
     override val projectTagContainers = List(
@@ -58,9 +58,6 @@ class Process extends ProjectTagger with TopicTagger
     private var description: Option[String] = stuff.map(_.description.is)
     private var actionTitle: Option[String] = stuff.map(_.title.is)
 
-    // Delegated attribute
-    private var currentContact: Option[Contact] = None
-
     // Scheduled attribute
     private var startDateTime: Option[Calendar] = None
     private var endDateTime: Option[Calendar] = None
@@ -71,18 +68,6 @@ class Process extends ProjectTagger with TopicTagger
 
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
-
-    val contactCombobox = new ContactComboBox {
-
-        override def setContact(selected: Option[Contact]): JsCmd = {
-            selected match {
-                case None => """$('#saveDelegated').attr('disabled', true)"""
-                case Some(contact) =>
-                    currentContact = selected
-                    """$('#saveDelegated').attr('disabled', false)"""
-            }
-        }
-    }
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
 
@@ -242,7 +227,6 @@ class Process extends ProjectTagger with TopicTagger
 
     def setDeadline(dateString: String): JsCmd = 
     {
-
         val onOK: JsCmd = {
             "$('#deadline_error').fadeOut()" &
             "$('#goToActionType').attr('disabled', false)"
@@ -320,6 +304,10 @@ class Process extends ProjectTagger with TopicTagger
 
     def hasStuffBinding(stuff: Stuff) = 
     {
+
+        val noContactSelected =  """$('#saveDelegated').attr('disabled', true)"""
+        val contactSelected = """$('#saveDelegated').attr('disabled', false)"""
+
         "#noStuffAlert" #> "" &
         "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
         "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
@@ -338,7 +326,7 @@ class Process extends ProjectTagger with TopicTagger
             "#saveNextAction [onclick]" #> SHtml.onEvent(saveNextAction(stuff))
         ) &
         "#isDelegated" #> (
-            "#contactCombo" #> contactCombobox.comboBox &
+            "#contactCombo" #> contactCombobox(noContactSelected, contactSelected) &
             "#saveDelegated [onclick]" #> SHtml.onEvent(saveDelegated(stuff))
         ) &
         "#itIsReference" #> (

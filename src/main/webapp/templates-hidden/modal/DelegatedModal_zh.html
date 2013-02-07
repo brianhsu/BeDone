@@ -1,0 +1,32 @@
+<div class="modal hide" id="delegatedModal" data-lift="DelegatedModal?eager_eval=true" data-backdrop="false" data-keyboard="false">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3>委派他人</h3>
+  </div>
+  <div class="modal-body">
+
+    <fieldset class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題" id="delegatedTitle"/>
+      </div>
+    </fieldset>
+
+    <div style="width: 100%">
+       <textarea rows="3" id="delegatedDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+    </div>
+    <div style="padding-bottom:1.5em">
+      <div data-lift="lift:embed?what=/process/topicInput"></div>
+      <div data-lift="lift:embed?what=/process/projectInput"></div>
+      <div id="contactCombo"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">取消</a>
+    <a href="#" class="btn btn-primary" id="saveButton" disabled="true">確定</a>
+  </div>
+  <script type="text/javascript">
+      $("#delegatedModal").modal();
+  </script>
+</div>

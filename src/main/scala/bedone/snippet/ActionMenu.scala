@@ -29,6 +29,19 @@ object DragDropHandler extends JSImplicit
         )
     }
 
+    val showDelegatedDialog = {
+
+        def showModal (stuffID: String) = {
+            val snippet = "lift:embed?what=modal/DelegatedModal;stuffID=" + stuffID
+            JqSetHtml("modalBox", <div data-lift={snippet} />)
+        }
+        
+        Function(
+            "showDelegatedDialog", List("stuffID"), 
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+        )
+    }
+
     val showReferenceDialog = {
 
         def showModal (stuffID: String) = {
@@ -72,7 +85,8 @@ class ActionMenu
         "#menuAjaxJS" #> Script(
             DragDropHandler.markAsTrash & 
             DragDropHandler.showNextActionDialog &
-            DragDropHandler.showReferenceDialog
+            DragDropHandler.showReferenceDialog &
+            DragDropHandler.showDelegatedDialog
         )
     }
 }
