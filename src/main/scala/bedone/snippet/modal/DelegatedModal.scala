@@ -82,9 +82,10 @@ class DelegatedModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
 
     def setDeadline(dateString: String): JsCmd = 
     {
-        val onOK: JsCmd = {
+        def onOK: JsCmd = {
             "$('#deadline_error').fadeOut()" &
-            "$('#saveButton').attr('disabled', false)"
+            "$('#deadline_error_msg').text('')" &
+            "$('#saveButton').attr('disabled', %s)".format(currentContact.isEmpty)
         }
 
         def onError(xs: List[FieldError]): JsCmd = {
@@ -109,7 +110,10 @@ class DelegatedModal extends JSImplicit
         val helper = new DelegatedModalHelper(stuffID)
 
         val noContactSelected =  """$('#saveButton').attr('disabled', true)"""
-        val contactSelected = """$('#saveButton').attr('disabled', false)"""
+        val contactSelected = """
+            var isOK = ($('#deadline_error_msg').text() == "")
+            $('#saveButton').attr('disabled', !isOK)
+        """
 
         helper.createProjectTags("delegatedProject") &
         helper.createTopicTags("delegatedTopic") &

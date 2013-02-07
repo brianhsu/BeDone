@@ -28,7 +28,7 @@ trait DeadlinePicker extends HasStuff
          }
     }
 
-    def setDeadline(dateString: String, onOK: JsCmd, 
+    def setDeadline(dateString: String, onOK: => JsCmd, 
                     onError: List[FieldError] => JsCmd): JsCmd = 
     {
 

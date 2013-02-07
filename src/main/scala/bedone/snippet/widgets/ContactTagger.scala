@@ -18,7 +18,9 @@ trait ContactTagger extends JSImplicit
     def contactCombobox(notSelect: JsCmd, onSelect: JsCmd) = new ContactComboBox {
         override def setContact(selected: Option[Contact]): JsCmd = {
             selected match {
-                case None => notSelect
+                case None => 
+                    currentContact = None
+                    notSelect
                 case Some(contact) => 
                     currentContact = selected
                     onSelect
