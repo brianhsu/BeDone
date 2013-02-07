@@ -14,6 +14,7 @@ import net.liftweb.common.Full
 import net.liftweb.common.Failure
 
 import net.liftweb.util.Helpers._
+import net.liftweb.util.FieldError
 
 import net.liftweb.http.S
 import net.liftweb.http.SHtml
@@ -30,10 +31,9 @@ import java.text.SimpleDateFormat
 
 
 
-class Process extends ProjectTagger with TopicTagger with ContextTagger with JSImplicit
+class Process extends ProjectTagger with TopicTagger 
+              with ContextTagger with DeadlinePicker with HasStuff with JSImplicit
 {
-    private implicit def optFromStr(x: String) = Option(x).filterNot(_.trim.length == 0)
-
     val currentUser = CurrentUser.is.get
     val stuff = Stuff.findByUser(currentUser).openOr(Nil)
                      .headOption
@@ -224,19 +224,6 @@ class Process extends ProjectTagger with TopicTagger with ContextTagger with JSI
         }
     }
 
-    def getCalendarDate(dateString: String): Box[Calendar] = {
-         optFromStr(dateString) match {
-            case None => Empty
-            case Some(date) => tryo {
-                dateFormatter.setLenient(false)
-                val date = dateFormatter.parse(dateString)
-                val calendar = Calendar.getInstance
-                calendar.setTime(date)
-                calendar
-            }
-         }
-    }
-
     def getCalendar(dateTimeString: String): Option[Calendar] = {
         optFromStr(dateTimeString) match {
             case None => None
@@ -253,23 +240,21 @@ class Process extends ProjectTagger with TopicTagger with ContextTagger with JSI
         }
     }
 
-    def setDeadline(dateString: String): JsCmd = {
+    def setDeadline(dateString: String): JsCmd = 
+    {
 
-        val deadline = getCalendarDate(dateString)
-        val errors = stuff.toList.flatMap { s => 
-            s.deadline.setBox(deadline)
-            s.deadline.validate
+        val onOK: JsCmd = {
+            "$('#deadline_error').fadeOut()" &
+            "$('#goToActionType').attr('disabled', false)"
+        }
+        
+        def onError(xs: List[FieldError]): JsCmd = {
+            "$('#deadline_error').fadeIn()" &
+            "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
+            "$('#goToActionType').attr('disabled', true)"
         }
 
-        errors match {
-            case Nil => 
-                "$('#deadline_error').fadeOut()" &
-                "$('#goToActionType').attr('disabled', false)"
-            case xs  => 
-                "$('#deadline_error').fadeIn()" &
-                "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
-                "$('#goToActionType').attr('disabled', true)"
-        }
+        super.setDeadline(dateString, onOK, onError _)
     }
 
 
