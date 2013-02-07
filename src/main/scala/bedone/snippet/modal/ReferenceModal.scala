@@ -13,9 +13,8 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
-
-class ReferenceModal extends ProjectTagger with TopicTagger 
-                     with HasStuff with JSImplicit
+class ReferenceModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger 
+                                         with HasStuff with JSImplicit
 {
     val stuff = S.attr("stuffID")
                  .flatMap(stuffID => Stuff.findByID(stuffID.toInt))
@@ -66,19 +65,33 @@ class ReferenceModal extends ProjectTagger with TopicTagger
             updateStuff(todo, StuffType.Reference)
 
             """$('#referenceModal').modal('hide')""" &
-            RemoveInboxRow(todo.idField.is.toString)
+            RemoveInboxRow(todo.idField.is.toString) &
+            """updatePaging()"""
         }
 
         resultJS.getOrElse(Noop)
     }
+}
+
+class ReferenceModal 
+{
 
     def render = {
-        val stuffTitle = stuff.map(_.title.is).getOrElse("")
 
-        createProjectTags("referenceProject") &
-        createTopicTags("referenceTopic") &
-        "#referenceTitle" #> SHtml.textAjaxTest(stuffTitle, doNothing _, setTitle _) &
-        "#referenceDesc" #> SHtml.ajaxTextarea(description.getOrElse(""), setDescription _) &
-        "#saveButton [onclick]" #> SHtml.onEvent(saveReference _)
+        val stuffID = S.attr("stuffID").map(_.toInt).openOrThrowException("No stuffID")
+        val stuff = Stuff.findByID(stuffID.toInt)
+        val stuffTitle = stuff.map(_.title.is).getOrElse("")
+        val helper = new ReferenceModalHelper(stuffID)
+
+        helper.createProjectTags("referenceProject") &
+        helper.createTopicTags("referenceTopic") &
+        "#referenceTitle" #> SHtml.textAjaxTest(
+            stuffTitle, helper.doNothing _, helper.setTitle _
+        ) &
+        "#referenceDesc" #> SHtml.ajaxTextarea(
+            stuff.map(_.description.is).getOrElse(""), 
+            helper.setDescription _
+        ) &
+        "#saveButton [onclick]" #> SHtml.onEvent(helper.saveReference _)
     }
 }

@@ -13,14 +13,11 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
-
-class NextActionModal extends ProjectTagger with TopicTagger 
+class NextActionModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger 
                       with ContextTagger with DeadlinePicker 
                       with HasStuff with JSImplicit
 {
-    val stuff = S.attr("stuffID")
-                 .flatMap(stuffID => Stuff.findByID(stuffID.toInt))
-                 .toOption
+    val stuff = Stuff.findByID(stuffID.toInt).toOption
 
     override val projectTagContainers = List("nextActionProject")
     override val topicTagContainers = List("nextActionTopic")
@@ -73,7 +70,8 @@ class NextActionModal extends ProjectTagger with TopicTagger
             action.setContexts(currentContexts)
 
             """$('#nextActionModal').modal('hide')""" &
-            RemoveInboxRow(todo.idField.is.toString)
+            RemoveInboxRow(todo.idField.is.toString) &
+            """updatePaging()"""
         }
 
         resultJS.getOrElse(Noop)
@@ -94,17 +92,31 @@ class NextActionModal extends ProjectTagger with TopicTagger
 
         super.setDeadline(dateString, onOK, onError)
     }
-            
 
+}
+
+
+class NextActionModal
+{
     def render = {
+
+        val stuffID = S.attr("stuffID").map(_.toInt).openOrThrowException("No stuffID")
+        val stuff = Stuff.findByID(stuffID.toInt)
         val stuffTitle = stuff.map(_.title.is).getOrElse("")
 
-        createProjectTags("nextActionProject") &
-        createTopicTags("nextActionTopic") &
-        createContextTags("nextActionContext") &
-        "#actionTitle" #> SHtml.textAjaxTest(stuffTitle, doNothing _, setTitle _) &
-        "#actionDesc" #> SHtml.ajaxTextarea(description.getOrElse(""), setDescription _) &
-        "#deadline" #> SHtml.textAjaxTest("", doNothing _, setDeadline _) &
-        "#saveButton [onclick]" #> SHtml.onEvent(saveNextAction _)
+        val helper = new NextActionModalHelper(stuffID)
+
+        helper.createProjectTags("nextActionProject") &
+        helper.createTopicTags("nextActionTopic") &
+        helper.createContextTags("nextActionContext") &
+        "#actionTitle" #> SHtml.textAjaxTest(
+            stuffTitle, helper.doNothing _, helper.setTitle _
+        ) &
+        "#actionDesc" #> SHtml.ajaxTextarea(
+            stuff.map(_.description.is).getOrElse(""), 
+            helper.setDescription _
+        ) &
+        "#deadline" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setDeadline _) &
+        "#saveButton [onclick]" #> SHtml.onEvent(helper.saveNextAction _)
     }
 }
