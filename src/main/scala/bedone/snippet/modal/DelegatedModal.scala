@@ -14,7 +14,8 @@ import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
 class DelegatedModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger 
-                                         with ContactTagger with HasStuff with JSImplicit
+                                         with DeadlinePicker with ContactTagger 
+                                         with HasStuff with JSImplicit
 {
     val stuff = S.attr("stuffID")
                  .flatMap(stuffID => Stuff.findByID(stuffID.toInt))
@@ -79,6 +80,22 @@ class DelegatedModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
         """updatePaging()"""
     }
 
+    def setDeadline(dateString: String): JsCmd = 
+    {
+        val onOK: JsCmd = {
+            "$('#deadline_error').fadeOut()" &
+            "$('#saveButton').attr('disabled', false)"
+        }
+
+        def onError(xs: List[FieldError]): JsCmd = {
+            "$('#deadline_error').fadeIn()" &
+            "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
+            "$('#saveButton').attr('disabled', true)"
+        }
+
+        super.setDeadline(dateString, onOK, onError)
+    }
+
 }
 
 class DelegatedModal extends JSImplicit
@@ -104,6 +121,7 @@ class DelegatedModal extends JSImplicit
             stuff.map(_.description.is).getOrElse(""), 
             helper.setDescription _
         ) &
+        "#deadline" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setDeadline _) &
         "#saveButton [onclick]" #> SHtml.onEvent(helper.saveDelegated)
     }
 }
