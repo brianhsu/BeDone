@@ -314,6 +314,18 @@ class NextAction extends JSImplicit
         updateList()
     }
 
+    def clearAllDone() = 
+    {
+        val actions = (projectAction orElse topicAction).getOrElse(allActions)
+        val doneStuffs = actions.filter(_.action.isDone.is).map(_.stuff)
+
+        doneStuffs.foreach { stuff => 
+            stuff.isTrash(true).saveTheRecord() 
+        }
+
+        updateList()
+    }
+
     def render = 
     {
         val (notDoneActions, doneActions) = actions
@@ -325,6 +337,10 @@ class NextAction extends JSImplicit
         "#actionPageSelector *" #> notDoneActions.pageSelector(currentActionPage) &
         "#donePageSelector *" #> doneActions.pageSelector(currentDonePage) &
         "#allActionTab [onclick]" #> SHtml.onEvent(showAllAction _) &
+        "#clearAllDone [onclick]" #> Confirm(
+            S.?("Are you sure to move all actions marked as done to recycle bin?"), 
+            SHtml.ajaxInvoke(clearAllDone _)
+        ) &
         ".contextTab" #> contexts.map(createContextTab)
     }
 }
