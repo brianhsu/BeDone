@@ -13,12 +13,13 @@ import net.liftweb.http.S
 import scala.xml.NodeSeq
 
 
-object DragDropHandler extends JSImplicit
+class DragDropHandler extends JSImplicit
 {
 
     val showNextActionDialog = {
 
         def showModal (stuffID: String) = {
+            println("Show Next Action Modal:" + stuffID)
             val snippet = "lift:embed?what=modal/NextActionModal;stuffID=" + stuffID
             JqSetHtml("modalBox", <div data-lift={snippet} />)
         }
@@ -32,6 +33,8 @@ object DragDropHandler extends JSImplicit
     val showDelegatedDialog = {
 
         def showModal (stuffID: String) = {
+            println("Show Delegated Modal:" + stuffID)
+
             val snippet = "lift:embed?what=modal/DelegatedModal;stuffID=" + stuffID
             JqSetHtml("modalBox", <div data-lift={snippet} />)
         }
@@ -45,6 +48,8 @@ object DragDropHandler extends JSImplicit
     val showReferenceDialog = {
 
         def showModal (stuffID: String) = {
+            println("Show Reference Modal:" + stuffID)
+
             val snippet = "lift:embed?what=modal/ReferenceModal;stuffID=" + stuffID
             JqSetHtml("modalBox", <div data-lift={snippet} />)
         }
@@ -58,6 +63,8 @@ object DragDropHandler extends JSImplicit
     val markAsTrash = {
 
         def markAsTrashInDB (stuffID: String) = {
+
+            println("Mark as trash:" + stuffID)
 
             Stuff.findByID(stuffID.toInt)
                  .foreach(_.isTrash(true).saveTheRecord)
@@ -79,14 +86,15 @@ class ActionMenu
     def render = {
 
         val menuID = "#" + S.request.map(_.path(0)).openOr("nonMenu")
+        val dragDropHandler = new DragDropHandler
 
         (menuID + " [class]") #> "active" &
         (menuID) #> ("i [class+]" #> "icon-white") &
         "#menuAjaxJS" #> Script(
-            DragDropHandler.markAsTrash & 
-            DragDropHandler.showNextActionDialog &
-            DragDropHandler.showReferenceDialog &
-            DragDropHandler.showDelegatedDialog
+            dragDropHandler.markAsTrash & 
+            dragDropHandler.showNextActionDialog &
+            dragDropHandler.showReferenceDialog &
+            dragDropHandler.showDelegatedDialog
         )
     }
 }
