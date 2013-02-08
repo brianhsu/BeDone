@@ -14,11 +14,11 @@ import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 
 import java.util.Calendar
-import java.text.SimpleDateFormat
+
 
 class Process extends ProjectTagger with TopicTagger with ContactTagger
               with ContextTagger with DeadlinePicker with TicklerPicker 
-              with HasStuff with JSImplicit
+              with SchedulePicker with HasStuff with JSImplicit
 {
     val currentUser = CurrentUser.is.get
     val stuff = Stuff.findByUser(currentUser).openOr(Nil)
@@ -45,13 +45,80 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
     private var description: Option[String] = stuff.map(_.description.is)
     private var actionTitle: Option[String] = stuff.map(_.title.is)
 
-    // Scheduled attribute
-    private var startDateTime: Option[Calendar] = None
-    private var endDateTime: Option[Calendar] = None
-    private var location: Option[String] = None
+    def setDeadline(dateString: String): JsCmd = 
+    {
+        val onOK: JsCmd = {
+            "$('#deadline_error').fadeOut()" &
+            "$('#goToActionType').attr('disabled', false)"
+        }
+        
+        def onError(xs: List[FieldError]): JsCmd = {
+            "$('#deadline_error').fadeIn()" &
+            "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
+            "$('#goToActionType').attr('disabled', true)"
+        }
 
-    private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-    private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+        super.setDeadline(dateString, onOK, onError _)
+    }
+
+    def setDescription(description: String): JsCmd = {
+        this.description = description
+        Noop
+    }
+
+    def setTickler(dateString: String) =
+    {
+        val onOK: JsCmd = {
+            "$('#tickler_error').fadeOut()" &
+            "$('#saveMaybeTickler').attr('disabled', false)"
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#tickler_error').fadeIn()" &
+            "$('#tickler_error_msg').text('%s')".format(error.map(_.msg).mkString("、")) &
+            "$('#saveMaybeTickler').attr('disabled', true)"
+        }
+
+        super.setTickler(dateString, onOK, onError)
+    }
+
+    def setEndDateTime(dateTimeString: String): JsCmd =
+    {
+        def onOK: JsCmd = {
+            
+            val isScheduleValid = !validateSchedule.isEmpty
+
+            "$('#endTime_error').fadeOut()" &
+            "$('#saveScheduled').attr('disabled', %s)".format(isScheduleValid)
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#endTime_error').fadeIn()" &
+            "$('#endTime_error_msg').text('%s')".format(error.flatMap(_.msg).mkString) &
+            "$('#saveScheduled').attr('disabled', true)"
+        }
+
+        super.setEndDateTime(dateTimeString, onOK, onError)
+
+    }
+
+    def setStartDateTime(dateTimeString: String): JsCmd = 
+    {
+        def onOK: JsCmd = {
+            val isScheduleValid = !validateSchedule.isEmpty
+
+            "$('#startTime_error').fadeOut()" &
+            "$('#saveScheduled').attr('disabled', %s)".format(isScheduleValid)
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#startTime_error').fadeIn()" &
+            "$('#startTime_error_msg').text('%s')".format(error.flatMap(_.msg).mkString) &
+            "$('#saveScheduled').attr('disabled', true)"
+        }
+
+        super.setStartDateTime(dateTimeString, onOK, onError)
+    }
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
 
@@ -175,8 +242,8 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         val action = Action.createRecord.idField(updatedStuff.idField.is)
         val scheduled = Scheduled.createRecord.idField(updatedStuff.idField.is)
 
-        scheduled.startTime.setBox(startDateTime)
-        scheduled.endTime.setBox(endDateTime)
+        scheduled.startTime.setBox(startTime)
+        scheduled.endTime.setBox(endTime)
         scheduled.location.setBox(location)
         scheduled.validate match {
             case Nil => 
@@ -193,95 +260,6 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         }
     }
 
-    def getCalendar(dateTimeString: String): Option[Calendar] = {
-        optFromStr(dateTimeString) match {
-            case None => None
-            case Some(dateTimeString) =>
-                try {
-                    dateTimeFormatter.setLenient(false)
-                    val dateTime = dateTimeFormatter.parse(dateTimeString)
-                    val calendar = Calendar.getInstance
-                    calendar.setTime(dateTime)
-                    Some(calendar)
-                } catch {
-                    case e => None
-                }
-        }
-    }
-
-    def setDeadline(dateString: String): JsCmd = 
-    {
-        val onOK: JsCmd = {
-            "$('#deadline_error').fadeOut()" &
-            "$('#goToActionType').attr('disabled', false)"
-        }
-        
-        def onError(xs: List[FieldError]): JsCmd = {
-            "$('#deadline_error').fadeIn()" &
-            "$('#deadline_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
-            "$('#goToActionType').attr('disabled', true)"
-        }
-
-        super.setDeadline(dateString, onOK, onError _)
-    }
-
-
-    def setEndDateTime(dateTimeString: String): JsCmd = {
-        endDateTime = getCalendar(dateTimeString)
-        Noop
-    }
-
-    def setStartDateTime(dateTimeString: String): JsCmd = {
-        
-
-        val dateTime = tryo {
-            require(optFromStr(dateTimeString).isDefined, S.?("This field is required."))
-
-            dateTimeFormatter.setLenient(false)
-
-            val dateTime = dateTimeFormatter.parse(dateTimeString)
-            val calendar = Calendar.getInstance
-            calendar.setTime(dateTime)
-            calendar
-        }
-
-        this.startDateTime = dateTime.toOption
-
-        dateTime match {
-            case Full(date) => 
-                "$('#deadline_error').fadeOut()" &
-                "$('#saveScheduled').attr('disabled', false)"
-            case Empty => 
-                "$('#deadline_error').fadeOut()" &
-                "$('#saveScheduled').attr('disabled', true)"
-            case Failure(msg, _, _) => 
-                "$('#deadline_error').fadeIn()" &
-                "$('#deadline_error_msg').text('%s')".format("SSSS") &
-                "$('#saveScheduled').attr('disabled', true)"
-        }
-    }
-
-    def setDescription(description: String): JsCmd = {
-        this.description = description
-        Noop
-    }
-
-    def setTickler(dateString: String) =
-    {
-        val onOK: JsCmd = {
-            "$('#tickler_error').fadeOut()" &
-            "$('#saveMaybeTickler').attr('disabled', false)"
-        }
-
-        def onError(error: List[FieldError]): JsCmd = {
-            "$('#tickler_error').fadeIn()" &
-            "$('#tickler_error_msg').text('%s')".format(error.map(_.msg).mkString("、")) &
-            "$('#saveMaybeTickler').attr('disabled', true)"
-        }
-
-        super.setTickler(dateString, onOK, onError)
-    }
-
     def hasStuffBinding(stuff: Stuff) = 
     {
 
@@ -291,9 +269,9 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         "#noStuffAlert" #> "" &
         "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
         "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
-        "#location" #> SHtml.textAjaxTest("", doNothing _, location = _) &
-        "#startDateTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
-        "#endDateTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
+        "#location" #> SHtml.textAjaxTest("", doNothing _, setLocation _) &
+        "#startTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
+        "#endTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
         "#saveScheduled [onclick]" #> SHtml.onEvent(saveScheduled(stuff)) &
         "#processEdit" #> (
             createProjectTags("editFormProject") &

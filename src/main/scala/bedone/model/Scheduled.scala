@@ -92,26 +92,42 @@ class Scheduled extends Record[Scheduled] with KeyedRecord[Int]
 
     @Column(name="actionID")
     val idField = new IntField(this)
-    val startTime = new DateTimeField(this)
+
+    val startTime = new DateTimeField(this) {
+
+        def afterToday(calendar: Calendar): List[FieldError] = {
+
+            calendar.before(today) match {
+                case true => FieldError(this, S.?("Deadline must later than today.")) :: Nil
+                case false => Nil
+
+            }
+        }
+
+        override def notOptionalErrorMessage = "This field is required."
+        override def validations = afterToday _ :: super.validations
+    }
 
     val endTime = new OptionalDateTimeField(this) {
 
-        def isAfterStartTime(endTime: Option[Calendar]): List[FieldError] = 
+        def afterStartTime(endTime: Option[Calendar]): List[FieldError] = 
         {
             endTime.forall(x => x.getTime.getTime > startTime.is.getTime.getTime) match {
                 case true  => Nil
                 case false => 
-                    new FieldError(this, Text(S.?("Deadline must later than today."))) :: Nil
+                    new FieldError(
+                        this, 
+                        Text(S.?("End time must later than start time."))
+                    ) :: Nil
             }
         }
 
-        override def validations = isAfterStartTime _ :: super.validations
+        override def validations = afterStartTime _ :: super.validations
     }
 
     val location = new OptionalStringField(this, 255)
 
     def action = Action.findByID(idField.is).get
-
 
     override def saveTheRecord() = tryo{
         this.isPersisted match {

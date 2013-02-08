@@ -210,9 +210,26 @@
           <div class="messageBox">
             <div class="message">
               <div style="margin-bottom:0.5em">What's the date and time?</div>
-              <div class="inline" style="margin-right:1em">Start Time:<input id="startDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">End Time:<input id="endDateTime" type="text"/></div>
-              <div class="inline" style="margin-right:1em">Location:<input id="location" type="text"/></div>
+              <div class="input-prepend input-append pull-left">
+                <span class="add-on">Start Time</span><input class="input-large" id="startTime" type="text" />
+              </div>
+              <span class="control-group error hide" id="startTime_error">
+                <span class="help-inline" id="startTime_error_msg" style="margin-top:3px"></span>
+              </span>
+              <div class="clearfix" />
+
+              <div class="input-prepend input-append pull-left">
+                <span class="add-on">End Time</span><input class="input-large" id="endTime" type="text" />
+              </div>
+              <span class="control-group error hide" id="endTime_error">
+                <span class="help-inline" id="endTime_error_msg" style="margin-top:3px"></span>
+              </span>
+              <div class="clearfix" />
+
+              <div class="input-prepend input-append pull-left">
+                <span class="add-on">Location</span><input class="input-large" id="location" type="text" />
+              </div>
+              <div class="clearfix" />
             </div>
             <div>
               <button onclick="showDialog('whatActionType')" class="btn btn-info pull-left">Previous</button>
@@ -241,21 +258,23 @@
 
       <script type="text/javascript">
         
-          $( "#startDateTime" ).datetimepicker({
+          $( "#startTime" ).datetimepicker({
               dateFormat: "yy-mm-dd",
               timeFormat: 'hh:mm',
               onClose: function(dateText) {
-                  $("#startDateTime").val(dateText)
-                  $("#startDateTime").blur()
+                  $("#startTime").val(dateText)
+                  $("#startTime").blur()
+                  $("#endTime").blur()
               }
           });
 
-          $( "#endDateTime" ).datetimepicker({
+          $( "#endTime" ).datetimepicker({
               dateFormat: "yy-mm-dd",
               timeFormat: 'hh:mm',
               onClose: function(dateText) {
-                  $("#endDateTime").val(dateText)
-                  $("#endDateTime").blur()
+                  $("#endTime").val(dateText)
+                  $("#startTime").blur()
+                  $("#endTime").blur()
               }
           });
 
