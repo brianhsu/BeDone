@@ -98,9 +98,14 @@ class DragDropHandler extends JSImplicit
 
 class ActionMenu
 {
+    def menuIDBox = S.request.map { url =>
+        val lastURLIndex = (0 max (url.path.partPath.size - 1))
+        url.path(lastURLIndex)
+    }
+
     def render = {
 
-        val menuID = "#" + S.request.map(_.path(0)).openOr("nonMenu")
+        val menuID = "#" + menuIDBox.openOr("nonMenu")
         val dragDropHandler = new DragDropHandler
 
         (menuID + " [class]") #> "active" &
