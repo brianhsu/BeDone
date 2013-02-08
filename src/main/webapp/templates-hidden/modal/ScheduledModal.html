@@ -1,0 +1,74 @@
+<div class="modal hide" id="scheduledModal" data-lift="ScheduledModal?eager_eval=true" data-backdrop="false" data-keyboard="false">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3>參考資料</h3>
+  </div>
+  <div class="modal-body">
+
+    <fieldset class="inline control-group">
+      <div class="input-prepend" style="margin-left: 0.5em">
+        <span title="標題" class="add-on">
+          <i class="icon-th-list"></i>
+        </span><input class="input-xlarge" type="text" placeholder="標題" id="scheduledTitle"/>
+      </div>
+    </fieldset>
+
+    <div style="width: 100%">
+       <textarea rows="3" id="scheduledDesc" style="margin-left: 0.2em; width: 98%"></textarea>
+    </div>
+    <div style="padding-bottom:1em">
+      <div data-lift="lift:embed?what=/process/topicInput"></div>
+      <div data-lift="lift:embed?what=/process/projectInput"></div>
+
+      <div class="input-prepend input-append pull-left">
+        <span class="add-on">開始時間</span><input class="input-large" id="startTime" type="text" style="z-index: 9990" />
+      </div>
+      <span class="control-group error hide" id="startTime_error">
+        <span class="help-inline" id="startTime_error_msg" style="margin-top:3px"></span>
+      </span>
+      <div class="clearfix" />
+
+      <div class="input-prepend input-append pull-left">
+        <span class="add-on">結束時間</span><input class="input-large" id="endTime" type="text" style="z-index: 9990" />
+      </div>
+      <span class="control-group error hide" id="endTime_error">
+        <span class="help-inline" id="endTime_error_msg" style="margin-top:3px"></span>
+      </span>
+      <div class="clearfix" />
+
+      <div class="input-prepend input-append pull-left">
+        <span class="add-on">地點</span><input class="input-large" id="location" type="text" />
+      </div>
+      <div class="clearfix" />
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">取消</button>
+    <button class="btn btn-primary" id="saveButton">確定</button>
+  </div>
+  <script type="text/javascript">
+      $("#scheduledModal").modal();
+
+      $( "#startTime" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#startTime").val(dateText)
+              $("#startTime").blur()
+              $("#endTime").blur()
+          }
+      });
+
+      $( "#endTime" ).datetimepicker({
+          dateFormat: "yy-mm-dd",
+          timeFormat: 'hh:mm',
+          onClose: function(dateText) {
+              $("#endTime").val(dateText)
+              $("#startTime").blur()
+              $("#endTime").blur()
+          }
+      });
+
+  </script>
+</div>

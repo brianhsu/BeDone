@@ -75,6 +75,21 @@ class DragDropHandler extends JSImplicit
         )
     }
 
+    val showScheduledDialog = {
+
+        def showModal (stuffID: String) = {
+            println("Show Scheduled Modal:" + stuffID)
+
+            val snippet = "lift:embed?what=modal/ScheduledModal;stuffID=" + stuffID
+            JqSetHtml("modalBox", <div data-lift={snippet} />)
+        }
+        
+        Function(
+            "showScheduledDialog", List("stuffID"), 
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+        )
+    }
+
     val markAsTrash = {
 
         def markAsTrashInDB (stuffID: String) = {
@@ -115,8 +130,8 @@ class ActionMenu
             dragDropHandler.showNextActionDialog &
             dragDropHandler.showReferenceDialog &
             dragDropHandler.showDelegatedDialog &
-            dragDropHandler.showMaybeDialog
-
+            dragDropHandler.showMaybeDialog &
+            dragDropHandler.showScheduledDialog
         )
     }
 }
