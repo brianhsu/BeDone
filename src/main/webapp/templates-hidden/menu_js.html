@@ -39,6 +39,17 @@
 
         */
 
+        $("#maybe").droppable({
+            accept: ".stuffs",
+            tolerance: "pointer",
+            activeClass: "dropActive",
+            hoverClass: "dropHover",
+            drop: function(event, ui) {
+                var stuffID = ui.draggable.data("stuffid");
+                showMaybeDialog(stuffID);
+            }
+        })
+
         $("#reference").droppable({
             accept: ".stuffs",
             tolerance: "pointer",
