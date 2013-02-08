@@ -60,16 +60,15 @@ class ReferenceModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
 
     def saveReference(valueAttr: String) = 
     {
-        val resultJS = stuff.map { todo =>
+        stuff.map { todo =>
 
             updateStuff(todo, StuffType.Reference)
 
             """$('#referenceModal').modal('hide')""" &
             RemoveInboxRow(todo.idField.is.toString) &
             """updatePaging()"""
-        }
 
-        resultJS.getOrElse(Noop)
+        }.toList
     }
 }
 

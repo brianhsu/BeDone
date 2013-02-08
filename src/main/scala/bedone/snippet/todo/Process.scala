@@ -4,34 +4,21 @@ import org.bedone.model._
 import org.bedone.lib._
 
 import org.bedone.model.StuffType.StuffType
-import TagButton.Implicit._
 
-import net.liftmodules.combobox._
-
-import net.liftweb.common.Box
-import net.liftweb.common.Empty
-import net.liftweb.common.Full
-import net.liftweb.common.Failure
-
+import net.liftweb.common._
 import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
-
 import net.liftweb.http.S
 import net.liftweb.http.SHtml
-
-import net.liftweb.http.js.JE.JsTrue
-import net.liftweb.http.js.JE.Str
-import net.liftweb.http.js.JsExp
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
-import net.liftweb.http.js.jquery.JqJsCmds._
 
 import java.util.Calendar
 import java.text.SimpleDateFormat
 
-
 class Process extends ProjectTagger with TopicTagger with ContactTagger
-              with ContextTagger with DeadlinePicker with HasStuff with JSImplicit
+              with ContextTagger with DeadlinePicker with TicklerPicker 
+              with HasStuff with JSImplicit
 {
     val currentUser = CurrentUser.is.get
     val stuff = Stuff.findByUser(currentUser).openOr(Nil)
@@ -62,9 +49,6 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
     private var startDateTime: Option[Calendar] = None
     private var endDateTime: Option[Calendar] = None
     private var location: Option[String] = None
-
-    // Maybe attribute
-    private var tickler: Box[Calendar] = Empty
 
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
@@ -282,24 +266,20 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         Noop
     }
 
-    def setTickler(dateString: String): JsCmd = {
-
-        this.tickler = getCalendarDate(dateString)
-        val errors = stuff.map(x => Maybe.createRecord).toList.flatMap { maybe => 
-            maybe.tickler.setBox(tickler)
-            maybe.tickler.validate
+    def setTickler(dateString: String) =
+    {
+        val onOK: JsCmd = {
+            "$('#tickler_error').fadeOut()" &
+            "$('#saveMaybeTickler').attr('disabled', false)"
         }
 
-
-        errors match {
-            case Nil => 
-                "$('#tickler_error').fadeOut()" &
-                "$('#saveMaybeTickler').attr('disabled', false)"
-            case xs  => 
-                "$('#tickler_error').fadeIn()" &
-                "$('#tickler_error_msg').text('%s')".format(xs.map(_.msg).mkString("、")) &
-                "$('#saveMaybeTickler').attr('disabled', true)"
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#tickler_error').fadeIn()" &
+            "$('#tickler_error_msg').text('%s')".format(error.map(_.msg).mkString("、")) &
+            "$('#saveMaybeTickler').attr('disabled', true)"
         }
+
+        super.setTickler(dateString, onOK, onError)
     }
 
     def hasStuffBinding(stuff: Stuff) = 

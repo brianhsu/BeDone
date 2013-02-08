@@ -62,7 +62,7 @@ class NextActionModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
 
     def saveNextAction(valueAttr: String): JsCmd = {
         
-        val resultJS = stuff.map { todo =>
+        stuff.map { todo =>
             val updatedStuff = updateStuff(todo, StuffType.Action)
             val action = Action.createRecord.idField(updatedStuff.idField.is)
 
@@ -72,9 +72,7 @@ class NextActionModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
             """$('#nextActionModal').modal('hide')""" &
             RemoveInboxRow(todo.idField.is.toString) &
             """updatePaging()"""
-        }
-
-        resultJS.getOrElse(Noop)
+        }.toList
     }
 
     def setDeadline(dateString: String): JsCmd = 

@@ -14,7 +14,7 @@ import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
 class MaybeModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger 
-                                     with HasStuff with JSImplicit
+                                     with TicklerPicker with HasStuff with JSImplicit
 {
     val stuff = S.attr("stuffID")
                  .flatMap(stuffID => Stuff.findByID(stuffID.toInt))
@@ -57,26 +57,60 @@ class MaybeModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
         stuff.saveTheRecord()
         stuff
     }
+
+    def setTickler(dateString: String) =
+    {
+        val onOK: JsCmd = {
+            "$('#tickler_error').fadeOut()" &
+            "$('#saveButton').attr('disabled', false)"
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#tickler_error').fadeIn()" &
+            "$('#tickler_error_msg').text('%s')".format(error.map(_.msg).mkString("、")) &
+            "$('#saveButton').attr('disabled', true)"
+        }
+
+        super.setTickler(dateString, onOK, onError)
+    }
+
+    def saveMaybe(valueAttr: String): JsCmd = {
+
+        stuff.map { todo =>
+            val updatedStuff = updateStuff(todo, StuffType.Maybe)
+            val maybe = Maybe.createRecord.idField(todo.idField.is)
+
+            maybe.tickler(this.tickler.toOption)
+            maybe.saveTheRecord()
+
+            """$('#maybeModal').modal('hide')""" &
+            RemoveInboxRow(todo.idField.is.toString) &
+            """updatePaging()"""
+        }.toList
+
+    }
 }
 
 class MaybeModal 
 {
-
     def render = {
 
         val stuffID = S.attr("stuffID").map(_.toInt).openOrThrowException("No stuffID")
         val stuff = Stuff.findByID(stuffID.toInt)
         val stuffTitle = stuff.map(_.title.is).getOrElse("")
-        val helper = new ReferenceModalHelper(stuffID)
+        val helper = new MaybeModalHelper(stuffID)
 
         helper.createProjectTags("maybeProject") &
         helper.createTopicTags("maybeTopic") &
+        "#tickler" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setTickler _) &
         "#maybeTitle" #> SHtml.textAjaxTest(
             stuffTitle, helper.doNothing _, helper.setTitle _
         ) &
         "#maybeDesc" #> SHtml.ajaxTextarea(
             stuff.map(_.description.is).getOrElse(""), 
             helper.setDescription _
-        )
+        ) &
+        "#saveButton [onclick]" #> SHtml.onEvent(helper.saveMaybe)
+
     }
 }
