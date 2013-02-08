@@ -14,7 +14,7 @@ import net.liftweb.util.Helpers._
 import net.liftweb.util.FieldError
 
 class ScheduledModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger 
-                                         with HasStuff with JSImplicit
+                                         with SchedulePicker with HasStuff with JSImplicit
 {
     val stuff = S.attr("stuffID")
                  .flatMap(stuffID => Stuff.findByID(stuffID.toInt))
@@ -47,6 +47,43 @@ class ScheduledModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
         }
     }
 
+    def setStartTime(dateTimeString: String): JsCmd = 
+    {
+        def onOK: JsCmd = {
+            val isScheduleValid = !validateSchedule.isEmpty
+
+            "$('#startTime_error').fadeOut()" &
+            "$('#saveScheduled').attr('disabled', %s)".format(isScheduleValid)
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#startTime_error').fadeIn()" &
+            "$('#startTime_error_msg').text('%s')".format(error.flatMap(_.msg).mkString) &
+            "$('#saveButton').attr('disabled', true)"
+        }
+
+        super.setStartTime(dateTimeString, onOK, onError)
+    }
+
+    def setEndTime(dateTimeString: String): JsCmd =
+    {
+        def onOK: JsCmd = {
+            
+            val isScheduleValid = !validateSchedule.isEmpty
+
+            "$('#endTime_error').fadeOut()" &
+            "$('#saveButton').attr('disabled', %s)".format(isScheduleValid)
+        }
+
+        def onError(error: List[FieldError]): JsCmd = {
+            "$('#endTime_error').fadeIn()" &
+            "$('#endTime_error_msg').text('%s')".format(error.flatMap(_.msg).mkString) &
+            "$('#saveButton').attr('disabled', true)"
+        }
+
+        super.setEndTime(dateTimeString, onOK, onError)
+    }
+
     def updateStuff(stuff: Stuff, stuffType: StuffType) =
     {
         stuff.title(scheduledTitle.getOrElse(stuff.title.is))
@@ -57,6 +94,28 @@ class ScheduledModalHelper(stuffID: Int) extends ProjectTagger with TopicTagger
         stuff.saveTheRecord()
         stuff
     }
+
+    def saveScheduled(valueAttr: String): JsCmd = 
+    {
+        stuff.map { todo =>
+
+            val updatedStuff = updateStuff(todo, StuffType.Scheduled)
+            val action = Action.createRecord.idField(updatedStuff.idField.is)
+            val scheduled = Scheduled.createRecord.idField(updatedStuff.idField.is)
+
+            action.saveTheRecord()
+            scheduled.startTime.setBox(startTime)
+            scheduled.endTime.setBox(endTime)
+            scheduled.location.setBox(location)
+            scheduled.saveTheRecord()
+
+            """$('#scheduledModal').modal('hide')""" &
+            RemoveInboxRow(todo.idField.is.toString) &
+            """updatePaging()"""
+
+        }.toList
+    }
+
 }
 
 class ScheduledModal 
@@ -71,12 +130,16 @@ class ScheduledModal
 
         helper.createProjectTags("scheduledProject") &
         helper.createTopicTags("scheduledTopic") &
+        "#location" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setLocation _) &
+        "#startTime" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setStartTime _) &
+        "#endTime" #> SHtml.textAjaxTest("", helper.doNothing _, helper.setEndTime _) &
         "#scheduledTitle" #> SHtml.textAjaxTest(
             stuffTitle, helper.doNothing _, helper.setTitle _
         ) &
         "#scheduledDesc" #> SHtml.ajaxTextarea(
             stuff.map(_.description.is).getOrElse(""), 
             helper.setDescription _
-        )
+        ) &
+        "#saveButton [onclick]" #> SHtml.onEvent(helper.saveScheduled)
     }
 }

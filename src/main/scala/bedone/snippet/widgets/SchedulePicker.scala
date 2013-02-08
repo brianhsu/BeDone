@@ -25,9 +25,20 @@ trait SchedulePicker extends HasStuff
         this.location = location
     }
 
-    def setEndDateTime(dateTimeString: String, 
-                       onOK: => JsCmd, 
-                       onError: List[FieldError] => JsCmd): JsCmd = 
+    def validateSchedule: List[FieldError] =
+    {
+        stuff.map { todo =>
+            val scheduled = Scheduled.createRecord
+            scheduled.startTime.setBox(startTime)
+            scheduled.endTime.set(endTime)
+            scheduled.location.set(location)
+            scheduled.validate
+        }.flatten.toList
+    }
+
+    def setEndTime(dateTimeString: String, 
+                   onOK: => JsCmd, 
+                   onError: List[FieldError] => JsCmd): JsCmd = 
     {
         endTime = getCalendar(dateTimeString)
 
@@ -45,20 +56,10 @@ trait SchedulePicker extends HasStuff
         }
     }
 
-    def validateSchedule: List[FieldError] =
-    {
-        stuff.map { todo =>
-            val scheduled = Scheduled.createRecord
-            scheduled.startTime.setBox(startTime)
-            scheduled.endTime.set(endTime)
-            scheduled.location.set(location)
-            scheduled.validate
-        }.flatten.toList
-    }
 
-    def setStartDateTime(dateTimeString: String, 
-                         onOK: => JsCmd,
-                         onError: List[FieldError] => JsCmd): JsCmd = 
+    def setStartTime(dateTimeString: String, 
+                     onOK: => JsCmd,
+                     onError: List[FieldError] => JsCmd): JsCmd = 
     {
         startTime = getCalendar(dateTimeString)
 

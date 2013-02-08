@@ -82,7 +82,7 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         super.setTickler(dateString, onOK, onError)
     }
 
-    def setEndDateTime(dateTimeString: String): JsCmd =
+    def setEndTime(dateTimeString: String): JsCmd =
     {
         def onOK: JsCmd = {
             
@@ -98,11 +98,11 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
             "$('#saveScheduled').attr('disabled', true)"
         }
 
-        super.setEndDateTime(dateTimeString, onOK, onError)
+        super.setEndTime(dateTimeString, onOK, onError)
 
     }
 
-    def setStartDateTime(dateTimeString: String): JsCmd = 
+    def setStartTime(dateTimeString: String): JsCmd = 
     {
         def onOK: JsCmd = {
             val isScheduleValid = !validateSchedule.isEmpty
@@ -117,7 +117,7 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
             "$('#saveScheduled').attr('disabled', true)"
         }
 
-        super.setStartDateTime(dateTimeString, onOK, onError)
+        super.setStartTime(dateTimeString, onOK, onError)
     }
 
     def saveDelegated(stuff: Stuff)(valueAttr: String): JsCmd = {
@@ -245,19 +245,16 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         scheduled.startTime.setBox(startTime)
         scheduled.endTime.setBox(endTime)
         scheduled.location.setBox(location)
-        scheduled.validate match {
-            case Nil => 
-                stuff.saveTheRecord()
-                action.saveTheRecord()
-                scheduled.saveTheRecord()
-                S.redirectTo(
-                    "/todo/process", 
-                    () => S.notice(S.?("'%s' is in schedule now.") format(stuff.title.is))
-                )
+        stuff.saveTheRecord()
+        action.saveTheRecord()
+        scheduled.saveTheRecord()
 
-                Noop
-            case xs  => Alert(xs.map(_.msg).mkString("、"))
-        }
+        S.redirectTo(
+            "/todo/process", 
+            () => S.notice(S.?("'%s' is in schedule now.") format(stuff.title.is))
+        )
+
+        Noop
     }
 
     def hasStuffBinding(stuff: Stuff) = 
@@ -270,8 +267,8 @@ class Process extends ProjectTagger with TopicTagger with ContactTagger
         "#isTrash [onclick]" #> SHtml.onEvent(markAsTrash(stuff)) &
         "#markAsDone [onclick]" #> SHtml.onEvent(markAsDone(stuff)) &
         "#location" #> SHtml.textAjaxTest("", doNothing _, setLocation _) &
-        "#startTime" #> SHtml.textAjaxTest("", doNothing _, setStartDateTime _) &
-        "#endTime" #> SHtml.textAjaxTest("", doNothing _, setEndDateTime _) &
+        "#startTime" #> SHtml.textAjaxTest("", doNothing _, setStartTime _) &
+        "#endTime" #> SHtml.textAjaxTest("", doNothing _, setEndTime _) &
         "#saveScheduled [onclick]" #> SHtml.onEvent(saveScheduled(stuff)) &
         "#processEdit" #> (
             createProjectTags("editFormProject") &
