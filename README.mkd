@@ -15,7 +15,7 @@ Installation
 2. Clone this project from GitHub.
 
     ```
-    $ git clone git://github.com/brianhsu/BeDone.git BeDone
+    $ git clone --branch develop git://github.com/brianhsu/BeDone.git BeDone 
     ```
 
 3. Configure your BeDone MySQL / SMTP / GMail OAuth settings by the following commands:
