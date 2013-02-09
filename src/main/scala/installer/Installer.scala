@@ -15,7 +15,7 @@ object DBCreator
 
     def getYesOrNo(prompt: String): String =
     {
-        val line = Option(consoleReader.readLine(prompt, '\0'))
+        val line = Option(consoleReader.readLine(prompt))
 
         line.filter(x => x == "yes" || x == "no" ) match {
             case Some(text) => text
@@ -57,7 +57,7 @@ object Insteller
 
     def getYesOrNo(prompt: String): String =
     {
-        val line = Option(consoleReader.readLine(prompt, '\0'))
+        val line = Option(consoleReader.readLine(prompt))
 
         line.filter(x => x == "yes" || x == "no" ) match {
             case Some(text) => text
@@ -67,7 +67,7 @@ object Insteller
 
     def getLine(prompt: String): String =
     {
-        val line = Option(consoleReader.readLine(prompt, '\0'))
+        val line = Option(consoleReader.readLine(prompt))
 
         line.filter(_.length > 0) match {
             case Some(text) => text
@@ -77,7 +77,7 @@ object Insteller
 
     def getLine(prompt: String, defaultValue: String): String =
     {
-        val line = Option(consoleReader.readLine(prompt, '\0'))
+        val line = Option(consoleReader.readLine(prompt))
 
         line.filter(_.length > 0) match {
             case Some(text) => text
