@@ -231,7 +231,7 @@ class NextAction extends JSImplicit
     {
         def deleteJS(context: Context) = Confirm(
             S.?("Are you sure to delete context '%s'?") format(context.title.is), 
-            SHtml.ajaxInvoke(deleteContext(context))
+            SHtml.ajaxInvoke(deleteContext(context)).cmd
         )
 
         val (notDoneList, doneList) = actions
@@ -339,7 +339,7 @@ class NextAction extends JSImplicit
         "#allActionTab [onclick]" #> SHtml.onEvent(showAllAction _) &
         "#clearAllDone [onclick]" #> Confirm(
             S.?("Are you sure to move all actions marked as done to recycle bin?"), 
-            SHtml.ajaxInvoke(clearAllDone _)
+            SHtml.ajaxInvoke(clearAllDone _).cmd
         ) &
         ".contextTab" #> contexts.map(createContextTab)
     }

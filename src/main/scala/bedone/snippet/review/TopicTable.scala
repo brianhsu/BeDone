@@ -64,7 +64,7 @@ class TopicTable extends Table with JSImplicit
         ".edit [onclick]" #> SHtml.onEvent(editTopic(topic)) &
         ".delete [onclick]" #> Confirm(
             S.?("Are you sure to delete topic '%s' permanently?") format(topic.title.is), 
-            SHtml.ajaxInvoke(deleteTopic(topic))
+            SHtml.ajaxInvoke(deleteTopic(topic)).cmd
         )
     }
 

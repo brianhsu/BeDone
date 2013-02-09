@@ -74,7 +74,7 @@ class GMailFetcher(userID: Int, username: String, password: String)
             store.close()
             None
         } catch {
-            case e => Some(convertException(e))
+            case e: Exception => Some(convertException(e))
         }
     }
 

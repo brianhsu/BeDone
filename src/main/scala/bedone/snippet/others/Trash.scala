@@ -51,8 +51,8 @@ class Trash extends  JSImplicit
 
         updateList &
         JqSetHtml("trashCurrent", topic.title.is) &
-        JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#trashCurrent').attr("class", "btn btn-info")""")
+        """$('#trashShowAll').prop("disabled", false)""" &
+        """$('#trashCurrent').attr("class", "btn btn-info")"""
     }
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
@@ -62,8 +62,8 @@ class Trash extends  JSImplicit
 
         updateList &
         JqSetHtml("trashCurrent", project.title.is) &
-        JsRaw("""$('#trashShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#trashCurrent').attr("class", "btn btn-success")""")
+        """$('#trashShowAll').prop("disabled", false)""" &
+        """$('#trashCurrent').attr("class", "btn btn-success")"""
     }
 
     def showAllStuff() = 
@@ -73,8 +73,8 @@ class Trash extends  JSImplicit
 
         updateList &
         JqSetHtml("trashCurrent", S.?("All")) &
-        JsRaw("""$('#trashShowAll').prop("disabled", true)""") &
-        JsRaw("""$('#trashCurrent').attr("class", "btn btn-inverse")""")
+        """$('#trashShowAll').prop("disabled", true)""" &
+        """$('#trashCurrent').attr("class", "btn btn-inverse")"""
     }
 
     def shouldDisplay(stuff: Stuff) = {
@@ -172,7 +172,7 @@ class Trash extends  JSImplicit
         "#emptyTrash [onclick]" #> SHtml.onEvent { s => 
             Confirm(
                 S.?("Are you sure to delete all items permanently?"), 
-                SHtml.ajaxInvoke(emptyTrash)
+                SHtml.ajaxInvoke(emptyTrash).cmd
             )
         } &
         ".trashRow" #> paged(currentPage).flatMap(createTrashRow) &

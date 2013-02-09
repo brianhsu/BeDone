@@ -109,7 +109,7 @@ trait StuffList extends JSImplicit
             }
 
             onSwitchPage(newPaging, targetPage)
-        })
+        }).cmd
     )
 
     def onSwitchPage(paging: Paging[Stuff], page: Int) = {
@@ -144,8 +144,8 @@ trait StuffList extends JSImplicit
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", topic.title.is) &
         JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
-        JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-info")""")
+        """$('#inboxShowAll').prop("disabled", false)""" &
+        """$('#inboxCurrent').attr("class", "btn btn-info")"""
     }
 
     def projectFilter(buttonID: String, project: Project): JsCmd = 
@@ -159,8 +159,8 @@ trait StuffList extends JSImplicit
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", project.title.is) &
         JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
-        JsRaw("""$('#inboxShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-success")""")
+        """$('#inboxShowAll').prop("disabled", false)""" &
+        """$('#inboxCurrent').attr("class", "btn btn-success")"""
     }
 
     def showAllStuff() = 
@@ -174,8 +174,8 @@ trait StuffList extends JSImplicit
         JqSetHtml("inboxList", newTable) &
         JqSetHtml("inboxCurrent", S.?("All")) &
         JqSetHtml("inboxPageSelector", paged.pageSelector(1)) &
-        JsRaw("""$('#inboxShowAll').prop("disabled", true)""") &
-        JsRaw("""$('#inboxCurrent').attr("class", "btn btn-inverse")""")
+        """$('#inboxShowAll').prop("disabled", true)""" &
+        """$('#inboxCurrent').attr("class", "btn btn-inverse")"""
     }
 
     def createStuffTable(stuffs: List[Stuff]) = stuffs.map(createStuffRow).flatten

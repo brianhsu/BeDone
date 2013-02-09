@@ -41,7 +41,7 @@ object CalendarUtils
                     calendar.setTime(dateTime)
                     Some(calendar)
                 } catch {
-                    case e => None
+                    case e: Exception => None
                 }
         }
     }

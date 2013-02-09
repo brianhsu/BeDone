@@ -75,8 +75,8 @@ class MaybeList extends JSImplicit
         this.currentProject = None
         
         JqSetHtml("maybeCurrent", topic.title.is) &
-        JsRaw("""$('#maybeShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-info")""") &
+        """$('#maybeShowAll').prop("disabled", false)""" &
+        """$('#maybeCurrent').attr("class", "btn btn-info")""" &
         updateList(currentTabID)
     }
 
@@ -86,8 +86,8 @@ class MaybeList extends JSImplicit
         this.currentProject = Some(project)
 
         JqSetHtml("maybeCurrent", project.title.is) &
-        JsRaw("""$('#maybeShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-success")""") &
+        """$('#maybeShowAll').prop("disabled", false)""" &
+        """$('#maybeCurrent').attr("class", "btn btn-success")""" &
         updateList(currentTabID)
     }
 
@@ -98,8 +98,8 @@ class MaybeList extends JSImplicit
 
         JqSetHtml("maybeCurrent", S.?("Show All")) &
         JqSetHtml("maybeList", maybeTs.flatMap(createMaybeRow)) &
-        JsRaw("""$('#maybeShowAll').prop("disabled", true)""") &
-        JsRaw("""$('#maybeCurrent').attr("class", "btn btn-inverse")""") &
+        """$('#maybeShowAll').prop("disabled", true)""" &
+        """$('#maybeCurrent').attr("class", "btn btn-inverse")""" &
         updateList(currentTabID)
     }
 

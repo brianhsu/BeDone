@@ -35,7 +35,7 @@ object PasswordHelper
             val cipher = createCipher(Cipher.DECRYPT_MODE)
             Some(cipher.doFinal(base64Decode(secretText)).map(_.toChar).mkString)
         } catch {
-            case e => None
+            case e: Exception => None
         }
     }
 }

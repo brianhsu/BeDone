@@ -33,7 +33,7 @@ trait SchedulePicker extends HasStuff
             scheduled.endTime.set(endTime)
             scheduled.location.set(location)
             scheduled.validate
-        }.flatten.toList
+        }.getOrElse(Nil)
     }
 
     def setEndTime(dateTimeString: String, 
@@ -48,7 +48,7 @@ trait SchedulePicker extends HasStuff
             scheduled.endTime.set(endTime)
             scheduled.location.set(location)
             scheduled.endTime.validate
-        }.flatten.toList
+        }.getOrElse(Nil)
 
         validation match {
             case Nil => onOK
@@ -69,7 +69,7 @@ trait SchedulePicker extends HasStuff
             scheduled.endTime.set(endTime)
             scheduled.location.set(location)
             scheduled.startTime.validate
-        }.flatten.toList
+        }.getOrElse(Nil)
 
         validation match {
             case Nil => onOK

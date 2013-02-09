@@ -26,7 +26,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "showNextActionDialog", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _).cmd
         )
     }
 
@@ -41,7 +41,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "showDelegatedDialog", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _).cmd
         )
     }
 
@@ -56,7 +56,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "showMaybeDialog", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _).cmd
         )
     }
 
@@ -71,7 +71,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "showReferenceDialog", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _).cmd
         )
     }
 
@@ -86,7 +86,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "showScheduledDialog", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), showModal _)
+            SHtml.ajaxCall(JsRaw("stuffID"), showModal _).cmd
         )
     }
 
@@ -106,7 +106,7 @@ class DragDropHandler extends JSImplicit
         
         Function(
             "markAsTrash", List("stuffID"), 
-            SHtml.ajaxCall(JsRaw("stuffID"), markAsTrashInDB _)
+            SHtml.ajaxCall(JsRaw("stuffID"), markAsTrashInDB _).cmd
         )
     }
 }

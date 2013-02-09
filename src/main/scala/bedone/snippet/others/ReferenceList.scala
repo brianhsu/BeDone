@@ -142,8 +142,8 @@ class ReferenceList extends JSImplicit
         this.currentProject = None
         
         JqSetHtml("referenceCurrent", topic.title.is) &
-        JsRaw("""$('#referenceShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#referenceCurrent').attr("class", "btn btn-info")""") &
+        """$('#referenceShowAll').prop("disabled", false)""" &
+        """$('#referenceCurrent').attr("class", "btn btn-info")""" &
         updateList(currentTabID)
     }
 
@@ -153,8 +153,8 @@ class ReferenceList extends JSImplicit
         this.currentProject = Some(project)
 
         JqSetHtml("referenceCurrent", project.title.is) &
-        JsRaw("""$('#referenceShowAll').prop("disabled", false)""") &
-        JsRaw("""$('#referenceCurrent').attr("class", "btn btn-success")""") &
+        """$('#referenceShowAll').prop("disabled", false)""" &
+        """$('#referenceCurrent').attr("class", "btn btn-success")""" &
         updateList(currentTabID)
     }
 
@@ -165,8 +165,8 @@ class ReferenceList extends JSImplicit
 
         JqSetHtml("referenceCurrent", S.?("All")) &
         JqSetHtml("referenceList", references.flatMap(createStuffRow)) &
-        JsRaw("""$('#referenceShowAll').prop("disabled", true)""") &
-        JsRaw("""$('#referenceCurrent').attr("class", "btn btn-inverse")""") &
+        """$('#referenceShowAll').prop("disabled", true)""" &
+        """$('#referenceCurrent').attr("class", "btn btn-inverse")""" &
         updateList(currentTabID)
     }
 

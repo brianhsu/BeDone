@@ -12,7 +12,7 @@ import scala.xml.Text
 
 trait JSImplicit
 {
-    protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str)
+    protected implicit def jsCmdFromStr(str: String): JsCmd = JsRaw(str).cmd
     protected implicit def xmlFromStr(x: String) = Text(x)
 
     object ClearValue
@@ -115,13 +115,13 @@ trait JSImplicit
     }
 
     object RemoveInboxRow {
-        def apply(stuffID: String): JsCmd = JsRaw(
-        """
-            $('div[data-stuffid="%s"]').fadeOut(500, function() {
-                $('div[data-stuffid="%s"]').remove();
-            })
-        """.format(stuffID, stuffID)
-        )
+        def apply(stuffID: String): JsCmd = {
+            """
+                $('div[data-stuffid="%s"]').fadeOut(500, function() {
+                    $('div[data-stuffid="%s"]').remove();
+                })
+            """.format(stuffID, stuffID)
+        }
     }
 }
 

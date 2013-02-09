@@ -4,7 +4,7 @@ name := "BeDone"            // 我們的專案名稱
 
 version := "0.1"            // 我們的專案版本
 
-scalaVersion := "2.9.2"     // 我們要使用的 Scala 版本
+scalaVersion := "2.10.0"     // 我們要使用的 Scala 版本
 
 seq(webSettings :_*)        // 使用 xsbt-web-plugin 的預設設定
 
@@ -17,7 +17,7 @@ seq(lessSettings:_*)
 
 (compile in Compile) <<= compile in Compile dependsOn (LessKeys.less in Compile)
 
-scalacOptions ++= Seq("-unchecked", "-deprecation")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:postfixOps", "-language:implicitConversions")
 
 resolvers ++= Seq(
     "Scala-Tools" at "https://oss.sonatype.org/content/repositories/snapshots/",
@@ -36,8 +36,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-    "net.liftweb" %% "lift-webkit" % "2.5-M1" % "compile->default",
-    "net.liftweb" %% "lift-squeryl-record" % "2.5-M1"
+    "net.liftweb" %% "lift-webkit" % "2.5-M4" % "compile->default",
+    "net.liftweb" %% "lift-squeryl-record" % "2.5-M4"
 )
 
 

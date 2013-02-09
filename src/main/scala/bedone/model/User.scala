@@ -27,10 +27,13 @@ import scala.xml.Text
 import java.util.Calendar
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
-object ActivationStatus extends Enumeration("Done", "Register", "Reset")
+object ActivationStatus extends Enumeration
 {
     type Status = Value
-    val Done, Register, Reset = Value
+
+    val Done = Value("Done")
+    val Register = Value("Register")
+    val Reset = Value("Reset")
 }
 
 object User extends User with MetaRecord[User]

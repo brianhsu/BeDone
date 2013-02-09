@@ -61,7 +61,7 @@ class ProjectTable extends Table with JSImplicit
         ".name [data-original-title]" #> project.description.is &
         ".delete [onclick]" #> Confirm(
             S.?("Are you sure to delete project '%s' permanently?") format(project.title.is), 
-            SHtml.ajaxInvoke(deleteProject(project))
+            SHtml.ajaxInvoke(deleteProject(project)).cmd
         ) &
         ".edit [onclick]" #> SHtml.onEvent(editProject(project))
 
