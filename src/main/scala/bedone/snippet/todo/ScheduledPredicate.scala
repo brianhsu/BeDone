@@ -17,6 +17,7 @@ trait ScheduledPredicate
     private lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm")
     private lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
+    def isDone(scheduledT: ScheduledT): Boolean = scheduledT.scheduled.action.isDone.is
     def isOutdated(scheduledT: ScheduledT): Boolean = 
     {
         val todayStart = (new DateMidnight())

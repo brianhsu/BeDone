@@ -44,7 +44,7 @@ class DashBoard extends ScheduledPredicate with JSImplicit
         case total => (doneScheduled.toDouble / total) * 100
     }
 
-    private val todayScheduled = scheduleds.filter(x => isToday(x) || isOutdated(x))
+    private val todayScheduled = scheduleds.filter(x => (isToday(x) || isOutdated(x)) && !isDone(x))
 
     def actionBar(scheduled: Scheduled) = 
     {
