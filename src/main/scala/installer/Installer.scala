@@ -33,7 +33,6 @@ object DBCreator
         (new Boot).boot
 
         print("Create DB schema...")
-        inTransaction { BeDoneSchema.drop }
         inTransaction { BeDoneSchema.create }
         println("Done")
     }
