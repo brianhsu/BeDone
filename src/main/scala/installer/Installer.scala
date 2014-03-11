@@ -127,13 +127,13 @@ object Insteller
                 | #
             """.stripMargin
         )
-        val dbHost = getLine("Please enter your MySQL host [localhost]:", "localhost")
-        val dbPort = getLine("Please enter your MySQL port [3306]:", "3306")
-        val dbName = getLine("Please enter your MySQL database name:")
-        val jdbcURL = "jdbc:mysql://%s:%s/%s" format(dbHost, dbPort, dbName)
+        val dbHost = getLine("Please enter your PostgresSQL host [localhost]:", "localhost")
+        val dbPort = getLine("Please enter your PostgresSQL port [5432]:", "5432")
+        val dbName = getLine("Please enter your PostgresSQL database name:")
+        val jdbcURL = "jdbc:postgresql://%s:%s/%s" format(dbHost, dbPort, dbName)
 
-        val dbUsername = getLine("Please enter your MySQL username:")
-        val dbPassword = getLine("Please enter your MySQL password:")
+        val dbUsername = getLine("Please enter your PostgresSQL username:")
+        val dbPassword = getLine("Please enter your PostgresSQL password:")
 
         val encKey = StringHelpers.randomString(28)
         
