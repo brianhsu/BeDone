@@ -1,13 +1,77 @@
 BeDone GTD Web App
+===================
+
+BeDone 是個人用來處理 TODO 待辦事項的 Web Application，使用了 David Allen 提出來的 [Getting Thing Done][00] 方法論，做為其操作流程的依據。你可以在 [Demo 網站][01]看到這東西長什麼樣子，不過因為是架在自家的電腦上面，所以不一定隨時都連得上。
+
+他是使用 Scala 程式語言與 Lift Framework 所撰寫的，算是我的第一個 Lift 專案，所以程式碼的部份寫得不是很漂亮，而且有的地方效能有點糟……XD
+
+基本需求
+---------
+
+1. Java 1.6
+2. SBT (Simple Build Tool) 建置軟體
+3. MySQL 或 PostgresSQL
+
+安裝步驟
+---------
+
+1. 安裝 [SBT][02].
+
+2. 從 GitHub clone 這個專案到自己的電腦上
+
+    ```
+    $ git clone --branch develop git://github.com/brianhsu/BeDone.git BeDone 
+    ```
+
+3. 使用 SBT 執行 org.bedone.installer.Insteller 來設定資料庫連線 / SMTP 等參數
+
+    ```
+    $ cd BeDone
+    $ sbt
+    [info] Loading project definition from /home/brianhsu/ss/BeDone/project
+    [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
+    > run-main org.bedone.installer.Insteller
+    > exit
+    ```
+
+5. 使用 SBT 執行 org.bedone.installer.DBCreator 來建立資料庫
+
+    ```
+    $ sbt
+    [info] Loading project definition from /home/brianhsu/ss/BeDone/project
+    [info] Set current project to BeDone (in build file:/home/brianhsu/ss/BeDone/)
+    > run-main org.bedone.installer.DBCreator
+    > exit
+    ```
+
+6. 在 SBT 中使用 ``container:start`` 啟動 Jetty 伺服器
+
+    ```
+    $ sbt
+    [info] Loading project definition from /home/brianhsu/BeDone/project
+    [info] Set current project to BeDone (in build file:/home/brianhsu/BeDone/)
+    > container:start
+    ```
+
+7. 瀏覽 [http://localhost:8081/](http://localhost:8081/)
+
+
+BeDone GTD Web App
 ====================
 
-BeDone is a TODO management web application that follows the [Getting Things Done][01] approach. You may checked out what it looks like at [demo site][demo] (It's on my home computer, so may not be available all the time).
+BeDone is a TODO management web application that follows the [Getting Things Done][00] approach. You may checked out what it looks like at [demo site][01] (It's on my home computer, so may not be available all the time).
 
-[demo]: http://bedone.twbbs.org/
-
-Since this is just a personal project, so there are still losts of problem. Specifically, the performance of Next Action tab is really terrible. 
+Since this is just a personal project, so there are still lots of problem. Specifically, the performance of Next Action tab is really terrible. 
 
 It's based on Scala / Lift Webframework.
+
+Prerequisite
+--------------
+
+1. Java 1.6
+2. SBT (Simple Build Tool)
+3. MySQL or PostgresSQL
+
 
 Installation
 --------------
@@ -52,7 +116,8 @@ Installation
 
 7. Visit [http://localhost:8081/](http://localhost:8081/)
 
-[01]: http://en.wikipedia.org/wiki/Getting_Things_Done
+[00]: http://en.wikipedia.org/wiki/Getting_Things_Done
+[01]: http://bedone.twbbs.org/
 [02]: http://www.scala-sbt.org/
 
 
