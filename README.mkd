@@ -1,7 +1,9 @@
 BeDone GTD Web App
 ====================
 
-BeDone is a TODO management web application that follows the [Getting Things Done][01] approach. You may checked out what it looks like at http://bedone.twbbs.org:8081/
+BeDone is a TODO management web application that follows the [Getting Things Done][01] approach. You may checked out what it looks like at [demo site][demo] (It's on my home computer, so may not be available all the time).
+
+[demo]: http://bedone.twbbs.org/
 
 Since this is just a personal project, so there are still losts of problem. Specifically, the performance of Next Action tab is really terrible. 
 
