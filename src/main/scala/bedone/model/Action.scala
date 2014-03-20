@@ -14,6 +14,7 @@ import net.liftweb.record.field.OptionalDateTimeField
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 import org.squeryl.annotations.Column
+import java.text.SimpleDateFormat
 
 import StuffType.StuffType
 
@@ -96,6 +97,9 @@ class Action extends Record[Action] with KeyedRecord[Int]
     def stuff = Stuff.findByID(idField.is).get
     def contexts = BeDoneSchema.actionContexts.left(this).toList
 
+    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
+    lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
     def removeContext(context: Context) = 
         BeDoneSchema.actionContexts.left(this).dissociate(context)
 
@@ -110,6 +114,16 @@ class Action extends Record[Action] with KeyedRecord[Int]
 
         shouldRemove.foreach(removeContext)
         shouldAdd.foreach(addContext)
+    }
+
+    def formatDoneTime: Option[String] = isDone.is match {
+        case true => doneTime.is.map(calendar => dateTimeFormatter.format(calendar.getTime))
+        case false => None
+    }
+
+    def formatDeadline: Option[String] = isDone.is match {
+        case true => None
+        case false => stuff.deadline.is.map(calendar => dateFormatter.format(calendar.getTime))
     }
 
     override def saveTheRecord() = tryo {

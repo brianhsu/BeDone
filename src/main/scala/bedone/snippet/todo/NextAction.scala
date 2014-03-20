@@ -23,9 +23,6 @@ import java.text.SimpleDateFormat
 
 class NextAction extends JSImplicit
 {
-    lazy val dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-    lazy val dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
-
     val currentUser = CurrentUser.get.get
     def contexts = Context.findByUser(currentUser).openOr(Nil)
 
@@ -42,28 +39,6 @@ class NextAction extends JSImplicit
 
     private var currentActionPage = 1
     private var currentDonePage = 1
-
-    def formatDoneTime(action: Action) = 
-    {
-        action.doneTime.is match {
-            case None => "*" #> ""
-            case Some(calendar) => ".label *" #> dateTimeFormatter.format(calendar.getTime)
-        }
-    }
-
-    def formatDeadline(action: Action) = 
-    {
-        val isDone = action.isDone.is
-
-        def dateBinding(calendar: Calendar) = {
-            ".label *" #> dateFormatter.format(calendar.getTime)
-        }
-
-        action.stuff.deadline.is match {
-            case Some(calendar) if !isDone => dateBinding(calendar)
-            case _ => "*" #> ""
-        }
-    }
 
     def actionBar(action: Action) = 
     {
@@ -268,6 +243,12 @@ class NextAction extends JSImplicit
         val action = actionT.action
         val stuff = action.stuff
 
+        val doneTimeFormatter = 
+            action.formatDoneTime.map(dateTime => ".label *" #> dateTime).getOrElse("*" #> "")
+
+        val deadlineFormatter = 
+            action.formatDeadline.map(dateTime => ".label *" #> dateTime).getOrElse("*" #> "")
+
         val cssBinding = 
             actionBar(action) &
             ".action [id]"    #> ("action" + action.idField) &
@@ -276,8 +257,8 @@ class NextAction extends JSImplicit
             ".desc *"         #> stuff.descriptionHTML &
             ".topic *"        #> stuff.topics.map(_.viewButton(topicFilter)).flatten &
             ".project *"      #> stuff.projects.map(_.viewButton(projectFilter)).flatten &
-            ".deadline"       #> formatDeadline(action) &
-            ".doneTime"       #> formatDoneTime(action) &
+            ".deadline"       #> deadlineFormatter &
+            ".doneTime"       #> doneTimeFormatter &
             ".listRow [data-stuffID]" #> stuff.idField.is
 
         template.map(cssBinding).openOr(<span>Template does not exists</span>)
