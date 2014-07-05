@@ -38,10 +38,12 @@ object DBSettings
   {
     val adapter = dbSystem match {
       case 'MySQL =>
-        Class.forName("org.postgresql.Driver")
+        println("MySQL....")
+        Class.forName("com.mysql.jdbc.Driver")
         new MySQLAdapter
       case 'PostgresSQL =>
-        Class.forName("com.mysql.jdbc.Driver")
+        println("PostgresSQL....")
+        Class.forName("org.postgresql.Driver")
         new PostgreSqlAdapter
     }
 
