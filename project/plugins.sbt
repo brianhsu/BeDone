@@ -1,6 +1,6 @@
 // BeDone/project/plugins.scala
 
-addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "0.7.0")
+addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "0.9.0")
 
 resolvers += Resolver.url("sbt-plugin-releases 2",
   new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/"))(

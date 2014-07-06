@@ -25,6 +25,7 @@ import net.liftweb.util.Schedule
 import scala.xml.Text
 
 import java.util.Calendar
+import net.liftweb.util.Props
 
 object CurrentUser extends SessionVar[Box[User]](Empty)
 object ActivationStatus extends Enumeration
@@ -143,8 +144,9 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         """).format(username.is, confirmURL).stripMargin
 
         val body = PlainMailBodyType(message)
+        val sender: String = Props.get("mail.user").getOrElse("bedone" + S.hostName)
 
-        Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
+        Mailer.sendMail(From(sender), subject, To(email.is), body)
     }
 
     def sendResetPassword()
@@ -172,8 +174,9 @@ class User extends Record[User] with KeyedRecord[Int] with MyValidation
         """).format(username.is, confirmURL).stripMargin
 
         val body = PlainMailBodyType(message)
+        val sender: String = Props.get("mail.user").getOrElse("bedone" + S.hostName)
 
-        Mailer.sendMail(From("brianhsu.hsu@gmail.com"), subject, To(email.is), body)
+        Mailer.sendMail(From(sender), subject, To(email.is), body)
     }
 
     def resetActivationCode(status: ActivationStatus.Value)

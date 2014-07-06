@@ -27,6 +27,8 @@ class SignupDialog extends AjaxForm[User]
         record.resetActivationCode(ActivationStatus.Register)
         record.saveTheRecord() 
 
+        S.notice("已將驗證碼寄至您的信箱，請使用內含的網址啟用您的帳號。以防萬一，也別忘了檢查垃圾郵件資料夾喲！")
+
         """$('#signupModal').modal('hide')""" & resetButton
     }
 
