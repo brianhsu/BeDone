@@ -9,6 +9,7 @@ import net.liftweb.http.SHtml
 import net.liftweb.http.js.JsCmds._
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JE.JsRaw
+import net.liftweb.util.Props
 
 import scala.xml.NodeSeq
 import scala.xml.Text
@@ -24,10 +25,17 @@ class SignupDialog extends AjaxForm[User]
 
     def saveAndClose(): JsCmd = {
 
-        record.resetActivationCode(ActivationStatus.Register)
-        record.saveTheRecord() 
+        val shouldSendActivationCode = Props.getBool("mail.sendActivationMail").getOrElse(true)
 
-        S.notice("已將驗證碼寄至您的信箱，請使用內含的網址啟用您的帳號。以防萬一，也別忘了檢查垃圾郵件資料夾喲！")
+        if (shouldSendActivationCode) {
+          record.resetActivationCode(ActivationStatus.Register)
+          S.notice("已將驗證碼寄至您的信箱，請使用內含的網址啟用您的帳號。以防萬一，也別忘了檢查垃圾郵件資料夾喲！")
+        } else {
+          record.activate()
+          S.notice("註冊完成，您可以使用您的帳號密碼登入 BeDone 了")
+        }
+
+        record.saveTheRecord() 
 
         """$('#signupModal').modal('hide')""" & resetButton
     }

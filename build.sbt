@@ -2,7 +2,7 @@
 
 name := "BeDone"            // 我們的專案名稱
 
-version := "0.1"            // 我們的專案版本
+version := "0.2"            // 我們的專案版本
 
 scalaVersion := "2.10.0"     // 我們要使用的 Scala 版本
 

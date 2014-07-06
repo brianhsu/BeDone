@@ -19,6 +19,9 @@ object Insteller
     |EncKey = %s
     |
     |# SMTP mail server setting
+    |
+    |mail.sendActivationMail = %s
+    |
     |mail.transport.protocol= smtp
     |mail.smtp.host = %s
     |mail.smtp.port = %s
@@ -79,6 +82,7 @@ object Insteller
       """.stripMargin
     )
 
+    val smtpSendActivationMail = ConsoleReader.getLine("User need confirm email address by activation mail [true]", "true")
     val smtpHost = ConsoleReader.getLine("Please enter SMTP hostname [smtp.gmail.com]:", "smtp.gmail.com")
     val smtpPort = ConsoleReader.getLine("Please enter SMTP port [587]:", "587")
     val smtpStartTLS = ConsoleReader.getLine("Enable STARTTLS [true]:", "true")
@@ -106,7 +110,7 @@ object Insteller
 
     val configFileContent = configTemplate.format(
       jdbcURL, dbUsername, dbPassword, encKey,
-      smtpHost, smtpPort, smtpStartTLS, smtpAuth, smtpUsername, smtpPassword,
+      smtpSendActivationMail, smtpHost, smtpPort, smtpStartTLS, smtpAuth, smtpUsername, smtpPassword,
       gmailOAuthID, gmailOAuthSecret
     )
 
