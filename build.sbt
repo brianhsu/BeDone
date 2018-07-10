@@ -4,7 +4,7 @@ name := "BeDone"            // 我們的專案名稱
 
 version := "0.2"            // 我們的專案版本
 
-scalaVersion := "2.10.0"     // 我們要使用的 Scala 版本
+scalaVersion := "2.11.12"     // 我們要使用的 Scala 版本
 
 seq(webSettings :_*)        // 使用 xsbt-web-plugin 的預設設定
 
@@ -21,7 +21,8 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:postf
 
 resolvers ++= Seq(
   "Scala-Tools" at "https://oss.sonatype.org/content/repositories/snapshots/",
-  "BoneCP" at "http://jolbox.com/bonecp/downloads/maven"
+  "BoneCP" at "http://jolbox.com/bonecp/downloads/maven",
+  "brianhsu" at "http://brianhsu.moe/ivy"
 )
 
 libraryDependencies ++= Seq(
@@ -39,8 +40,9 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "net.liftweb" %% "lift-webkit" % "2.5-M4" % "compile->default",
-  "net.liftweb" %% "lift-squeryl-record" % "2.5-M4"
+  "net.liftweb" %% "lift-webkit" % "2.6.3" % "compile->default",
+  "net.liftweb" %% "lift-squeryl-record" % "2.6.3",
+  "net.liftmodules" %% "combobox" % "2.6.3-0.7.2"
 )
 
 port in container.Configuration := 8081

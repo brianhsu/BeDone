@@ -7,6 +7,6 @@ object Gravatar
 {
     def avatarURL(email: String): String = {
         val avatarHash = hexEncode(md5(email.trim.toLowerCase.getBytes))
-        "http://www.gravatar.com/avatar/%s?d=mm" format(avatarHash)
+        "//www.gravatar.com/avatar/%s?d=mm" format(avatarHash)
     }
 }
